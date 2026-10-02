@@ -46,6 +46,37 @@ if (mark && !reduceMotion) {
   });
 }
 
+// The Konami code turns the page into a C64.
+const konami = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
+let konamiAt = 0;
+addEventListener('keydown', (event) => {
+  const key = event.key.toLowerCase();
+  konamiAt = key === konami[konamiAt] ? konamiAt + 1 : (key === konami[0] ? 1 : 0);
+  if (konamiAt === konami.length) {
+    konamiAt = 0;
+    import('/c64.js').then((c64) => c64.start());
+  }
+});
+
+// Something for whoever opens the developer tools.
+console.log(
+  '%c' + [
+    '    _       _ ____  ',
+    '   / \\     | | __ ) ',
+    '  / _ \\ _  | |  _ \\ ',
+    ' / ___ \\ |_| | |_) |',
+    '/_/   \\_\\___/|____/ ',
+  ].join('\n'),
+  'color: #24cafe; font: bold 14px monospace;',
+);
+console.log(
+  '%cHello, curious one. Everything here is hand-written and unminified, so read on.\n\n' +
+  '  * click the AJB logo five times\n' +
+  '  * up up down down left right left right B A\n\n' +
+  'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack and Evoke.',
+  'color: #cafe24; font: 12px monospace;',
+);
+
 // Restore the page if the browser brings it back from the back/forward cache.
 addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
