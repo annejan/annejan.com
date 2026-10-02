@@ -1,0 +1,17 @@
+# One canonical host: send www.annejan.com to annejan.com
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^www\.annejan\.com$ [NC]
+    RewriteRule ^(.*)$ https://annejan.com/$1 [R=301,L]
+</IfModule>
+
+<FilesMatch "^mail$">
+    ForceType application/x-httpd-php
+</FilesMatch>
+<FilesMatch "^test$">
+    ForceType application/x-httpd-php
+</FilesMatch>
+<FilesMatch "security.qr$">
+    ForceType image/svg+xml
+</FilesMatch>
+
