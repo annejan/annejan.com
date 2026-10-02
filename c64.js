@@ -23,9 +23,9 @@ const DISK = [
     'SITE AND AJB: ANNE JAN BROUWER',
     'PAIR PROGRAMMER: CLAUDE',
     'MUSIC: KLOTEN MET DE',
-    '  BROODTROMMEL (X 2026) BY',
-    '  DEFEEST: ANUS KLOOT AUGURK',
-    '  TL-BUIS RANZBAK CINDER',
+    '  BROODTROMMEL (X 2026),',
+    '  DEFEEST. ARRANGED BY ANUS',
+    '  WITH KLOOT AND AUGURK',
     'FONT: PRESS START 2P (OFL)',
     'ICONS: SIMPLE ICONS (CC0)',
     '404: YUKI AND THE ROPE',
@@ -55,7 +55,7 @@ export function start() {
 
   const style = document.createElement('style');
   style.textContent = `
-    @font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P.woff2') format('woff2'); font-display: block; }
+    @font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P-Regular.ttf') format('truetype'); font-display: block; }
     .c64 { position: fixed; inset: 0; z-index: 20; display: grid; place-content: center; gap: 1.2em;
            font-family: 'Press Start 2P', monospace; text-transform: uppercase; cursor: text; }
     .c64-screen { width: ${COLS}em; height: ${ROWS}em; line-height: 1em; white-space: pre; overflow: hidden; }

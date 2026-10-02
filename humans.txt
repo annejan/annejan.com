@@ -7,16 +7,18 @@
 /* THANKS */
   Yuki, for the rope (404 page, photo 2004)
 
-  deFEEST: Anus, Kloot, Augurk, TL-Buis, Ranzbak and Cinder,
-    for the soundtrack of "Kloten met de broodtrommel" (X 2026),
-    which plays in the AJB demo
+  deFEEST, for "Kloten met de broodtrommel" (X 2026), whose soundtrack
+    plays in the AJB demo: music arranged and sequenced by Anus with help
+    from Kloot and Augurk; vibecoded by Kloot, Anus, Augurk, TL-Buis,
+    Ranzbak and Cinder
   Cinder/deFEEST, for the instaFAIL music (Outline 2011)
 
   The Press Start 2P Project Authors (cody@zone38.net),
-    for the Press Start 2P font on the C64 screen (SIL OFL 1.1)
+    for the Press Start 2P font on the C64 screen (SIL OFL 1.1, unmodified)
   Simple Icons contributors, for the GitHub, LinkedIn and Mastodon icons (CC0 1.0)
-  AnonMoos, for the padlocked heart of the QtPass logo (CC0 1.0)
-  Stichting Badge.Team, for the Badge.Team wordmark (CC BY 4.0);
+  AnonMoos, for the padlocked heart of the QtPass logo (public domain)
+  Stichting Badge.Team, for the Badge.Team wordmark from https://badge.team/
+    (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/);
     the "B" icon here is cropped from it and made white
   MainDeck and Aid to Ukraine: their logos are their trademarks,
     shown in white only to link to them
