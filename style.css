@@ -1,0 +1,229 @@
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --text: #bbb;
+  --muted: #888;
+  --rule: #222;
+  --cyan: #24cafe;
+  --lime: #cafe24;
+}
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--muted);
+  font: 12px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  transition: background-color 2s, opacity 1s;
+}
+a { color: var(--fg); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+
+h1, h2 {
+  color: var(--fg);
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 0;
+}
+h1 { letter-spacing: 7px; }
+h2 { letter-spacing: 5px; color: var(--muted); margin-top: 6px; }
+
+@keyframes fade-in { from { opacity: 0; } }
+
+/* Front page */
+
+body.home {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+#card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "mark name"
+    "mark social"
+    "www  www"
+    "tag  tag";
+  column-gap: 48px;
+  width: min(760px, 100% - 32px);
+  padding: 48px 0;
+  animation: fade-in 3s ease both;
+}
+#mark {
+  grid-area: mark;
+  display: block;
+  width: clamp(180px, 36vw, 300px);
+  height: auto;
+  transition: filter 0.4s;
+}
+#mark:hover { filter: drop-shadow(0 0 12px var(--cyan)); }
+#card header { grid-area: name; align-self: end; }
+
+.social {
+  grid-area: social;
+  align-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+}
+.social a {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+  color: var(--fg);
+}
+.social svg, .social .icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  transition: transform 0.2s, color 0.2s;
+}
+/* Logos without an SVG: a white PNG used as a mask, so they take the text colour. */
+.social .icon {
+  background: currentColor;
+  mask: var(--icon) center / contain no-repeat;
+}
+.icon.maindeck { --icon: url(/icons/maindeck.png); }
+.icon.qtpass { --icon: url(/icons/qtpass.png); }
+.icon.badgeteam { --icon: url(/icons/badgeteam.png); }
+.icon.aidtoukraine { --icon: url(/icons/aidtoukraine.png); }
+.social a:hover :is(svg, .icon), .social a:focus-visible :is(svg, .icon) {
+  color: var(--cyan);
+  transform: scale(1.5);
+}
+.social a.launch :is(svg, .icon) {
+  z-index: 1;
+  transform: scale(32);
+  opacity: 0;
+  transition: transform 1s ease-in, opacity 1s ease-in;
+}
+
+.www {
+  grid-area: www;
+  margin: 32px 0 0;
+  color: var(--cyan);
+  font-size: clamp(22px, 7.4vw, 58px);
+  font-weight: bold;
+  letter-spacing: 0.28em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.tag {
+  grid-area: tag;
+  margin: 12px 0 0;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+body.leaving { background-color: var(--fg); }
+body.leaving .social li, body.leaving .www, body.leaving .tag {
+  opacity: 0;
+  transition: opacity 2s;
+}
+body.leaving .social li:has(.launch) { opacity: 1; }
+body.fading { opacity: 0; }
+
+@media (max-width: 560px) {
+  #card {
+    grid-template-columns: 1fr;
+    grid-template-areas: "mark" "name" "social" "www" "tag";
+    justify-items: center;
+    text-align: center;
+  }
+  #mark { width: min(60vw, 240px); margin-bottom: 24px; }
+  .social { justify-content: center; gap: 12px; }
+  .social a { width: 34px; height: 34px; }
+  .www { letter-spacing: 0.12em; }
+}
+
+/* CV page */
+
+body.cv {
+  font-size: 14px;
+  color: var(--text);
+}
+.page {
+  width: min(960px, 100% - 32px);
+  margin: 0 auto;
+  padding: 48px 0 64px;
+  animation: fade-in 1s ease both;
+}
+.page > header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--rule);
+}
+#home img {
+  display: block;
+  width: 72px;
+  height: auto;
+  transition: filter 0.4s;
+}
+#home:hover img { filter: drop-shadow(0 0 8px var(--cyan)); }
+.page > header .www {
+  margin: 0 0 0 auto;
+  font-size: 20px;
+  letter-spacing: 0.2em;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 56px;
+  margin-top: 40px;
+}
+h3 {
+  margin: 0 0 16px;
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+section + section { margin-top: 40px; }
+section p { margin: 0 0 12px; }
+.profile p { color: var(--fg); font-size: 16px; line-height: 1.6; }
+
+.entry { margin-bottom: 24px; }
+.entry h4 {
+  margin: 0;
+  color: var(--fg);
+  font-size: 14px;
+}
+.entry h4 span { color: var(--muted); font-weight: normal; }
+.entry .when {
+  margin: 2px 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.entry p { margin: 0 0 6px; }
+.entry .tech { color: var(--lime); font-size: 12px; }
+
+aside ul { list-style: none; margin: 0; padding: 0; }
+aside li { margin-bottom: 4px; }
+aside small { color: var(--muted); }
+aside ul + p { margin-top: 12px; }
+
+@media (max-width: 720px) {
+  .columns { grid-template-columns: 1fr; gap: 0; }
+  aside { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  aside section + section { margin-top: 0; }
+  aside section { margin-bottom: 32px; }
+  .page > header .www { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #card, .page { animation: none; }
+  body, .social svg, #mark, #home img { transition: none; }
+}

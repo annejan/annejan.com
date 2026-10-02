@@ -1,0 +1,32 @@
+// The old site's page transitions, without jQuery.
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const plainClick = (event) =>
+  !reduceMotion && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+
+// Social icon: zoom out of the page while it fades to white.
+document.querySelectorAll('.social a').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    if (!plainClick(event)) return;
+    event.preventDefault();
+    link.classList.add('launch');
+    document.body.classList.add('leaving');
+    setTimeout(() => { window.location = link.href; }, 1000);
+  });
+});
+
+// Internal links: fade the page out first.
+document.querySelectorAll('a.fade').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    if (!plainClick(event)) return;
+    event.preventDefault();
+    document.body.classList.add('fading');
+    setTimeout(() => { window.location = link.href; }, 1000);
+  });
+});
+
+// Restore the page if the browser brings it back from the back/forward cache.
+addEventListener('pageshow', (event) => {
+  if (!event.persisted) return;
+  document.body.classList.remove('leaving', 'fading');
+  document.querySelectorAll('.social a.launch').forEach((link) => link.classList.remove('launch'));
+});
