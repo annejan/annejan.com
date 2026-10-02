@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Anne Jan Brouwer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Description" content="Anne Jan Brouwer, developer @ annejan.com: Cross-platform C, C++, PHP and JavaScript programmer, HTML5, CSS &amp; SQL architect..." />
+    <meta name="author" content="Anne Jan" />
+    <meta name="google-site-verification" content="LHCblJujsrwv8VXX79l2VZ6NIiQAtNWG8qFaHrk1K-w" />
+    <link rel='stylesheet' href='/ajb.css' type='text/css' media='all' />
+    <script type="text/javascript" src="/jquery-2.1.4.min.js"></script>          
+    <script type="text/javascript" src="/jquery.animate-colors-min.js"></script>          
+    <script type="text/javascript">                                         
+        $(document).ready(function(){
+
+	$('.social a').click(function(){
+            $(this).addClass('hoverIn hoverOut');
+            $(this).children().css('z-index', '1').animate({width:2048, height: 2048, left: -1024, top: -1024, opacity: 0}, 1000, function(){
+              window.location = $(this).parent().attr('href');
+              $(this).parent().removeClass('hoverIn hoverOut');
+            });
+            $('body').animate({backgroundColor: '#ffffff'}, 2000);
+            $('.social').animate({opacity: 0}, 2000);
+            $('h3').animate({opacity: 0}, 2000);
+            return false;
+          }).hover(function(){
+            if (!$(this).is('.hoverIn')) {
+              $(this).addClass('hoverIn').children().css('z-index', '1').animate({width: 128, height: 128, left: -32, top: -32, opacity: 0.8}, 200, function(){
+                $(this).parent().removeClass('hoverIn');
+              });
+            }
+          }, function(){
+          if (!$(this).is('.hoverOut')) {
+            $(this).addClass('hoverOut').children().animate({width: 64, height: 64, left: 0, top: 0, opacity: 1}, 200, function(){
+              $(this).css('z-index', '0').parent().removeClass('hoverOut');
+            });
+          }
+        });
+	$('#home').click(function(){
+            $('body').animate({opacity: 0}, 1000, function(){
+		window.location = '/';
+	    });
+	    return false;
+	});
+    });
+    </script>     
+  </head>
+  <body>
+    <div id="header">
+      <h1>Anne Jan Brouwer</h1>
+      <h2>Developer</h2>
+      <h3>www.annejan.com</h3>
+			<a href="/" id="home"><img id="logo" src="/logo.png" alt="AJB" bordr="0" /></a>
+      <ul class="social">
+	<li>
+	  <a href="http://twitter.com/AnneJanBrouwer"><img src="/twitter.png" alt="Twitter" /></a>
+	</li>
+	<li>
+	  <a href="http://www.facebook.com/annejan.brouwer"><img src="/facebook.png" alt="Facebook" /></a>
+	</li>
+	<li>
+          <a href="https://github.com/annejan/"><img src="/github.png" alt="GitHub" /></a>
+	</li>
+	<li>
+	  <a href="http://nl.linkedin.com/in/annejanbrouwer"><img src="/linkedin.png" alt="LinkedIn" /></a>
+	</li>
+	<li>
+          <a href="http://stackoverflow.com/users/395588/the-jinx"><img src="/stackoverflow.png" alt="StackOverflow" /></a>
+	</li>
+	<li>
+	  <a href="http://www.google.com/profiles/annejan"><img src="/google.png" alt="Google profile" /></a>
+	</li>
+      </ul>
+      <h4>Cross-platform C, C++, PHP and JavaScript programmer, HTML5, CSS &amp; SQL architect</h4>
+		</div>
+		<div id="content">
+			<div class="float">
+				<h5>OpenSource</h5>
+				<p><a href="https://qtpass.org/" title="QtPass is a multi-platform GUI for pass, the standard unix password manager.">QtPass</a></p>
+				<p><a href="http://ijduino.org/">IJduino</a></p>
+			</div>
+			<div class="float">
+				<h5>Volunteering</h5>
+				<p><a href="http://ijhack.nl/">IJhack</a></p>
+				<p><a href="http://en.wikipedia.org/wiki/Observe._Hack._Make.">Observe, Hack, Make</a></p>
+				<p><a href="http://en.wikipedia.org/wiki/Hacking_at_Random">Hacking At Random</a></p>
+			</div>
+			<div class="float">
+				<h5>Demoscene</h5>	
+				<p><a href="/bagger">bagger</a> <small><a href="/baggerParty">party version</a></small></p>
+				<p><a href="/kansloos">kansloos</a> <small><a href="/kansloosParty">party version</a></small></p>
+				<p><a href="/html5/instafail">instaFAIL</a></p>
+				<p><a href="https://annejan.com/media/360">test360</a></p>
+			</div>
+		</div>
+  </body>
+</html>
+

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Anne Jan Brouwer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Description" content="Anne Jan Brouwer, developer @ annejan.com: Cross-platform C, C++, PHP and JavaScript programmer, HTML5, CSS &amp; SQL architect..." />
+    <meta name="author" content="Anne Jan" />
+    <meta name="google-site-verification" content="LHCblJujsrwv8VXX79l2VZ6NIiQAtNWG8qFaHrk1K-w" />
+    <link rel="me" href="https://mastodon.social/@annejan"> 
+    <link rel='stylesheet' href='/ajb.css' type='text/css' media='all' />
+    <script type="text/javascript" src="/jquery-2.1.4.min.js"></script>          
+    <script type="text/javascript" src="/jquery.animate-colors-min.js"></script>          
+    <script type="text/javascript">                                         
+        $(window).load(function(){
+          $('.frontpage').animate({opacity: 1}, 3000);
+          $('.social a').click(function(){
+	    $(this).addClass('hoverIn hoverOut');
+	    $(this).children().css('z-index', '1').animate({width:2048, height: 2048, left: -1024, top: -1024, opacity: 0}, 1000, function(){
+	      window.location = $(this).parent().attr('href');
+	      $(this).parent().removeClass('hoverIn hoverOut');
+	    });
+	    $('body').animate({backgroundColor: '#ffffff'}, 2000);
+	    $('.social').animate({opacity: 0}, 2000);
+	    $('h3').animate({opacity: 0}, 2000);
+	    return false;
+	  }).hover(function(){
+	    if (!$(this).is('.hoverIn')) {
+	      $(this).addClass('hoverIn').children().css('z-index', '1').animate({width: 128, height: 128, left: -32, top: -32, opacity: 0.8}, 200, function(){
+		$(this).parent().removeClass('hoverIn');
+	      });
+	    }
+	  }, function(){
+	  if (!$(this).is('.hoverOut')) {
+	    $(this).addClass('hoverOut').children().animate({width: 64, height: 64, left: 0, top: 0, opacity: 1}, 200, function(){
+	      $(this).css('z-index', '0').parent().removeClass('hoverOut');
+	    });
+	  }
+        });
+          $('#portfolio').click(function(){
+            $('#header').animate({marginTop: 0}, 500, function(){ window.location = '/portfolio';}); 
+            return false;
+          });
+      });
+    </script>     
+  </head>
+  <body>
+    <div id="header" class="frontpage">
+      <h1>Anne Jan Brouwer</h1>
+      <h2>Developer</h2>
+      <h3>www.annejan.com</h3>
+      <img id="logo" src="/logo.png" alt="AJB" />
+      <ul class="social">
+	<li>
+	  <a href="https://twitter.com/AnneJanBrouwer"><img src="/twitter.png" alt="Twitter" /></a>
+	</li>
+	<li>
+	  <a href="https://www.facebook.com/annejan.brouwer"><img src="/facebook.png" alt="Facebook" /></a>
+	</li>
+	<li>
+	  <a href="https://github.com/annejan/"><img src="/github.png" alt="GitHub" /></a>
+	</li>
+	<li>
+	  <a href="https://nl.linkedin.com/in/annejanbrouwer"><img src="/linkedin.png" alt="LinkedIn" /></a>
+	</li>
+	<li>
+	  <a href="http://stackoverflow.com/users/395588/the-jinx"><img src="/stackoverflow.png" alt="StackOverflow" /></a>
+	</li>
+	<li>
+	  <a href="https://www.google.com/profiles/annejan"><img src="/google.png" alt="Google profile" /></a>
+	  <!-- <a href="mailto:brouwer@annejan.com"><img src="/email.png" alt="Email" /></a> -->
+	</li>
+      </ul>
+      <h4><a id="portfolio" href="/portfolio">Cross-platform C, C++, PHP and JavaScript programmer, HTML5, CSS &amp; SQL architect</a></h4>
+    </div>
+  </body>
+</html>
+
