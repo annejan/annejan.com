@@ -1,3 +1,6 @@
+# Missing pages get Yuki and the rope
+ErrorDocument 404 /error/404.html
+
 # One canonical host: send www.annejan.com to annejan.com
 <IfModule mod_rewrite.c>
     RewriteEngine On
