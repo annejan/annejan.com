@@ -91,10 +91,10 @@ body.home {
   background: currentColor;
   mask: var(--icon) center / contain no-repeat;
 }
-.icon.maindeck { --icon: url(/icons/maindeck.png); }
-.icon.qtpass { --icon: url(/icons/qtpass.png); }
-.icon.badgeteam { --icon: url(/icons/badgeteam.png); }
-.icon.aidtoukraine { --icon: url(/icons/aidtoukraine.png); }
+.icon.maindeck { --icon: url(/logos/maindeck.png); }
+.icon.qtpass { --icon: url(/logos/qtpass.png); }
+.icon.badgeteam { --icon: url(/logos/badgeteam.png); }
+.icon.aidtoukraine { --icon: url(/logos/aidtoukraine.png); }
 .social a:hover :is(svg, .icon), .social a:focus-visible :is(svg, .icon) {
   color: var(--cyan);
   transform: scale(1.5);
