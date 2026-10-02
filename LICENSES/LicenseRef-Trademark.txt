@@ -1,0 +1,9 @@
+LicenseRef-Trademark
+
+The logo in this file is a trademark of its owner, named in the file's
+SPDX-FileCopyrightText. It is shown on annejan.com only to link to that
+owner, in a white single-colour version that matches the other icons.
+
+All rights remain with the trademark owner. The logo is NOT covered by the
+licences of this site (MIT / CC-BY-4.0) and may not be reused, modified or
+redistributed without permission from the owner.

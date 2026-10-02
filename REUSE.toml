@@ -1,0 +1,82 @@
+version = 1
+SPDX-PackageName = "annejan.com"
+SPDX-PackageSupplier = "Anne Jan Brouwer"
+SPDX-PackageDownloadLocation = "https://annejan.com/"
+
+# Code: MIT.
+[[annotations]]
+path = [
+    "**.js",
+    "**.css",
+    ".htaccess",
+    ".gitignore",
+    "robots.txt",
+    "sitemap.xml",
+    "REUSE.toml",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2010-2026 Anne Jan Brouwer"
+SPDX-License-Identifier = "MIT"
+
+# Pages, texts, the AJB monogram, the favicon, the share image and Yuki's photo: CC-BY-4.0.
+# The inline GitHub, LinkedIn and Mastodon icons in index.html are marked as CC0-1.0 snippets.
+[[annotations]]
+path = [
+    "**.html",
+    "humans.txt",
+    "ajb.png",
+    "ajb.svg",
+    "og.png",
+    "apple-touch-icon.png",
+    "favicon.ico",
+    "CV_Anne_Jan.pdf",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2010-2026 Anne Jan Brouwer"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = "error/yuki-touw.jpg"
+SPDX-FileCopyrightText = "2004 Anne Jan Brouwer"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Brand icons from Simple Icons (https://simpleicons.org/).
+[[annotations]]
+path = ["logos/github.svg", "logos/linkedin.svg", "logos/mastodon.svg"]
+SPDX-FileCopyrightText = "Simple Icons contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+# The QtPass padlocked heart, made white and single-colour.
+[[annotations]]
+path = "logos/qtpass.png"
+SPDX-FileCopyrightText = "AnonMoos"
+SPDX-License-Identifier = "CC0-1.0"
+
+# The "B" from the Badge.Team wordmark, cropped and made white and single-colour.
+[[annotations]]
+path = "logos/badgeteam.png"
+SPDX-FileCopyrightText = "Stichting Badge.Team"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Logos used only to link to their owners.
+[[annotations]]
+path = "logos/maindeck.png"
+SPDX-FileCopyrightText = "MainDeck"
+SPDX-License-Identifier = "LicenseRef-Trademark"
+
+[[annotations]]
+path = "logos/aidtoukraine.png"
+SPDX-FileCopyrightText = "Aid to Ukraine"
+SPDX-License-Identifier = "LicenseRef-Trademark"
+
+# Press Start 2P, used by the C64 screen.
+[[annotations]]
+path = ["fonts/PressStart2P.woff2", "fonts/OFL.txt"]
+SPDX-FileCopyrightText = "2012 The Press Start 2P Project Authors (cody@zone38.net)"
+SPDX-License-Identifier = "OFL-1.1"
+
+# The soundtrack of "Kloten met de broodtrommel" (X 2026), recorded from the release.
+[[annotations]]
+path = "music/**"
+SPDX-FileCopyrightText = "2026 deFEEST (Anus, Kloot, Augurk, TL-Buis, Ranzbak, Cinder)"
+SPDX-License-Identifier = "LicenseRef-AllRightsReserved"

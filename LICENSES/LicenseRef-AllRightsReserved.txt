@@ -1,0 +1,9 @@
+LicenseRef-AllRightsReserved
+
+All rights reserved by the copyright holders named in the file's
+SPDX-FileCopyrightText.
+
+The file is published on annejan.com to be listened to or viewed there. It is
+NOT covered by the licences of this site (MIT / CC-BY-4.0) and may not be
+reused, modified or redistributed without permission from the copyright
+holders.

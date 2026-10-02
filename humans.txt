@@ -1,0 +1,37 @@
+/* TEAM */
+  Site, code and the AJB monogram: Anne Jan Brouwer (the_JinX)
+  Mastodon: @annejan@mastodon.social
+
+  Pair programmer: Claude (Anthropic), in Claude Code
+
+/* THANKS */
+  Yuki, for the rope (404 page, photo 2004)
+
+  deFEEST: Anus, Kloot, Augurk, TL-Buis, Ranzbak and Cinder,
+    for the soundtrack of "Kloten met de broodtrommel" (X 2026),
+    which plays in the AJB demo
+  Cinder/deFEEST, for the instaFAIL music (Outline 2011)
+
+  The Press Start 2P Project Authors (cody@zone38.net),
+    for the Press Start 2P font on the C64 screen (SIL OFL 1.1)
+  Simple Icons contributors, for the GitHub, LinkedIn and Mastodon icons (CC0 1.0)
+  AnonMoos, for the padlocked heart of the QtPass logo (CC0 1.0)
+  Stichting Badge.Team, for the Badge.Team wordmark (CC BY 4.0);
+    the "B" icon here is cropped from it and made white
+  MainDeck and Aid to Ukraine: their logos are their trademarks,
+    shown in white only to link to them
+  Vincent Connare, for Comic Sans MS, whose letters make up the AJB monogram (2010)
+  Eric S. Raymond, for the glider hacker emblem in the favicon
+  Philip "Pepto" Timmermann, for the measured C64 colour palette
+  Peter Selinger, for potrace, which traced the monogram to SVG
+
+  Greetings to Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack and Evoke
+
+/* SITE */
+  Last update: 2026/10/03
+  Language: English
+  Standards: HTML5, CSS3, JavaScript modules
+  Components: none. No frameworks, no trackers, no cookies.
+  Licences: code MIT, content CC BY 4.0, third-party parts as noted.
+    REUSE compliant, see https://annejan.com/REUSE.toml
+  Since: 2005 (this design: 2010, again)
