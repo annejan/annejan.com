@@ -58,7 +58,12 @@ body.home {
   height: auto;
   transition: filter 0.4s;
 }
-#mark:hover { filter: drop-shadow(0 0 12px var(--cyan)); }
+#mark:hover { filter: drop-shadow(0 0 12px var(--glow, var(--cyan))); }
+#mark.boing { animation: boing 0.4s ease; }
+@keyframes boing {
+  30% { transform: scale(1.12, 0.88); }
+  60% { transform: scale(0.95, 1.05); }
+}
 #card header { grid-area: name; align-self: end; }
 
 .social {

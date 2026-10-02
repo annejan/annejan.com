@@ -24,6 +24,28 @@ document.querySelectorAll('a.fade').forEach((link) => {
   });
 });
 
+// The monogram: each click makes it boing and changes its glow colour.
+// Five clicks in quick succession start the demo.
+const mark = document.getElementById('mark');
+if (mark && !reduceMotion) {
+  const glows = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
+  let clicks = 0;
+  let resetTimer;
+  mark.addEventListener('click', () => {
+    clicks += 1;
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => { clicks = 0; }, 1500);
+    mark.style.setProperty('--glow', glows[(clicks - 1) % glows.length]);
+    mark.classList.remove('boing');
+    void mark.offsetWidth;
+    mark.classList.add('boing');
+    if (clicks >= 5) {
+      clicks = 0;
+      import('/demo.js').then((demo) => demo.start(mark.currentSrc || mark.src));
+    }
+  });
+}
+
 // Restore the page if the browser brings it back from the back/forward cache.
 addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
