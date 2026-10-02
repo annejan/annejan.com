@@ -227,3 +227,17 @@ aside ul + p { margin-top: 12px; }
   #card, .page { animation: none; }
   body, .social svg, #mark, #home img { transition: none; }
 }
+
+.prods { list-style: none; margin: 0; padding: 0; }
+.prods li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.prods li > a { color: var(--fg); font-weight: bold; }
+.prods .meta { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
+.prods .win { color: var(--lime); font-weight: bold; }
+.prods small { margin-left: auto; font-size: 12px; }
