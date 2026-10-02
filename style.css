@@ -44,7 +44,8 @@ body.home {
   grid-template-areas:
     "mark name"
     "mark social"
-    "sig  sig";
+    "www  www"
+    "tag  tag";
   column-gap: 48px;
   width: min(760px, 100% - 32px);
   padding: 48px 0;
@@ -106,6 +107,7 @@ body.home {
 }
 
 .www {
+  grid-area: www;
   margin: 32px 0 0;
   color: var(--cyan);
   font-size: clamp(22px, 7.4vw, 58px);
@@ -115,24 +117,11 @@ body.home {
   white-space: nowrap;
 }
 .tag {
+  grid-area: tag;
   margin: 12px 0 0;
   font-size: 10px;
   letter-spacing: 4px;
   text-transform: uppercase;
-}
-
-/* The tagline is justified to exactly the width of www.annejan.com. The negative
-   margins cancel the trailing letter-spacing, so both lines end on a glyph. */
-.sig { grid-area: sig; justify-self: start; width: max-content; }
-.sig .www { margin-right: -0.28em; }
-.sig .tag {
-  width: 0;
-  min-width: calc(100% + 4px);
-  text-align: justify;
-  text-align-last: justify;
-  /* scale down with www.annejan.com (full size from 784px) so it stays on one line */
-  font-size: min(10px, 1.276vw);
-  letter-spacing: min(4px, 0.51vw);
 }
 
 body.leaving { background-color: var(--fg); }
@@ -146,7 +135,7 @@ body.fading { opacity: 0; }
 @media (max-width: 560px) {
   #card {
     grid-template-columns: 1fr;
-    grid-template-areas: "mark" "name" "social" "sig";
+    grid-template-areas: "mark" "name" "social" "www" "tag";
     justify-items: center;
     text-align: center;
   }
@@ -154,9 +143,6 @@ body.fading { opacity: 0; }
   .social { justify-content: center; gap: 12px; }
   .social a { width: 34px; height: 34px; }
   .www { letter-spacing: 0.12em; }
-  .sig { justify-self: center; }
-  .sig .www { margin-right: -0.12em; }
-  .sig .tag { text-align: center; text-align-last: center; font-size: 10px; letter-spacing: 4px; }
 }
 
 /* CV page */
