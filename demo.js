@@ -1,5 +1,6 @@
 // A small old-school demo, unlocked by clicking the AJB monogram a few times.
-// Starfield, raster bars, a wobbling logo and a sine scroller. Click or Esc to leave.
+// Starfield, raster bars, a wobbling logo, a sine scroller and the Kloten soundtrack.
+// Click or Esc to leave, M mutes.
 
 const COLORS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const SCROLL_TEXT =
@@ -25,6 +26,12 @@ export function start(logoSrc) {
 
   const logo = new Image();
   logo.src = logoSrc;
+
+  // The soundtrack of "Kloten met de broodtrommel" by deFEEST (X 2026). M mutes.
+  const music = new Audio();
+  music.src = music.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten.ogg' : '/music/kloten.m4a';
+  music.loop = true;
+  music.play().catch(() => {});
   const stars = Array.from({ length: 240 }, () => ({ x: Math.random(), y: Math.random(), z: Math.random() }));
 
   let w, h, dpr, logoCanvas, fontSize, charWidths, textWidth;
@@ -118,6 +125,9 @@ export function start(logoSrc) {
   raf = requestAnimationFrame(frame);
 
   function stop() {
+    music.pause();
+    music.removeAttribute('src');
+    music.load();
     cancelAnimationFrame(raf);
     canvas.remove();
     removeEventListener('resize', layout);
@@ -126,6 +136,7 @@ export function start(logoSrc) {
   }
   function onKey(event) {
     if (event.key === 'Escape') stop();
+    if (event.key === 'm' || event.key === 'M') music.muted = !music.muted;
   }
   canvas.addEventListener('click', stop);
   addEventListener('keydown', onKey);
