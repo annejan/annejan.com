@@ -92,6 +92,9 @@ export function start(logoSrc, remix) {
     zIndex: '10', background: '#000', cursor: 'pointer',
   });
   document.body.append(canvas);
+  // No page scrollbar over the demo.
+  const overflow = document.documentElement.style.overflow;
+  document.documentElement.style.overflow = 'hidden';
   const ctx = canvas.getContext('2d');
 
   const logo = new Image();
@@ -508,11 +511,14 @@ export function start(logoSrc, remix) {
 
   function frame() {
     const t = (performance.now() - t0) / 1000;
-    // Latch the timeline to the music once, when it starts, so the visuals land on its beat grid.
-    // After a track loop it runs on its own clock.
-    if (!latched && music.currentTime > 0) {
+    // Keep the timeline on the music's beat grid: latch to it when it starts, and follow it
+    // when it drifts (buffering, or the ogg's few ms of padding per loop) by more than 80 ms.
+    if (!music.paused && music.currentTime > 0) {
+      const song = 5 * LOOP;
+      let off = (((t - mt0) % song) + song) % song - music.currentTime;
+      off -= song * Math.round(off / song);   // across the loop point, the short way round
+      if (!latched || Math.abs(off) > 0.08) mt0 += off;
       latched = true;
-      mt0 = Math.max(0, t - music.currentTime);
     }
     // Without the block logo, stay in part 1 forever.
     const p = mask ? (t - mt0) % LOOP : 0;
@@ -639,6 +645,7 @@ export function start(logoSrc, remix) {
     music.load();
     cancelAnimationFrame(raf);
     canvas.remove();
+    document.documentElement.style.overflow = overflow;
     logo.removeEventListener('load', layout);
     block.removeEventListener('load', layout);
     removeEventListener('resize', layout);
@@ -647,6 +654,9 @@ export function start(logoSrc, remix) {
   }
   function sound() {
     needSound = false;
+    // Join the music in where the visuals already are, rather than restart them.
+    const t = (performance.now() - t0) / 1000;
+    if (music.paused) music.currentTime = Math.max(0, t - mt0) % (5 * LOOP);
     music.play().catch((error) => { if (error.name === 'NotAllowedError') needSound = true; });
   }
   function onKey(event) {
