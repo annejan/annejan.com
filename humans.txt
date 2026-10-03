@@ -5,10 +5,10 @@
   Pair programmer: Claude (Anthropic), in Claude Code
 
 /* THANKS */
-  deFEEST, for "Kloten met de broodtrommel" (X 2026), whose soundtrack
-    plays in the AJB demo: music arranged and sequenced by Anus with help
-    from Kloot and Augurk; vibecoded by Kloot, Anus, Augurk, TL-Buis,
-    Ranzbak and Cinder
+  deFEEST, for "Kloten met de broodtrommel" (X 2026): music arranged and
+    sequenced by Anus with help from Kloot and Augurk; vibecoded by Kloot,
+    Anus, Augurk, TL-Buis, Ranzbak and Cinder. Its annejan.com remix plays
+    in the AJB demo: same notes, synthesised from scratch with Claude
   Cinder/deFEEST, for the instaFAIL music (Outline 2011)
 
   The Press Start 2P Project Authors (cody@zone38.net),

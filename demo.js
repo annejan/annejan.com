@@ -1,5 +1,5 @@
 // A small old-school demo, unlocked by clicking the AJB monogram a few times.
-// Starfield, raster bars, a wobbling logo, a sine scroller and the Kloten soundtrack.
+// Starfield, raster bars, a wobbling logo, a sine scroller and the Kloten remix.
 // Then the blocky 2010 logo drops in, with copper in the letters, a column swing and water.
 // Click or Esc to leave, M mutes.
 
@@ -78,9 +78,9 @@ export function start(logoSrc) {
   const block = new Image();
   block.src = BLOCK_SRC;
 
-  // The soundtrack of "Kloten met de broodtrommel" by deFEEST (X 2026). M mutes.
+  // The annejan.com remix of "Kloten met de broodtrommel" by deFEEST (X 2026). M mutes.
   const music = new Audio();
-  music.src = music.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten.ogg' : '/music/kloten.m4a';
+  music.src = music.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten-remix.ogg' : '/music/kloten-remix.m4a';
   music.loop = true;
   music.play().catch(() => {});
   const stars = Array.from({ length: 240 }, () => ({ x: Math.random(), y: Math.random(), z: Math.random() }));

@@ -77,8 +77,9 @@ path = ["fonts/PressStart2P-Regular.ttf", "fonts/OFL.txt"]
 SPDX-FileCopyrightText = "2012 The Press Start 2P Project Authors (cody@zone38.net)"
 SPDX-License-Identifier = "OFL-1.1"
 
-# The soundtrack of "Kloten met de broodtrommel" (X 2026), recorded from the release.
+# The annejan.com remix of "Kloten met de broodtrommel" (X 2026): the release's music,
+# synthesised from scratch (x2026-kloten repo, remix/remix.py).
 [[annotations]]
 path = "music/**"
-SPDX-FileCopyrightText = "2026 deFEEST (music arranged and sequenced by Anus, with help from Kloot and Augurk)"
+SPDX-FileCopyrightText = "2026 deFEEST (music arranged and sequenced by Anus, with help from Kloot and Augurk; remix by Anus with Claude)"
 SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
