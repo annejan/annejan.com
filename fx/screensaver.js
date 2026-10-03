@@ -1,8 +1,8 @@
 // After a minute of nothing on the home page, a screensaver, After Dark style: a starfield
 // with things flying through it, each glowing in one of the monogram's colours: mostly AJB
-// monograms, and the causes from the home page: QtPass's padlocked heart, Aid to Ukraine,
-// and Badge.Team's name in its marker lettering. A neon clock drifts slowly over it all.
-// Any mouse move, touch or key brings the page back.
+// monograms, and the causes from the home page, flat white as there: QtPass's padlocked
+// heart, Aid to Ukraine, and Badge.Team's name in its marker lettering. A neon clock
+// drifts slowly over it all. Any mouse move, touch or key brings the page back.
 
 const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const load = (src) => {
@@ -11,44 +11,17 @@ const load = (src) => {
   return img;
 };
 const monogram = load('/ajb.svg');
-const heartBody = load('/demo/qtpass-body.svg');
-const aidToUkraine = load('/logos/aidtoukraine.png');   // white, as on the home page
+const qtpass = load('/logos/qtpass.png');                 // white, as on the home page
+const aidToUkraine = load('/logos/aidtoukraine.png');
 const wordmark = load('/fx/badgeteam-wordmark.svg');      // white, 80 x 10
 const ready = (img) => img.complete && img.naturalWidth > 0;
 let running = false;
-
-// The QtPass padlocked heart, closed: the heart without its shackle, and the shackle drawn
-// from the logo's own geometry with its gray-silver-gray shading (as in fx/unlock.js).
-let heart = null;
-function padlockedHeart() {
-  if (heart || !ready(heartBody)) return heart;
-  const S = 256;
-  heart = document.createElement('canvas');
-  heart.width = heart.height = S;
-  const g = heart.getContext('2d');
-  const k = S / 3230;
-  g.setTransform(k, 0, 0, -k, 1615 * k, 2186 * k);   // logo units, y up
-  g.beginPath();
-  g.moveTo(-630, 0);
-  g.lineTo(-630, 1320);
-  g.arc(0, 1320, 630, Math.PI, 0, true);
-  g.lineTo(630, 900);
-  for (let w = 360; w > 0; w -= 12) {
-    const v = Math.round(128 + 64 * Math.min(1, Math.max(0, (0.45 - w / 720) / 0.35)));
-    g.lineWidth = w;
-    g.strokeStyle = `rgb(${v}, ${v}, ${v})`;
-    g.stroke();
-  }
-  g.setTransform(1, 0, 0, 1, 0, 0);
-  g.drawImage(heartBody, 0, 0, S, S);
-  return heart;
-}
 
 // What a flyer is this time round: an image, its width to height, and its height relative
 // to the others. Drawn whole at that size: SVG intrinsic sizes differ per browser.
 function pick() {
   const r = Math.random();
-  if (r < 0.2 && padlockedHeart()) return { img: heart, aspect: 1, scale: 0.8 };
+  if (r < 0.2 && ready(qtpass)) return { img: qtpass, aspect: 1, scale: 0.8 };
   if (r < 0.35 && ready(aidToUkraine)) return { img: aidToUkraine, aspect: 1, scale: 0.8 };
   if (r < 0.5 && ready(wordmark)) return { img: wordmark, aspect: 8, scale: 0.26 };
   return { img: monogram, aspect: 603 / 781, scale: 1 };
