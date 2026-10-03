@@ -25,7 +25,7 @@
   Philip "Pepto" Timmermann, for the measured C64 colour palette
   Peter Selinger, for potrace, which traced the monogram to SVG
 
-  Greetings to Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack and Evoke
+  Greetings to Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack, Evoke and Outline
 
 /* SITE */
   Last update: 2026/10/03

@@ -90,7 +90,7 @@ console.log(
   '%cHello, curious one. Everything here is hand-written and unminified, so read on.\n\n' +
   '  * click the AJB logo five times\n' +
   '  * up up down down left right left right B A\n\n' +
-  'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack and Evoke.',
+  'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack, Evoke and Outline.',
   'color: #cafe24; font: 12px monospace;',
 );
 

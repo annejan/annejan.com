@@ -6,7 +6,7 @@
 const COLORS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const SCROLL_TEXT =
   'AJB IS BACK ... THE 2010 LOGO RETURNS IN 2026 ... YES, IT IS MADE OF COMIC SANS ... ' +
-  'GREETINGS TO EVERYONE AT BADGE.TEAM, HACKER HOTEL, TREPAAN, POOBRAIN, BORNHACK, EVOKE ... ' +
+  'GREETINGS TO EVERYONE AT BADGE.TEAM, HACKER HOTEL, TREPAAN, POOBRAIN, BORNHACK, EVOKE, OUTLINE ... ' +
   'CLICK OR PRESS ESC TO RETURN TO REALITY ...      ';
 const FONT = '"Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive';
 const BLOCK_SRC = '/logo.svg'; // the blocky 2010 AJB wordmark
