@@ -122,6 +122,25 @@ body.home {
   line-height: 1.1;
   white-space: nowrap;
 }
+/* On the home page it's a neon tube: a white-hot core in a cyan glow, which now and then
+   stutters, like a tube that's not quite warmed up. */
+#card .www {
+  color: #e8fbff;
+  text-shadow: 0 0 2px #fff, 0 0 8px var(--cyan), 0 0 18px var(--cyan), 0 0 36px var(--cyan),
+    0 0 70px rgba(36, 202, 254, 0.55);
+  animation: neon 9s infinite;
+}
+@keyframes neon {
+  0%, 88%, 89.4%, 90.6%, 100% {
+    color: #e8fbff;
+    text-shadow: 0 0 2px #fff, 0 0 8px var(--cyan), 0 0 18px var(--cyan), 0 0 36px var(--cyan),
+      0 0 70px rgba(36, 202, 254, 0.55);
+  }
+  88.7%, 90% {
+    color: #4f8fa3;
+    text-shadow: 0 0 4px rgba(36, 202, 254, 0.3);
+  }
+}
 .tag {
   grid-area: tag;
   margin: 12px 0 0;
@@ -248,7 +267,7 @@ aside ul + p { margin-top: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #card, .page { animation: none; }
+  #card, .page, #card .www { animation: none; }
   body, .social svg, .social .icon, #mark, #home img { transition: none; }
 }
 
