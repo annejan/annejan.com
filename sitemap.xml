@@ -13,7 +13,7 @@
     <xhtml:link rel="alternate" hreflang="nl" href="https://annejan.com/portfolio/nl/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://annejan.com/portfolio/" />
   </url>
-  <url><loc>https://annejan.com/html5/instafail/</loc><lastmod>2026-10-03</lastmod><priority>0.4</priority></url>
+  <url><loc>https://annejan.com/html5/instafail/</loc><priority>0.4</priority></url>
   <url><loc>https://annejan.com/bagger/</loc><priority>0.4</priority></url>
   <url><loc>https://annejan.com/kansloos/</loc><priority>0.4</priority></url>
 </urlset>
