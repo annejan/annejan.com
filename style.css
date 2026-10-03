@@ -163,6 +163,7 @@ body.cv {
   animation: fade-in 1s ease both;
 }
 .page > header {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -180,6 +181,17 @@ body.cv {
   margin: 0 0 0 auto;
   font-size: 20px;
   letter-spacing: 0.2em;
+}
+/* Switch between the English and the Dutch CV, in the space above the header so annejan.com keeps its place. */
+.page > header .lang {
+  position: absolute;
+  top: -36px;
+  right: 0;
+  padding: 4px 0;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
 }
 
 .columns {
@@ -226,6 +238,8 @@ aside ul + p { margin-top: 12px; }
   aside section + section { margin-top: 0; }
   aside section { margin-bottom: 32px; }
   .page > header .www { display: none; }
+  /* Without annejan.com, line the switch up with the end of the rule (letter-spacing also follows the last letter). */
+  .page > header .lang { margin-right: -4px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

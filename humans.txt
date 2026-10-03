@@ -29,7 +29,7 @@
 
 /* SITE */
   Last update: 2026/10/03
-  Language: English
+  Language: English, Dutch (CV)
   Standards: HTML5, CSS3, JavaScript modules
   Components: none. No frameworks, no trackers, no cookies.
   Licences: code MIT, content CC BY 4.0, third-party parts as noted.

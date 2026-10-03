@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url><loc>https://annejan.com/</loc><lastmod>2026-10-03</lastmod><priority>1.0</priority></url>
-  <url><loc>https://annejan.com/portfolio/</loc><lastmod>2026-10-03</lastmod><priority>0.8</priority></url>
+  <url>
+    <loc>https://annejan.com/portfolio/</loc><lastmod>2026-10-03</lastmod><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://annejan.com/portfolio/" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://annejan.com/portfolio/nl/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://annejan.com/portfolio/" />
+  </url>
+  <url>
+    <loc>https://annejan.com/portfolio/nl/</loc><lastmod>2026-10-03</lastmod><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://annejan.com/portfolio/" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://annejan.com/portfolio/nl/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://annejan.com/portfolio/" />
+  </url>
   <url><loc>https://annejan.com/html5/instafail/</loc><lastmod>2026-10-03</lastmod><priority>0.4</priority></url>
   <url><loc>https://annejan.com/bagger/</loc><priority>0.4</priority></url>
   <url><loc>https://annejan.com/kansloos/</loc><priority>0.4</priority></url>
