@@ -1,15 +1,15 @@
 // The neon tube of www.annejan.com, lit by the first click on the monogram (see site.js).
 // It lights up letter by letter, then runs a minute-long timeline: a letter goes bad for a
 // while, the colour drifts through the monogram's glows and back, and the power cuts out
-// and it lights up again. (The stutter every nine seconds is the CSS.) It hums, as neon
-// does, and ticks and crackles when it flickers: Web Audio, no samples; M mutes it.
+// and it lights up again. (The stutter every nine seconds is the CSS.) It ticks as it
+// strikes and crackles when it flickers: Web Audio, no samples; M mutes it.
 // From the fourth click on the monogram (site.js), the pointer leaves a trail of sparks.
 
 const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const rnd = (a, b) => a + Math.random() * (b - a);
 
-// The hum of the transformer and the tube, and the ticks of a tube striking.
+// The ticks and crackles of a tube striking and flickering.
 function makeSound() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return null;
@@ -17,24 +17,6 @@ function makeSound() {
   const master = ctx.createGain();
   master.gain.value = 1;
   master.connect(ctx.destination);
-
-  const hum = ctx.createGain();
-  hum.gain.value = 0;
-  const mellow = ctx.createBiquadFilter();
-  mellow.type = 'lowpass';
-  mellow.frequency.value = 420;
-  hum.connect(mellow).connect(master);
-  // Mains hum: 50 Hz and its harmonics, with a little buzz on top.
-  for (const [freq, type, level] of [[50, 'sine', 1], [100, 'sine', 0.55], [150, 'sine', 0.25], [100, 'sawtooth', 0.12]]) {
-    const osc = ctx.createOscillator();
-    osc.type = type;
-    osc.frequency.value = freq;
-    const g = ctx.createGain();
-    g.gain.value = level;
-    osc.connect(g).connect(hum);
-    osc.start();
-  }
-  const LEVEL = 0.03;
 
   const noise = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate);
   const data = noise.getChannelData(0);
@@ -69,10 +51,6 @@ function makeSound() {
   addEventListener('keydown', wake);
 
   return {
-    // How much of the tube is lit, 0..1: the hum follows it.
-    level(lit, glide = 0.05) {
-      hum.gain.setTargetAtTime(LEVEL * lit, ctx.currentTime, glide);
-    },
     tick() { burst(0.02, 3500, 2500, 0.12); },
     crackle() { burst(0.05, 5000, 1200, 0.18); },
     zap() { burst(0.22, 4000, 200, 0.3); },
@@ -163,7 +141,6 @@ export function start(www) {
   const drifts = GLOWS.slice(1);
   let drift = 0;
   const sound = makeSound();
-  const litShare = () => letters.filter((span) => !span.classList.contains('off')).length / letters.length;
 
   async function ignite() {
     letters.forEach((span) => span.classList.add('off'));
@@ -172,7 +149,6 @@ export function start(www) {
       await sleep(rnd(30, 110));
       span.classList.remove('off');
       sound?.tick();
-      sound?.level(litShare());
       if (Math.random() < 0.3) {
         span.classList.add('bad');
         setTimeout(() => span.classList.remove('bad'), rnd(250, 700));
@@ -183,20 +159,16 @@ export function start(www) {
   async function cut() {
     sound?.zap();
     letters.forEach((span) => span.classList.add('off'));
-    sound?.level(0, 0.02);
     await sleep(1400);
     await ignite();
   }
 
-  // The CSS stutter (88.7-90% of a nine-second cycle): dip the hum and tick along.
+  // The CSS stutter (88.7-90% of a nine-second cycle): crackle along.
   www.addEventListener('animationstart', syncStutter);
   www.addEventListener('animationiteration', syncStutter);
   function syncStutter(event) {
     if (event.animationName !== 'neon' || !sound) return;
-    for (const at of [7983, 8100]) {
-      setTimeout(() => { sound.crackle(); sound.level(0.2 * litShare(), 0.01); }, at);
-      setTimeout(() => sound.level(litShare(), 0.02), at + 63);
-    }
+    for (const at of [7983, 8100]) setTimeout(() => sound.crackle(), at);
   }
 
   async function timeline() {
