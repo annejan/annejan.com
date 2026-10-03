@@ -1,6 +1,8 @@
 // A small old-school demo, unlocked by clicking the AJB monogram a few times.
 // Starfield, raster bars, a wobbling logo, a sine scroller and the Kloten remix.
 // Then the blocky 2010 logo drops in, with copper in the letters, a column swing and water.
+// In the second and third loop guests take its place: the QtPass heart, and the Badge.Team
+// stamp with a carousel of badges over their hero photo.
 // Click or Esc to leave, M mutes.
 
 const COLORS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
@@ -11,6 +13,16 @@ const SCROLL_TEXT =
 const FONT = '"Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive';
 const BLOCK_SRC = '/logo.svg'; // the blocky 2010 AJB wordmark
 const BLOCK_ASPECT = 467 / 220; // from its viewBox, because SVG intrinsic sizes differ per browser
+// The remix is five loops long; this is who drops in on beat 32 of each loop.
+const GUESTS = ['block', 'qtpass', 'badgeteam', 'block', 'block'];
+// The padlocked heart (AnonMoos, public domain), split in two so the shackle can lift out of the heart.
+const SHACKLE_SRC = '/demo/qtpass-shackle.svg';
+const HEART_SRC = '/demo/qtpass-body.svg';
+const STAMP_SRC = '/demo/badgeteam-stamp.svg'; // Badge.Team's 80s stamp (CC BY 4.0)
+const HERO_SRC = '/demo/badgeteam-hero.jpg'; // Badge.Team's hero photo (CC BY 4.0)
+const BADGES_SRC = '/demo/badges.webp'; // eight badge drawings in 512 px cells (CC BY 4.0)
+const BADGE_COUNT = 8;
+const BADGE_CELL = 512;
 const BEAT = 0.48; // Kloten: 24 PAL frames per beat (125 BPM)
 const LOOP = 64 * BEAT; // 16 bars
 // The loop, in beats:
@@ -78,6 +90,17 @@ export function start(logoSrc) {
   logo.src = logoSrc;
   const block = new Image();
   block.src = BLOCK_SRC;
+  const shackle = new Image();
+  shackle.src = SHACKLE_SRC;
+  const heart = new Image();
+  heart.src = HEART_SRC;
+  const stamp = new Image();
+  stamp.src = STAMP_SRC;
+  const hero = new Image();
+  hero.src = HERO_SRC;
+  const badges = new Image();
+  badges.src = BADGES_SRC;
+  const ready = (img) => img.complete && img.naturalWidth > 0;
 
   // The annejan.com remix of "Kloten met de broodtrommel" by deFEEST (X 2026). M mutes.
   const music = new Audio();
@@ -91,6 +114,8 @@ export function start(logoSrc) {
   let bw = 0, bh = 0, depth = 0, bx = 0, by = 0, floorY = 0, reflH = 0, barH = 0, rowH = 0, rows = 0;
   let cs = 0, step = 0, copperLen = 0, mask = null;
   let extrude, face, faceCtx, stage, stageCtx, scene, sceneCtx, copper, barStrips;
+  let heartSize = 0, heartBuf, heartCtx;
+  let stampBuf = null; // the stamp SVG, rasterised once per layout at its drawn size
 
   function layout() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -164,10 +189,24 @@ export function start(logoSrc) {
     rows = Math.ceil((bh + depth) / rowH);
     cs = Math.max(Math.round(4 * dpr), Math.ceil((bw + depth) / 160)); // at most 160 columns
     step = Math.max(Math.round(2 * dpr), Math.ceil(reflH / 90)); // at most 90 water slices
+
+    // The QtPass heart is drawn into its own buffer, so it can be darkened and scaled as one.
+    heartSize = Math.round(Math.min(floorY * 0.8, bh * 1.6)); // headroom for the lifted shackle
+    heartBuf = make(heartSize, heartSize);
+    heartCtx = heartBuf.getContext('2d');
+
+    stampBuf = null;
+    if (ready(stamp)) {
+      const sh = Math.min(floorY * 0.85, bh * 1.6);
+      const sw = Math.round(Math.min(scene.width, sh * stamp.naturalWidth / stamp.naturalHeight));
+      stampBuf = make(sw, Math.round(sw * stamp.naturalHeight / stamp.naturalWidth));
+      stampBuf.getContext('2d').drawImage(stamp, 0, 0, stampBuf.width, stampBuf.height);
+    }
   }
   layout();
   logo.addEventListener('load', layout);
   block.addEventListener('load', layout);
+  stamp.addEventListener('load', layout);
   addEventListener('resize', layout);
 
   // One clock for the start and every frame, so time never runs backwards.
@@ -236,8 +275,11 @@ export function start(logoSrc) {
       sceneCtx.drawImage(stage, 0, Math.round(y0));
     }
     ctx.drawImage(scene, bx, 0);
+    drawWater(t, p);
+  }
 
-    // 4. Water: thin rippling slices of the scene, read bottom-up, so they look mirrored.
+  // Water under every guest: thin rippling slices of the scene, read bottom-up, so they look mirrored.
+  function drawWater(t, p) {
     const reflA = ease(33, 35, p) * (1 - ease(59, 60, p));
     if (reflA > 0) {
       for (let j = 0; j < reflH; j += step) {
@@ -254,6 +296,109 @@ export function start(logoSrc) {
     }
   }
 
+  // QtPass: the padlocked heart punches in on the drop, beats on every kick, unlocks on
+  // beat 36 and locks again on 52, darkens while hush closes its filter, and spins away.
+  function drawHeart(t, p) {
+    const S = heartSize;
+    // Unlocked, the shackle lifts; its legs stay hidden behind the heart.
+    const open = ease(36, 37, p) * (1 - ease(52, 53, p)) * 0.14 * S;
+    heartCtx.clearRect(0, 0, S, S);
+    heartCtx.drawImage(shackle, 0, -open, S, S);
+    heartCtx.drawImage(heart, 0, 0, S, S);
+    const dark = 0.6 * ease(42, 58, p);
+    if (dark > 0) {
+      heartCtx.globalCompositeOperation = 'source-atop';
+      heartCtx.fillStyle = `rgba(0, 0, 0, ${dark})`;
+      heartCtx.fillRect(0, 0, S, S);
+      heartCtx.globalCompositeOperation = 'source-over';
+    }
+
+    const s = p - B(32);
+    const kick = Math.exp(-9 * (p % BEAT)) * ease(33, 34, p);
+    const punch = 1 + 2.2 * Math.exp(-7 * s);
+    const leave = 1 - ease(56, 60, p);
+    const size = S * punch * (1 + 0.07 * kick) * leave;
+    const cx = bx + scene.width / 2;
+    const bottom = floorY - 0.03 * S;
+    const cy = bottom - 0.5 * S; // the image centre while it rests
+
+    // A cyan glow that breathes with the kick.
+    const glow = ctx.createRadialGradient(cx, cy + 0.1 * S, 0, cx, cy + 0.1 * S, 0.6 * size);
+    glow.addColorStop(0, `rgba(36, 202, 254, ${0.35 * kick * leave})`);
+    glow.addColorStop(1, 'rgba(36, 202, 254, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(cx - size, cy - size, size * 2, size * 2);
+
+    if (size > 1) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(ease(56, 60, p) * Math.PI * 2);
+      ctx.drawImage(heartBuf, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
+    // The water mirrors the resting heart.
+    sceneCtx.clearRect(0, 0, scene.width, scene.height);
+    const rs = S * (1 + 0.07 * kick) * leave;
+    if (rs > 1) sceneCtx.drawImage(heartBuf, scene.width / 2 - rs / 2, cy - rs / 2, rs, rs);
+    drawWater(t, p);
+  }
+
+  // Badge.Team's hero photo of a pile of badges, behind the stars' foreground, slowly zooming.
+  function drawHero(t, p) {
+    const a = 0.45 * ease(31, 33, p) * (1 - ease(57, 60, p));
+    if (a <= 0 || !ready(hero)) return;
+    const k = Math.max(w / hero.naturalWidth, h / hero.naturalHeight) * (1.08 + 0.14 * ease(32, 60, p));
+    const iw = hero.naturalWidth * k;
+    const ih = hero.naturalHeight * k;
+    ctx.globalAlpha = a;
+    ctx.drawImage(hero, (w - iw) / 2 + Math.sin(t * 0.2) * w * 0.02, (h - ih) / 2, iw, ih);
+    ctx.globalAlpha = 1;
+  }
+
+  // Badge.Team: the 80s stamp drops in on the drop and a carousel of badges circles it,
+  // each one jumping on the beat. The back half is drawn before the stamp, the front half after.
+  function drawBadgeTeam(t, p) {
+    const s = p - B(32);
+    const sw = stampBuf.width;
+    const sH = stampBuf.height;
+    const fall = floorY + sH;
+    const amp = s < BEAT ? fall : Math.min(fall, 3.5 * by);
+    const lift = amp * Math.exp(-1.6 * s) * Math.abs(Math.cos(Math.PI * s / (2 * BEAT)));
+    const sink = p >= B(56) ? (p - B(56)) ** 2 * bh * 2 : 0;
+    const top = floorY - 0.04 * sH - sH - lift + sink;
+
+    const cx = bx + scene.width / 2;
+    const cy = floorY - 0.5 * sH;
+    const fade = ease(35, 37, p) * (1 - ease(55, 57, p));
+    const items = [];
+    if (fade > 0 && ready(badges)) {
+      const size0 = bh * 0.62;
+      const rx = Math.min(w * 0.5 - size0 * 0.55, scene.width * 0.9); // the front badges stay on screen
+      const ry = sH * 0.28;
+      for (let i = 0; i < BADGE_COUNT; i++) {
+        const a = t * 0.7 + (i * 2 * Math.PI) / BADGE_COUNT;
+        const z = Math.sin(a);
+        const jump = Math.exp(-8 * ((p + i * BEAT / 4) % BEAT)) * 0.22 * size0;
+        const size = size0 * (0.62 + 0.38 * (z + 1) / 2) * fade;
+        items.push({ i, z, size, x: cx + Math.cos(a) * rx, y: cy + z * ry - jump });
+      }
+      items.sort((u, v) => u.z - v.z);
+    }
+    const drawBadge = (b) => {
+      ctx.globalAlpha = 0.55 + 0.45 * (b.z + 1) / 2;
+      ctx.drawImage(badges, b.i * BADGE_CELL, 0, BADGE_CELL, BADGE_CELL, b.x - b.size / 2, b.y - b.size / 2, b.size, b.size);
+      ctx.globalAlpha = 1;
+    };
+    items.filter((b) => b.z <= 0).forEach(drawBadge);
+
+    sceneCtx.clearRect(0, 0, scene.width, scene.height);
+    sceneCtx.drawImage(stampBuf, (scene.width - sw) / 2, top);
+    ctx.drawImage(scene, bx, 0);
+    drawWater(t, p);
+
+    items.filter((b) => b.z > 0).forEach(drawBadge);
+  }
+
   function frame() {
     const t = (performance.now() - t0) / 1000;
     // Latch the timeline to the music once, during part 1, so the first pass lands on its beat grid.
@@ -264,6 +409,8 @@ export function start(logoSrc) {
     }
     // Without the block logo, stay in part 1 forever.
     const p = mask ? (t - mt0) % LOOP : 0;
+    let guest = GUESTS[Math.floor(Math.max(0, t - mt0) / LOOP) % GUESTS.length];
+    if ((guest === 'qtpass' && !(ready(shackle) && ready(heart))) || (guest === 'badgeteam' && !stampBuf)) guest = 'block';
     // Part weights: the monogram leaves on beats 30-33 and comes back on 59-62.
     const mono = 1 - ease(30, 33, p) * (1 - ease(59, 62, p));
     const out = 1 - mono;
@@ -282,6 +429,8 @@ export function start(logoSrc) {
       ctx.fillStyle = `rgba(255, 255, 255, ${0.25 + s.z * 0.75})`;
       ctx.fillRect(s.x * w, s.y * h, size + warp * s.z * 120 * dpr, size);
     }
+
+    if (mask && guest === 'badgeteam') drawHero(t, p);
 
     // Raster bars. Between the parts they converge onto the block logo and go into it.
     if (barsA > 0) {
@@ -323,7 +472,11 @@ export function start(logoSrc) {
       ctx.globalAlpha = 1;
     }
 
-    if (mask && p >= B(32) && p < B(60)) drawBlock(t, p);
+    if (mask && p >= B(32) && p < B(60)) {
+      if (guest === 'qtpass') drawHeart(t, p);
+      else if (guest === 'badgeteam') drawBadgeTeam(t, p);
+      else drawBlock(t, p);
+    }
 
     // Sine scroller.
     ctx.font = `bold ${fontSize}px ${FONT}`;

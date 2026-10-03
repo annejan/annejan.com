@@ -14,10 +14,14 @@
   The Press Start 2P Project Authors (cody@zone38.net),
     for the Press Start 2P font on the C64 screen (SIL OFL 1.1, unmodified)
   Simple Icons contributors, for the GitHub, LinkedIn and Mastodon icons (CC0 1.0)
-  AnonMoos, for the padlocked heart of the QtPass logo (public domain)
+  AnonMoos, for the padlocked heart of the QtPass logo (public domain),
+    which also beats and unlocks in the AJB demo
   Stichting Badge.Team, for the Badge.Team wordmark from https://badge.team/
     (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/);
-    the "B" icon here is cropped from it and made white
+    the "B" icon here is cropped from it and made white; and for the 80s
+    stamp, the badge drawings and the hero photo of the badge pile that
+    appear in the AJB demo (the drawings rendered into one sheet, the photo
+    resized)
   MainDeck and Aid to Ukraine: their logos are their trademarks,
     shown in white only to link to them
   Vincent Connare, for Comic Sans MS, whose letters make up the AJB monogram (2010)

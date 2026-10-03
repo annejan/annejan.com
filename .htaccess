@@ -8,6 +8,11 @@ ErrorDocument 404 /error/404.html
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 </If>
 
+# Compress SVG and the other text types Debian's deflate.conf leaves out.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE image/svg+xml application/toml
+</IfModule>
+
 # Caching: code and text are always revalidated (a cheap 304 when unchanged), so a
 # new demo.js is never stuck behind an old one; media may be kept for a day.
 <IfModule mod_headers.c>
