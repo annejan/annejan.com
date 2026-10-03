@@ -93,7 +93,7 @@ export function start() {
   style.href = '/c64.css';
   const root = document.createElement('div');
   root.className = 'c64';
-  root.dataset.quiet = '';   // its own sounds: fx/neon.js keeps quiet meanwhile
+  root.dataset.quiet = '';   // its own sounds: fx/neon.js stops humming meanwhile
   root.setAttribute('role', 'application');
   root.setAttribute('aria-label', 'C64 screen. Type BASIC commands, Escape to close.');
   const screen = document.createElement('div');
