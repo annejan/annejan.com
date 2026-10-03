@@ -93,6 +93,7 @@ export function start() {
   style.href = '/c64.css';
   const root = document.createElement('div');
   root.className = 'c64';
+  root.dataset.quiet = '';   // its own sounds: fx/neon.js stops humming meanwhile
   root.setAttribute('role', 'application');
   root.setAttribute('aria-label', 'C64 screen. Type BASIC commands, Escape to close.');
   const screen = document.createElement('div');
@@ -244,6 +245,60 @@ export function start() {
       click.playbackRate.value = 0.7 + Math.random() * 0.6;
       click.connect(filter);
       click.start(t + i * 0.045);
+    }
+  });
+
+  // The keyboard: a plastic clack per key, never quite the same twice; SPACE and RETURN
+  // are the big keys, lower and heavier. Held keys repeat more softly.
+  const clack = (event) => sound((context, t) => {
+    const big = event.key === ' ' || event.key === 'Enter';
+    const soft = event.repeat ? 0.45 : 1;
+    const click = context.createBufferSource();
+    click.buffer = noise;
+    click.playbackRate.value = 0.8 + Math.random() * 0.5;
+    const band = context.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = (big ? 900 : 1900) + Math.random() * 600;
+    band.Q.value = 1.4;
+    const level = context.createGain();
+    level.gain.value = (big ? 1.4 : 1.1) * soft;
+    click.connect(band).connect(level).connect(master);
+    click.start(t);
+    // The key bottoming out.
+    const thock = context.createOscillator();
+    thock.frequency.setValueAtTime(big ? 110 : 170, t);
+    thock.frequency.exponentialRampToValueAtTime(big ? 60 : 90, t + 0.04);
+    const env = context.createGain();
+    env.gain.setValueAtTime((big ? 0.5 : 0.28) * soft, t);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    thock.connect(env).connect(master);
+    thock.start(t);
+    thock.stop(t + 0.06);
+  });
+
+  // Switching on: the thump of the power and the crackle of a TV's picture tube.
+  const powerOn = () => sound((context, t) => {
+    const thump = context.createOscillator();
+    thump.frequency.setValueAtTime(70, t);
+    thump.frequency.exponentialRampToValueAtTime(32, t + 0.3);
+    const env = context.createGain();
+    env.gain.setValueAtTime(0.9, t);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    thump.connect(env).connect(master);
+    thump.start(t);
+    thump.stop(t + 0.36);
+    const band = context.createBiquadFilter();
+    band.type = 'highpass';
+    band.frequency.value = 2500;
+    band.connect(master);
+    for (let i = 0; i < 14; i += 1) {
+      const crackle = context.createBufferSource();
+      crackle.buffer = noise;
+      crackle.playbackRate.value = 0.5 + Math.random();
+      const g = context.createGain();
+      g.gain.value = 0.3 + Math.random() * 0.5;
+      crackle.connect(g).connect(band);
+      crackle.start(t + 0.05 + Math.random() * 0.4);
     }
   });
 
@@ -622,6 +677,7 @@ export function start() {
   function onKey(event) {
     if (event.ctrlKey || event.metaKey || event.altKey) return;
     event.stopPropagation();
+    if (event.key.length === 1 || ['Enter', 'Backspace', 'Escape'].includes(event.key)) clack(event);
     if (event.key === 'Escape') {
       event.preventDefault();
       if (running) running.stop = true;
@@ -684,5 +740,6 @@ export function start() {
 
   // Repaint, not reboot, once the font is in: the user may be typing already.
   document.fonts.load('16px "Press Start 2P"').finally(paint);
+  powerOn();   // the Konami code's last key press allows the sound
   boot();
 }

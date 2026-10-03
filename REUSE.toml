@@ -57,9 +57,10 @@ SPDX-License-Identifier = "CC0-1.0"
 
 # Badge.Team's 80s stamp (unchanged), badge drawings (rendered into one sheet, and the
 # Konsool on its own, cropped) and hero photo (resized), from
-# https://github.com/badgeteam/website, for the demo.
+# https://github.com/badgeteam/website, for the demo; and its badger and snake, from
+# badge.rs (https://github.com/annejan/badge.rs), for the typed easter eggs.
 [[annotations]]
-path = ["demo/badgeteam-stamp.svg", "demo/badges.webp", "demo/konsool.webp", "demo/badgeteam-hero.jpg"]
+path = ["demo/badgeteam-stamp.svg", "demo/badges.webp", "demo/konsool.webp", "demo/badgeteam-hero.jpg", "fx/badger.webp", "fx/snake.webp"]
 SPDX-FileCopyrightText = "Stichting Badge.Team"
 SPDX-License-Identifier = "CC-BY-4.0"
 

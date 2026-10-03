@@ -41,86 +41,16 @@ document.querySelectorAll('a.fade').forEach((link) => {
   });
 });
 
-// The neon tube of www.annejan.com. Until the monogram is clicked it's just the cyan text.
-// The first click lights it as neon, letter by letter (the stutter every nine seconds is
-// the CSS), and starts a minute-long timeline: a letter goes bad for a while, the colour
-// drifts through the monogram's glows and back, and the power cuts out and it lights up
-// again. Every click flashes it in that click's colour.
-function startNeon() {
-  const www = document.querySelector('#card .www');
-  if (!www || reduceMotion) return null;
-  const letters = [...www.textContent].map((ch) => {
-    const span = document.createElement('span');
-    span.textContent = ch;
-    return span;
-  });
-  www.replaceChildren(...letters);
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  const rnd = (a, b) => a + Math.random() * (b - a);
-  const lit = letters.filter((span) => span.textContent !== '.');
-  const colours = ['#cafe24', '#d60b51', '#0080c8'];
-  let drift = 0;
-
-  async function ignite() {
-    letters.forEach((span) => span.classList.add('off'));
-    const order = [...letters].sort(() => Math.random() - 0.5);
-    for (const span of order) {
-      await sleep(rnd(30, 110));
-      span.classList.remove('off');
-      if (Math.random() < 0.3) {
-        span.classList.add('bad');
-        setTimeout(() => span.classList.remove('bad'), rnd(250, 700));
-      }
-    }
-  }
-
-  async function cut() {
-    letters.forEach((span) => span.classList.add('off'));
-    await sleep(1400);
-    await ignite();
-  }
-
-  async function timeline() {
-    letters.forEach((span) => span.classList.add('off'));
-    www.classList.add('lit');
-    await sleep(400);
-    await ignite();
-    for (;;) {
-      await sleep(15000);
-      const bad = lit[Math.floor(Math.random() * lit.length)];
-      bad.classList.add('bad');
-      await sleep(rnd(3500, 6000));
-      bad.classList.remove('bad');
-
-      await sleep(9000);
-      www.style.setProperty('--neon', colours[drift++ % colours.length]);
-      await sleep(8000);
-      www.style.removeProperty('--neon');
-
-      await sleep(10000);
-      await cut();
-    }
-  }
-
-  let started = false;
-  return {
-    start() {
-      if (started) return;
-      started = true;
-      timeline();
-    },
-    flash(colour) {
-      www.classList.add('flash');
-      www.style.setProperty('--neon', colour);
-      clearTimeout(this.timer);
-      this.timer = setTimeout(() => {
-        www.classList.remove('flash');
-        www.style.removeProperty('--neon');
-      }, 900);
-    },
-  };
+// The neon tube of www.annejan.com: plain cyan text until the monogram is clicked; the
+// first click lights it (fx/neon.js, loaded then), and every click flashes it in that
+// click's colour.
+const www = document.querySelector('#card .www');
+let neon = null;
+function neonClick(colour) {
+  if (!www || reduceMotion) return;
+  if (!neon) neon = import('/fx/neon.js').then((fx) => fx.start(www));
+  neon.then((tube) => tube.flash(colour));
 }
-const neon = startNeon();
 
 // The monogram: each click makes it boing and changes its glow colour.
 // Five clicks in quick succession start the demo.
@@ -134,10 +64,7 @@ if (mark && !reduceMotion) {
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => { clicks = 0; }, 1500);
     mark.style.setProperty('--glow', glows[(clicks - 1) % glows.length]);
-    if (neon) {
-      neon.flash(glows[(clicks - 1) % glows.length]);
-      neon.start();
-    }
+    neonClick(glows[(clicks - 1) % glows.length]);
     mark.classList.remove('boing');
     void mark.offsetWidth;
     mark.classList.add('boing');
@@ -174,6 +101,41 @@ addEventListener('keydown', (event) => {
   }
 });
 
+// Typed words: "pass" unlocks the QtPass heart, "badger" and "snake" bring badge.rs over.
+const words = {
+  pass: () => import('/fx/unlock.js').then((fx) => fx.start()),
+  badger: () => import('/fx/badge.js').then((fx) => fx.badgers()),
+  snake: () => import('/fx/badge.js').then((fx) => fx.snake()),
+};
+let typed = '';
+addEventListener('keydown', (event) => {
+  if (reduceMotion || event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (document.querySelector('.c64') || event.target.closest?.('input, textarea, [contenteditable]')) return;
+  typed = (typed + event.key.toLowerCase()).slice(-12);
+  for (const [word, run] of Object.entries(words)) {
+    if (typed.endsWith(word)) {
+      typed = '';
+      run();
+    }
+  }
+});
+
+// A minute of nothing on the home page brings on the screensaver (fx/screensaver.js).
+if (document.getElementById('card') && !reduceMotion) {
+  let idle;
+  const busy = () => document.hidden || document.fullscreenElement || document.querySelector('.c64')
+    || document.querySelector('body > canvas:not([data-fx])');
+  const rest = () => {
+    clearTimeout(idle);
+    idle = setTimeout(() => {
+      if (!busy()) import('/fx/screensaver.js').then((fx) => fx.start());
+      rest();
+    }, 60000);
+  };
+  for (const type of ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll']) addEventListener(type, rest, { passive: true });
+  rest();
+}
+
 // Something for whoever opens the developer tools.
 console.log(
   '%c' + [
@@ -187,8 +149,10 @@ console.log(
 );
 console.log(
   '%cHello, curious one. Everything here is hand-written and unminified, so read on.\n\n' +
-  '  * click the AJB logo five times\n' +
-  '  * up up down down left right left right B A\n\n' +
+  '  * click the AJB logo, then five times\n' +
+  '  * up up down down left right left right B A\n' +
+  '  * type pass, badger or snake\n' +
+  '  * or just leave it alone for a minute\n\n' +
   'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack, Evoke and Outline.',
   'color: #cafe24; font: 12px monospace;',
 );

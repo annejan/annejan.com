@@ -21,7 +21,8 @@
     the "B" icon here is cropped from it and made white; and for the 80s
     stamp, the badge drawings and the hero photo of the badge pile that
     appear in the AJB demo (the drawings rendered into one sheet, the
-    Konsool also on its own, the photo resized)
+    Konsool also on its own, the photo resized); and for the badger and
+    the snake that come over from https://badge.rs/ when you type their names
   MainDeck and Aid to Ukraine: their logos are their trademarks,
     shown in white only to link to them
   Vincent Connare, for Comic Sans MS, whose letters make up the AJB monogram (2010)

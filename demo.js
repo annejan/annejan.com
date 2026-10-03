@@ -87,6 +87,7 @@ export function start(logoSrc, remix) {
 
   const canvas = document.createElement('canvas');
   canvas.setAttribute('aria-hidden', 'true');
+  canvas.dataset.quiet = '';   // it has its own music: fx/neon.js stops humming meanwhile
   Object.assign(canvas.style, {
     position: 'fixed', inset: '0', width: '100%', height: '100%',
     zIndex: '10', background: '#000', cursor: 'pointer',
