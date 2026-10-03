@@ -42,14 +42,19 @@ document.querySelectorAll('a.fade').forEach((link) => {
 });
 
 // The neon tube of www.annejan.com: plain cyan text until the monogram is clicked; the
-// first click lights it (fx/neon.js, loaded then), and every click flashes it in that
-// click's colour.
+// first click lights it (fx/neon.js, loaded then), every click flashes it in that click's
+// colour, and from the fourth on the pointer throws sparks.
 const www = document.querySelector('#card .www');
 let neon = null;
+let neonClicks = 0;
 function neonClick(colour) {
   if (!www || reduceMotion) return;
   if (!neon) neon = import('/fx/neon.js').then((fx) => fx.start(www));
-  neon.then((tube) => tube.flash(colour));
+  neonClicks += 1;
+  neon.then((tube) => {
+    tube.flash(colour);
+    if (neonClicks >= 4) tube.sparks();
+  });
 }
 
 // The monogram: each click makes it boing and changes its glow colour.
@@ -149,7 +154,7 @@ console.log(
 );
 console.log(
   '%cHello, curious one. Everything here is hand-written and unminified, so read on.\n\n' +
-  '  * click the AJB logo, then five times\n' +
+  '  * click the AJB logo, once, four times, then five times fast\n' +
   '  * up up down down left right left right B A\n' +
   '  * type pass, badger or snake\n' +
   '  * or just leave it alone for a minute\n\n' +

@@ -3,7 +3,7 @@
 // while, the colour drifts through the monogram's glows and back, and the power cuts out
 // and it lights up again. (The stutter every nine seconds is the CSS.) It hums, as neon
 // does, and ticks and crackles when it flickers: Web Audio, no samples; M mutes it.
-// While it burns, the pointer leaves a trail of sparks.
+// From the fourth click on the monogram (site.js), the pointer leaves a trail of sparks.
 
 const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -226,13 +226,18 @@ export function start(www) {
   }
 
   timeline();
-  makeSparks();
+  let sparking = false;
   addEventListener('keydown', (event) => {
     if ((event.key === 'm' || event.key === 'M') && !document.querySelector('.c64')) sound?.mute();
   });
 
   let timer;
   return {
+    sparks() {
+      if (sparking) return;
+      sparking = true;
+      makeSparks();
+    },
     flash(colour) {
       www.classList.add('flash');
       www.style.setProperty('--neon', colour);
