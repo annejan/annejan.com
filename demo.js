@@ -14,12 +14,13 @@ const BLOCK_ASPECT = 467 / 220; // from its viewBox, because SVG intrinsic sizes
 const BEAT = 0.48; // Kloten: 24 PAL frames per beat (125 BPM)
 const LOOP = 64 * BEAT; // 16 bars
 // The loop, in beats:
-//  0-20  part 1: monogram, bars, scroller
-// 20-23  the monogram tears out sideways, the bars converge on the logo band
-// 22-29  FLD drop of the block logo, impacts on 23 (flash), 25 and 27, bob from 29
-// 23-25  the bars go into the letters, the water fades in
-// 25-40  copper in the letters
-// 40-56  column DYCP
+//  0-30  part 1: monogram, bars, scroller
+// 30-33  the monogram tears out sideways, the bars converge on the logo band
+// 32-39  FLD drop of the block logo on the remix's drop (bar 9), impacts on 33 (flash),
+//        35 and 37, bob from 39
+// 33-35  the bars go into the letters, the water fades in
+// 35-44  copper in the letters
+// 44-56  column DYCP
 // 56-60  FLD sink into the water, the bars come back out on 57-61
 // 59-62  the monogram swings back in, boing on 62
 // 64     wrap to 0
@@ -175,7 +176,7 @@ export function start(logoSrc) {
   let mt0 = 0, latched = false;
   let raf;
 
-  // The block logo part, from beat 22 to 60.
+  // The block logo part, from beat 32 to 60.
   function drawBlock(t, p) {
     // 1. The face: scrolling copper and the four bars, cut out by the letters.
     faceCtx.globalCompositeOperation = 'source-over';
@@ -185,7 +186,7 @@ export function start(logoSrc) {
       faceCtx.drawImage(b, 0, 0, 1, barH, 0, y, bw, barH);
     });
     // A white flash in the letters on the first impact.
-    const fl = p >= B(23) ? 0.7 * Math.exp(-10 * (p - B(23))) : 0;
+    const fl = p >= B(33) ? 0.7 * Math.exp(-10 * (p - B(33))) : 0;
     if (fl > 0.01) {
       faceCtx.globalAlpha = fl;
       faceCtx.fillStyle = '#fff';
@@ -204,19 +205,19 @@ export function start(logoSrc) {
 
     // 3. The scene. It ends at the floor, so anything that sinks below it clips.
     sceneCtx.clearRect(0, 0, scene.width, scene.height);
-    // The drop bounces on beats 23, 25, 27 and 29. The fall is high enough that the
+    // The drop bounces on beats 33, 35, 37 and 39. The fall is high enough that the
     // stretched logo starts fully above the screen. Lower rebounds keep its top on screen.
-    const s = p - B(22);
+    const s = p - B(32);
     const gap0 = 0.06 * bh;
     const fall = by + bh + depth + rowH + rows * gap0;
     const amp = s < BEAT ? fall : Math.min(fall, 3.5 * by);
     const lift = amp * Math.exp(-1.6 * s) * Math.abs(Math.cos(Math.PI * s / (2 * BEAT)));
-    const bob = Math.sin(2 * (p - B(29))) * 0.03 * bh * ease(29, 31, p);
+    const bob = Math.sin(2 * (p - B(39))) * 0.03 * bh * ease(39, 41, p);
     const y0 = by - lift + bob;
     // The row gaps close up as the logo lands, so the stretched logo never sinks into the floor.
     const gap = Math.min(gap0 * Math.exp(-1.6 * s), Math.max(0, (floorY - y0 - bh - depth) / rows));
-    const dycp = ease(40, 43, p) * (1 - ease(53, 56, p));
-    if (p < B(32) || p >= B(56)) {
+    const dycp = ease(44, 47, p) * (1 - ease(53, 56, p));
+    if (p < B(42) || p >= B(56)) {
       // FLD: char rows fall in spread apart and close up, then sink into the water, lower rows first.
       for (let r = 0; r < rows; r++) {
         const sy0 = r * rowH;
@@ -237,7 +238,7 @@ export function start(logoSrc) {
     ctx.drawImage(scene, bx, 0);
 
     // 4. Water: thin rippling slices of the scene, read bottom-up, so they look mirrored.
-    const reflA = ease(23, 25, p) * (1 - ease(59, 60, p));
+    const reflA = ease(33, 35, p) * (1 - ease(59, 60, p));
     if (reflA > 0) {
       for (let j = 0; j < reflH; j += step) {
         const k = j / reflH;
@@ -263,11 +264,11 @@ export function start(logoSrc) {
     }
     // Without the block logo, stay in part 1 forever.
     const p = mask ? (t - mt0) % LOOP : 0;
-    // Part weights: the monogram leaves on beats 20-23 and comes back on 59-62.
-    const mono = 1 - ease(20, 23, p) * (1 - ease(59, 62, p));
+    // Part weights: the monogram leaves on beats 30-33 and comes back on 59-62.
+    const mono = 1 - ease(30, 33, p) * (1 - ease(59, 62, p));
     const out = 1 - mono;
-    const conv = ease(20, 23, p) * (1 - ease(58, 61, p));
-    const barsA = 1 - ease(23, 24.5, p) * (1 - ease(57, 58.5, p));
+    const conv = ease(30, 33, p) * (1 - ease(58, 61, p));
+    const barsA = 1 - ease(33, 34.5, p) * (1 - ease(57, 58.5, p));
     const warp = Math.sin(Math.PI * out) ** 2;
 
     ctx.fillStyle = '#000';
@@ -322,7 +323,7 @@ export function start(logoSrc) {
       ctx.globalAlpha = 1;
     }
 
-    if (mask && p >= B(22) && p < B(60)) drawBlock(t, p);
+    if (mask && p >= B(32) && p < B(60)) drawBlock(t, p);
 
     // Sine scroller.
     ctx.font = `bold ${fontSize}px ${FONT}`;
