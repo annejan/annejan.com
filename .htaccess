@@ -8,10 +8,12 @@ ErrorDocument 404 /error/404.html
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 </If>
 
-# One canonical host: send www.annejan.com to annejan.com
+# One canonical host: send www.annejan.com, and any other name that lands here,
+# to annejan.com (but leave certificate challenges alone)
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{HTTP_HOST} ^www\.annejan\.com$ [NC]
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteCond %{HTTP_HOST} !^annejan\.com(:\d+)?$ [NC]
     RewriteRule ^(.*)$ https://annejan.com/$1 [R=301,L]
 </IfModule>
 
