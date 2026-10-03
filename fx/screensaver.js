@@ -1,12 +1,93 @@
 // After a minute of nothing on the home page, a screensaver, After Dark style: a starfield
-// with AJB monograms flying through it, each glowing in one of the monogram's colours.
-// Any mouse move, touch or key brings the page back.
+// with things flying through it, each glowing in one of the monogram's colours: mostly AJB
+// monograms, and the causes from the home page: QtPass's padlocked heart, Aid to Ukraine,
+// and Badge.Team, as a name tag. A neon clock drifts slowly over it all. Any mouse move,
+// touch or key brings the page back.
 
 const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
-const logo = new Image();
-logo.src = '/ajb.svg';
-const ASPECT = 603 / 781; // the monogram's viewBox
+const load = (src) => {
+  const img = new Image();
+  img.src = src;
+  return img;
+};
+const monogram = load('/ajb.svg');
+const heartBody = load('/demo/qtpass-body.svg');
+const aidToUkraine = load('/logos/aidtoukraine.png');   // white, as on the home page
+const stamp = load('/demo/badgeteam-stamp.svg');         // Badge.Team's 80s logo, 567 x 425
+const ready = (img) => img.complete && img.naturalWidth > 0;
 let running = false;
+
+// The QtPass padlocked heart, closed: the heart without its shackle, and the shackle drawn
+// from the logo's own geometry with its gray-silver-gray shading (as in fx/unlock.js).
+let heart = null;
+function padlockedHeart() {
+  if (heart || !ready(heartBody)) return heart;
+  const S = 256;
+  heart = document.createElement('canvas');
+  heart.width = heart.height = S;
+  const g = heart.getContext('2d');
+  const k = S / 3230;
+  g.setTransform(k, 0, 0, -k, 1615 * k, 2186 * k);   // logo units, y up
+  g.beginPath();
+  g.moveTo(-630, 0);
+  g.lineTo(-630, 1320);
+  g.arc(0, 1320, 630, Math.PI, 0, true);
+  g.lineTo(630, 900);
+  for (let w = 360; w > 0; w -= 12) {
+    const v = Math.round(128 + 64 * Math.min(1, Math.max(0, (0.45 - w / 720) / 0.35)));
+    g.lineWidth = w;
+    g.strokeStyle = `rgb(${v}, ${v}, ${v})`;
+    g.stroke();
+  }
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(heartBody, 0, 0, S, S);
+  return heart;
+}
+
+// Badge.Team as what it makes: a name tag. HELLO, my name is: the 80s logo.
+let tag = null;
+function nameTag() {
+  if (tag || !ready(stamp)) return tag;
+  const W = 360, H = 250, R = 22;
+  tag = document.createElement('canvas');
+  tag.width = W;
+  tag.height = H;
+  const g = tag.getContext('2d');
+  const card = () => {
+    g.beginPath();
+    g.roundRect(0, 0, W, H, R);
+  };
+  card();
+  g.fillStyle = '#fff';
+  g.fill();
+  g.save();
+  card();
+  g.clip();
+  g.fillStyle = '#d60b51';
+  g.fillRect(0, 0, W, 78);
+  g.fillRect(0, H - 16, W, 16);
+  g.restore();
+  g.fillStyle = '#fff';
+  g.textAlign = 'center';
+  g.font = '900 40px system-ui, sans-serif';
+  g.fillText('HELLO', W / 2, 44);
+  g.font = '16px system-ui, sans-serif';
+  g.fillText('my name is', W / 2, 66);
+  const h = H - 78 - 16 - 16;
+  const w = h * 567 / 425;
+  g.drawImage(stamp, (W - w) / 2, 78 + 8, w, h);
+  return tag;
+}
+
+// What a flyer is this time round: a source image and rectangle.
+function pick() {
+  const r = Math.random();
+  const whole = (img) => ({ img, sx: 0, sy: 0, sw: img.width || img.naturalWidth, sh: img.height || img.naturalHeight });
+  if (r < 0.2 && padlockedHeart()) return whole(heart);
+  if (r < 0.35 && ready(aidToUkraine)) return whole(aidToUkraine);
+  if (r < 0.5 && nameTag()) return whole(tag);
+  return { img: monogram, sx: 0, sy: 0, sw: 603, sh: 781 };
+}
 
 export function start() {
   if (running) return;
@@ -32,11 +113,40 @@ export function start() {
   addEventListener('resize', layout);
 
   const stars = Array.from({ length: 220 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() }));
-  // Monograms fly from the top right to the bottom left, wobbling, the nearer ones bigger and faster.
+  // Flyers go from the top right to the bottom left, wobbling, the nearer ones bigger and faster.
   const flyers = Array.from({ length: 12 }, (_, i) => ({
     u: Math.random(), lane: Math.random(), depth: 0.35 + Math.random() * 0.65,
-    colour: GLOWS[i % GLOWS.length], wobble: Math.random() * Math.PI * 2,
+    colour: GLOWS[i % GLOWS.length], wobble: Math.random() * Math.PI * 2, sprite: pick(),
   })).sort((a, b) => a.depth - b.depth);
+
+  // The clock: a neon HH:MM, drifting and bouncing off the edges, slowly.
+  const clock = { x: Math.random(), y: Math.random(), vx: 0.025, vy: 0.018 };
+  function drawClock(t, dt) {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const size = Math.min(W, H) * 0.16;
+    g.font = `bold ${size}px system-ui, sans-serif`;
+    g.textBaseline = 'middle';
+    g.textAlign = 'center';
+    const w = g.measureText('00:00').width;
+    clock.x += clock.vx * dt;
+    clock.y += clock.vy * dt;
+    const mx = w / 2 / W, my = size / 2 / H;
+    if (clock.x < mx || clock.x > 1 - mx) { clock.vx = -clock.vx; clock.x = Math.min(1 - mx, Math.max(mx, clock.x)); }
+    if (clock.y < my || clock.y > 1 - my) { clock.vy = -clock.vy; clock.y = Math.min(1 - my, Math.max(my, clock.y)); }
+    const x = clock.x * W;
+    const y = clock.y * H;
+    const colon = now.getMilliseconds() < 500 ? ':' : ' ';
+    g.save();
+    g.shadowColor = GLOWS[0];
+    for (const blur of [40, 18, 6]) {
+      g.shadowBlur = blur;
+      g.fillStyle = '#e8fbff';
+      g.fillText(`${hh}${colon}${mm}`, x, y);
+    }
+    g.restore();
+  }
 
   let raf = 0;
   let last = performance.now();
@@ -60,13 +170,15 @@ export function start() {
       g.fillRect(x, y, r, r);
     }
     g.globalAlpha = 1;
-    if (logo.complete && logo.naturalWidth) {
+    if (ready(monogram)) {
       const span = W + H;
       for (const f of flyers) {
         f.u += dt * 0.045 * f.depth;
-        if (f.u > 1) { f.u = 0; f.lane = Math.random(); }
-        const h = Math.min(W, H) * 0.28 * f.depth;
-        const w = h * ASPECT;
+        if (f.u > 1) { f.u = 0; f.lane = Math.random(); f.sprite = pick(); }
+        const { img, sx, sy, sw, sh } = f.sprite;
+        const fit = Math.min(W, H) * 0.28 * f.depth;
+        const h = img === monogram ? fit : img === tag ? fit * 0.75 : fit * 0.8 * Math.min(1, sh / sw);
+        const w = h * sw / sh;
         // Along a diagonal from top right to bottom left, offset by its lane.
         const d = f.u * span;
         const x = W + w - d * 0.75 + (f.lane - 0.5) * W * 0.9;
@@ -77,10 +189,11 @@ export function start() {
         g.shadowColor = f.colour;
         g.shadowBlur = 26 * f.depth;
         g.globalAlpha = 0.5 + 0.5 * f.depth;
-        g.drawImage(logo, -w / 2, -h / 2, w, h);
+        g.drawImage(img, sx, sy, sw, sh, -w / 2, -h / 2, w, h);
         g.restore();
       }
     }
+    drawClock(t, dt);
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);

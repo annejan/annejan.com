@@ -21,10 +21,12 @@
     the "B" icon here is cropped from it and made white; and for the 80s
     stamp, the badge drawings and the hero photo of the badge pile that
     appear in the AJB demo (the drawings rendered into one sheet, the
-    Konsool also on its own, the photo resized); and for the badger and
-    the snake that come over from https://badge.rs/ when you type their names
+    Konsool also on its own, the photo resized), the stamp also on a name
+    tag in the screensaver; and for the badger and the snake that come over
+    from https://badge.rs/ when you type their names
   MainDeck and Aid to Ukraine: their logos are their trademarks,
-    shown in white only to link to them
+    shown in white only to link to them (Aid to Ukraine's also flies by,
+    in white, in the screensaver)
   Vincent Connare, for Comic Sans MS, whose letters make up the AJB monogram (2010)
   Eric S. Raymond, for the glider hacker emblem in the favicon
   Philip "Pepto" Timmermann, for the measured C64 colour palette
