@@ -1,6 +1,7 @@
 // A C64-style screen, opened with the Konami code.
 // No Commodore ROM or charset: the boot text and this tiny BASIC are hand-written,
 // the font is Press Start 2P (SIL Open Font License, see /fonts/OFL.txt).
+// The SID-style sounds are made with Web Audio on the spot, there are no samples.
 // Esc is RUN/STOP; when nothing runs, Esc closes the screen.
 
 const COLS = 40;
@@ -10,15 +11,29 @@ const PALETTE = ['#000000', '#ffffff', '#68372b', '#70a4b2', '#6f3d86', '#588d43
   '#6f4f25', '#433900', '#9a6759', '#444444', '#6c6c6c', '#9ad284', '#6c5eb5', '#959595'];
 
 // The virtual 1541: what LOAD"$",8 lists and what RUN does with each file.
+// A 1541 file name has at most 16 characters. The 0-block DEL entries only
+// divide the listing, as on scene disks: LOAD never finds them.
+const divider = (name) => ({ name, blocks: 0, type: 'DEL' });
 const DISK = [
   { name: 'AJB DEMO', blocks: 42, demo: true },
   { name: 'CV', blocks: 7, url: '/portfolio/' },
+  { name: 'CV-NL', blocks: 7, url: '/portfolio/nl/' },
   { name: 'INSTAFAIL', blocks: 31, url: '/html5/instafail/' },
   { name: 'KANSLOOS', blocks: 44, url: '/kansloos/' },
   { name: 'BAGGER', blocks: 53, url: '/bagger/' },
+  divider('----------------'),
   { name: 'GITHUB', blocks: 1, url: 'https://github.com/annejan' },
   { name: 'MASTODON', blocks: 1, url: 'https://mastodon.social/@annejan' },
   { name: 'LINKEDIN', blocks: 1, url: 'https://www.linkedin.com/in/annejanbrouwer/' },
+  divider('---- DEFEEST ---'),
+  // Kloten met de broodtrommel (C64, X 2026), as big as on its own disk.
+  { name: 'KLOTEN BROODTROM', blocks: 146, url: 'https://www.youtube.com/watch?v=Cj4rynml_qI' },
+  // Claude maar wat aan (TIC-80, Outline 2026).
+  { name: 'CLAUDE MAAR WAT', blocks: 64, url: 'https://youtu.be/_vUn_xbWBt8' },
+  // Outline 2017: realtime wild and animation.
+  { name: 'BADGE DEMO', blocks: 17, url: 'https://files.scene.org/view/parties/2017/outline17/realtime_wild/anus_badge.mp4' },
+  { name: 'PENTEST AN AI', blocks: 17, url: 'https://files.scene.org/view/parties/2017/outline17/animation/pentest.mp4' },
+  divider('----------------'),
   { name: 'CREDITS', blocks: 3, credits: [
     'SITE AND AJB: ANNE JAN BROUWER',
     'PAIR PROGRAMMER: CLAUDE',
@@ -45,18 +60,30 @@ export function start() {
   // Screen: a list of lines, each a list of segments { text, href }.
   let lines = [[]];
   let input = '';
-  let busy = false;      // LOAD in progress, no typing
+  let busy = false;      // 'disk' or 'tape' while LOADing, 'run' while leaving for a link: no typing
   let running = null;    // a BASIC program is running
   let program = new Map();
   let loaded = null;     // a file from DISK, after LOAD
   let directory = null;  // directory lines, after LOAD"$",8
+  let closed = false;
+
+  // setTimeout that close() cancels, so nothing runs on after the screen is gone.
+  const timers = new Set();
+  function later(fn, ms) {
+    const id = setTimeout(() => { timers.delete(id); if (!closed) fn(); }, ms);
+    timers.add(id);
+  }
+  function cancel() {
+    for (const id of timers) clearTimeout(id);
+    timers.clear();
+  }
 
   // --- DOM ---------------------------------------------------------------
 
   const style = document.createElement('style');
   style.textContent = `
     @font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P-Regular.ttf') format('truetype'); font-display: block; }
-    .c64 { position: fixed; inset: 0; z-index: 20; display: grid; place-content: center; gap: 1.2em;
+    .c64 { position: fixed; inset: 0; z-index: 20; display: grid; grid-template-columns: ${COLS}em; place-content: center; gap: 1.2em;
            font-family: 'Press Start 2P', monospace; text-transform: uppercase; cursor: text; }
     .c64-screen { width: ${COLS}em; height: ${ROWS}em; line-height: 1em; white-space: pre; overflow: hidden; }
     .c64-screen a { color: inherit; text-decoration: none; }
@@ -64,7 +91,7 @@ export function start() {
     .c64-screen a:hover span { filter: invert(1); }
     .c64-cursor { animation: c64-blink 0.66s steps(1) infinite; }
     @keyframes c64-blink { 50% { visibility: hidden; } }
-    .c64-hint { font-size: 0.45em; text-align: center; opacity: 0.8; line-height: 1.6; }
+    .c64-hint { font-size: max(0.45em, 8px); text-align: center; opacity: 0.8; line-height: 1.6; white-space: pre-line; }
   `;
   const root = document.createElement('div');
   root.className = 'c64';
@@ -74,7 +101,9 @@ export function start() {
   screen.className = 'c64-screen';
   const hint = document.createElement('div');
   hint.className = 'c64-hint';
-  hint.textContent = 'LOAD"$",8 · LIST · LOAD"*",8,1 · RUN · NEW · SYS 64738 · ESC = RUN/STOP, ESC AGAIN = EXIT';
+  // Non-breaking spaces keep each command on one line when the hint wraps on a phone.
+  hint.textContent = ['LOAD"$",8', 'LIST', 'LOAD"*",8,1', 'RUN', 'NEW', 'SYS 64738', 'POKE 54296,0 = MUTE']
+    .map((command) => command.replace(/ /g, '\u00a0')).join(' · ') + '\nESC = RUN/STOP, ESC AGAIN = EXIT';
   root.append(screen, hint);
   document.head.append(style);
   document.body.append(root);
@@ -89,6 +118,7 @@ export function start() {
   addEventListener('resize', size);
 
   function paint() {
+    if (closed) return;
     root.style.background = PALETTE[colors.border];
     root.style.color = PALETTE[colors.text];
     screen.style.background = PALETTE[colors.background];
@@ -129,6 +159,129 @@ export function start() {
     });
   }
 
+  // --- Sound -------------------------------------------------------------
+
+  // The AudioContext starts with the first sound, which always follows a key press,
+  // so autoplay rules allow it. Without Web Audio the C64 is simply silent.
+  const LEVEL = 0.25;  // loudness at full SID volume: modest
+  let volume = 15;     // the SID master volume ($D418), set with POKE 54296,n
+  let audio = null;
+  let master = null;
+  let pulse = null;    // the SID's pulse wave, 25% duty cycle
+  let noise = null;    // 20 ms of fading white noise
+  let hum = null;      // the drive motor, while LOADING
+
+  function sid() {
+    if (!audio) {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return null;
+      audio = new Context();
+      master = audio.createGain();
+      master.gain.value = LEVEL * volume / 15;
+      master.connect(audio.destination);
+      // The Fourier series of a pulse that is high for a quarter of each period.
+      const real = new Float32Array(32);
+      const imag = new Float32Array(32);
+      for (let n = 1; n < 32; n += 1) {
+        real[n] = Math.sin(Math.PI * n / 2) / (Math.PI * n);
+        imag[n] = (1 - Math.cos(Math.PI * n / 2)) / (Math.PI * n);
+      }
+      pulse = audio.createPeriodicWave(real, imag);
+      noise = audio.createBuffer(1, Math.floor(audio.sampleRate / 50), audio.sampleRate);
+      const data = noise.getChannelData(0);
+      for (let i = 0; i < data.length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) ** 4;
+    }
+    if (audio.state === 'suspended') audio.resume().catch(() => {});
+    return audio;
+  }
+
+  // Play an effect, play(context, now). Muted, closed or no Web Audio: nothing.
+  function sound(play) {
+    if (!volume || closed) return;
+    try {
+      const context = sid();
+      if (context) play(context, context.currentTime);
+    } catch {
+      // No sound then.
+    }
+  }
+
+  function setVolume(value) {
+    volume = value;
+    if (master) master.gain.value = LEVEL * volume / 15;
+  }
+
+  // ?... ERROR: a short, harsh pulse buzz that drops a fifth.
+  const buzz = () => sound((context, t) => {
+    const osc = context.createOscillator();
+    osc.setPeriodicWave(pulse);
+    osc.frequency.setValueAtTime(147, t);
+    osc.frequency.setValueAtTime(98, t + 0.11);
+    const env = context.createGain();
+    env.gain.setValueAtTime(0.6, t);
+    env.gain.setValueAtTime(0.6, t + 0.2);
+    env.gain.linearRampToValueAtTime(0, t + 0.26);
+    osc.connect(env).connect(master);
+    osc.start(t);
+    osc.stop(t + 0.27);
+  });
+
+  // SEARCHING FOR: the drive head rattles over to the directory track.
+  const rattle = () => sound((context, t) => {
+    const filter = context.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1100;
+    const boost = context.createGain();
+    boost.gain.value = 2;
+    filter.connect(boost).connect(master);
+    for (let i = 0; i < 9; i += 1) {
+      const click = context.createBufferSource();
+      click.buffer = noise;
+      click.playbackRate.value = 0.7 + Math.random() * 0.6;
+      click.connect(filter);
+      click.start(t + i * 0.045);
+    }
+  });
+
+  // LOADING: a quiet motor hum that wobbles with the disk, 300 rpm.
+  function motor(on) {
+    if (hum) {
+      const { osc, wobble, env } = hum;
+      hum = null;
+      try {
+        env.gain.setTargetAtTime(0, audio.currentTime, 0.02);
+        osc.stop(audio.currentTime + 0.15);
+        wobble.stop(audio.currentTime + 0.15);
+      } catch {
+        // The context is gone already.
+      }
+    }
+    if (!on) return;
+    sound((context, t) => {
+      const osc = context.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.value = 50;
+      const filter = context.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 240;
+      // The wobble comes before the envelope, so the fade-out silences it too.
+      const wobble = context.createOscillator();
+      wobble.frequency.value = 5;
+      const depth = context.createGain();
+      depth.gain.value = 0.28;
+      const am = context.createGain();
+      am.gain.value = 1;
+      wobble.connect(depth).connect(am.gain);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0, t);
+      env.gain.linearRampToValueAtTime(0.18, t + 0.1);
+      osc.connect(filter).connect(am).connect(env).connect(master);
+      osc.start(t);
+      wobble.start(t);
+      hum = { osc, wobble, env };
+    });
+  }
+
   // --- Output ------------------------------------------------------------
 
   const width = (segments) => segments.reduce((n, s) => n + s.text.length, 0);
@@ -148,11 +301,19 @@ export function start() {
     while (lines.length > ROWS) lines.shift();
   }
   const println = (text = '') => write(text);
-  const error = (name, lineNo) => println(`?${name}  ERROR${lineNo !== undefined ? ` IN ${lineNo}` : ''}`);
+  function error(name, lineNo) {
+    println(`?${name}  ERROR${lineNo !== undefined ? ` IN ${lineNo}` : ''}`);
+    buzz();
+  }
   const ready = () => { println('READY.'); paint(); };
 
+  // Power on, or SYS 64738: a cold start clears the program and the SID volume too.
   function boot() {
     colors.border = 14; colors.background = 6; colors.text = 14;
+    program = new Map();
+    loaded = null;
+    directory = null;
+    setVolume(15);
     lines = [[]];
     println();
     println('   **** ANNEJAN.COM 64 BASIC V2 ****');
@@ -185,28 +346,33 @@ export function start() {
     return true;
   }
 
+  const SYNTAX = { error: 'SYNTAX' };
+
+  // POKE address,value: an address above 65535 or a value above 255 is out of range.
   function poke(args) {
     const m = args.match(/^(\d+)\s*,\s*(\d+)$/);
-    if (!m) return false;
+    if (!m) return SYNTAX;
+    if (Number(m[1]) > 65535 || Number(m[2]) > 255) return { error: 'ILLEGAL QUANTITY' };
     const value = Number(m[2]) & 15;
     if (m[1] === '53280') colors.border = value;
     else if (m[1] === '53281') colors.background = value;
     else if (m[1] === '646') colors.text = value;
-    return true;
+    else if (m[1] === '54296') setVolume(value);
+    return 'ok';
   }
 
-  // Run one statement. Returns 'ok', 'end', { goto: n } or false for a syntax error.
+  // Run one statement. Returns 'ok', 'end', 'reset', { goto: n } or { error: name }.
   function statement(text) {
     const s = text.trim();
     let m;
     if (!s || s.startsWith('REM')) return 'ok';
-    if ((m = s.match(/^(PRINT|\?)(.*)$/))) return print(m[2]) ? 'ok' : false;
+    if ((m = s.match(/^(PRINT|\?)(.*)$/))) return print(m[2]) ? 'ok' : SYNTAX;
     if ((m = s.match(/^GOTO\s*(\d+)$/))) return { goto: Number(m[1]) };
-    if ((m = s.match(/^POKE\s*(.*)$/))) return poke(m[1]) ? 'ok' : false;
+    if ((m = s.match(/^POKE\s*(.*)$/))) return poke(m[1]);
     if (/^SYS\s*64738$/.test(s)) return 'reset';
     if (/^SYS\s*\d+$/.test(s)) return 'ok';
     if (s === 'END' || s === 'STOP') return 'end';
-    return false;
+    return SYNTAX;
   }
 
   function runProgram(from) {
@@ -221,7 +387,7 @@ export function start() {
         if (at >= numbers.length) { running = null; ready(); return; }
         const lineNo = numbers[at];
         const result = statement(program.get(lineNo));
-        if (result === false) { error('SYNTAX', lineNo); running = null; ready(); return; }
+        if (result.error) { error(result.error, lineNo); running = null; ready(); return; }
         if (result === 'end') { running = null; ready(); return; }
         if (result === 'reset') { running = null; boot(); return; }
         if (result.goto !== undefined) {
@@ -232,36 +398,53 @@ export function start() {
         }
       }
       paint();
-      setTimeout(step, 30);
+      later(step, 30);
     }
     paint();
     step();
   }
 
+  // LOAD"NAME" or LOAD"NAME",1 reads the tape: there is none, so it waits for RUN/STOP.
+  function tape() {
+    busy = 'tape';
+    println();
+    println('PRESS PLAY ON TAPE');
+    paint();
+  }
+
   function load(args) {
-    const m = args.match(/^"([^"]*)"?\s*(?:,\s*(\d+)\s*)?(?:,\s*(\d+)\s*)?$/);
-    if (!m || !m[1]) { error('MISSING FILE NAME'); return ready(); }
-    if (m[2] !== '8') { error('DEVICE NOT PRESENT'); return ready(); }
+    const m = args.match(/^(?:"([^"]*)"?)?\s*(?:,\s*(\d+)\s*)?(?:,\s*(\d+)\s*)?$/);
+    if (!m) { error('MISSING FILE NAME'); return ready(); }
+    const device = m[2] === undefined ? 1 : Number(m[2]);
+    if (device === 1) return tape();
+    if (device !== 8) { error('DEVICE NOT PRESENT'); return ready(); }
+    if (!m[1]) { error('MISSING FILE NAME'); return ready(); }
     const name = m[1];
-    busy = true;
+    busy = 'disk';
     println();
     println(`SEARCHING FOR ${name}`);
     paint();
-    const pattern = new RegExp(`^${name.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`);
-    const file = name === '$' ? null : DISK.find((f) => pattern.test(f.name));
-    setTimeout(() => {
+    rattle();
+    // As on a 1541: ? matches any one character, * matches the rest of the name.
+    const star = name.indexOf('*');
+    const stem = (star < 0 ? name : name.slice(0, star)).replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\?/g, '.');
+    const pattern = new RegExp(`^${stem}${star < 0 ? '$' : ''}`);
+    const file = name === '$' ? null : DISK.find((f) => f.type !== 'DEL' && pattern.test(f.name));
+    later(() => {
       if (name !== '$' && !file) { busy = false; error('FILE NOT FOUND'); return ready(); }
       println('LOADING');
       paint();
-      setTimeout(() => {
+      motor(true);
+      later(() => {
         busy = false;
+        motor(false);
         program = new Map();
         if (name === '$') {
           loaded = null;
-          const free = 664 - DISK.reduce((n, f) => n + f.blocks, 0);
+          const free = Math.max(0, 664 - DISK.reduce((n, f) => n + f.blocks, 0));
           directory = [
             [{ text: '0 ' }, { text: '"ANNEJAN.COM     " AJ 2A', reverse: true }],
-            ...DISK.map((f) => [{ text: `${String(f.blocks).padEnd(5)}"${f.name}"`.padEnd(24) + 'PRG', href: f.url }]),
+            ...DISK.map((f) => [{ text: `${String(f.blocks).padEnd(5)}"${f.name}"`.padEnd(24) + (f.type || 'PRG'), href: f.url }]),
             [{ text: `${free} BLOCKS FREE.` }],
           ];
         } else if (file.credits) {
@@ -302,7 +485,7 @@ export function start() {
       return undefined;
     }
     if (loaded && loaded.url) {
-      busy = true;
+      busy = 'run';
       paint();
       window.location.href = loaded.url;
       return undefined;
@@ -332,7 +515,7 @@ export function start() {
     if ((m = text.match(/^LOAD\s*(.*)$/))) return load(m[1]);
     if ((m = text.match(/^GOTO\s*(\d+)$/))) return runProgram(Number(m[1]));
     const result = statement(text);
-    if (result === false) error('SYNTAX');
+    if (result.error) error(result.error);
     if (result === 'reset') return boot();
     return ready();
   }
@@ -345,7 +528,14 @@ export function start() {
     if (event.key === 'Escape') {
       event.preventDefault();
       if (running) running.stop = true;
-      else close();
+      else if (busy === 'tape' || busy === 'disk') {
+        // RUN/STOP stops a LOAD: its timers are the only ones pending.
+        cancel();
+        motor(false);
+        busy = false;
+        error('BREAK');
+        ready();
+      } else close();
       return;
     }
     if (busy || running) { event.preventDefault(); return; }
@@ -366,16 +556,36 @@ export function start() {
   }
   addEventListener('keydown', onKey, true);
 
+  // Back from a RUN link through the back/forward cache: ready for the next command.
+  function onShow(event) {
+    if (event.persisted && busy === 'run') { busy = false; ready(); }
+  }
+  addEventListener('pageshow', onShow);
+
+  // Close cleanly at any moment: no LOAD, program or sound carries on.
   function close() {
+    if (closed) return;
+    closed = true;
     if (running) running.stop = true;
+    cancel();
+    hum = null;
+    if (audio) {
+      try {
+        audio.close().catch(() => {});
+      } catch {
+        // Nothing to close.
+      }
+    }
     removeEventListener('keydown', onKey, true);
     removeEventListener('resize', size);
+    removeEventListener('pageshow', onShow);
     root.remove();
     style.remove();
     document.body.style.overflow = overflow;
     open = false;
   }
 
-  document.fonts.load('16px "Press Start 2P"').finally(boot);
+  // Repaint, not reboot, once the font is in: the user may be typing already.
+  document.fonts.load('16px "Press Start 2P"').finally(paint);
   boot();
 }
