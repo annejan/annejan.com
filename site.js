@@ -41,11 +41,11 @@ document.querySelectorAll('a.fade').forEach((link) => {
   });
 });
 
-// The neon tube of www.annejan.com. Until the monogram is clicked it just glows (and
-// stutters every nine seconds: that's the CSS). Each click flashes it in that click's
-// colour; the first one also cuts its power, lights it up again letter by letter, and
-// starts a minute-long timeline: a letter goes bad for a while, the colour drifts through
-// the monogram's glows and back, and the power cuts out and it lights up again.
+// The neon tube of www.annejan.com. Until the monogram is clicked it's just the cyan text.
+// The first click lights it as neon, letter by letter (the stutter every nine seconds is
+// the CSS), and starts a minute-long timeline: a letter goes bad for a while, the colour
+// drifts through the monogram's glows and back, and the power cuts out and it lights up
+// again. Every click flashes it in that click's colour.
 function startNeon() {
   const www = document.querySelector('#card .www');
   if (!www || reduceMotion) return null;
@@ -81,8 +81,10 @@ function startNeon() {
   }
 
   async function timeline() {
-    await sleep(1000);                       // after the click's flash
-    await cut();
+    letters.forEach((span) => span.classList.add('off'));
+    www.classList.add('lit');
+    await sleep(400);
+    await ignite();
     for (;;) {
       await sleep(15000);
       const bad = lit[Math.floor(Math.random() * lit.length)];

@@ -122,16 +122,16 @@ body.home {
   line-height: 1.1;
   white-space: nowrap;
 }
-/* On the home page it's a neon tube: a white-hot core in a glow, which now and then
-   stutters, like a tube that's not quite warmed up. site.js lights it letter by letter and
-   runs a longer timeline on it: a bad letter, a drift through the monogram's colours, a
-   power cut. --neon is registered so the colour can drift. */
+/* Once the monogram is clicked, site.js turns it into a neon tube (.lit): a white-hot core
+   in a glow, which now and then stutters, like a tube that's not quite warmed up, and a
+   longer timeline on top: a bad letter, a drift through the monogram's colours, a power
+   cut. --neon is registered so the colour can drift. */
 @property --neon {
   syntax: '<color>';
   inherits: true;
   initial-value: #24cafe;
 }
-#card .www {
+#card .www.lit {
   --neon: var(--cyan);
   color: #e8fbff;
   text-shadow: 0 0 2px #fff, 0 0 8px var(--neon), 0 0 18px var(--neon), 0 0 36px var(--neon),
@@ -139,7 +139,7 @@ body.home {
   animation: neon 9s infinite;
   transition: --neon 2.5s ease;
 }
-#card .www.flash { transition-duration: 0.15s; }
+#card .www.lit.flash { transition-duration: 0.15s; }
 @keyframes neon {
   0%, 88%, 89.4%, 90.6%, 100% {
     color: #e8fbff;
@@ -152,12 +152,12 @@ body.home {
   }
 }
 /* A letter whose tube is out: just the glass, faintly. */
-#card .www span.off {
+#card .www.lit span.off {
   color: rgba(150, 220, 240, 0.16);
   text-shadow: none;
 }
 /* A letter whose tube is going: on, off, on, off, irregularly. */
-#card .www span.bad { animation: bad 1.3s steps(1) infinite; }
+#card .www.lit span.bad { animation: bad 1.3s steps(1) infinite; }
 @keyframes bad {
   0%, 9%, 31%, 47%, 72%, 81% { color: rgba(150, 220, 240, 0.16); text-shadow: none; }
   5%, 22%, 38%, 60%, 76%, 90% { color: inherit; text-shadow: inherit; }
@@ -288,7 +288,7 @@ aside ul + p { margin-top: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #card, .page, #card .www, #card .www span { animation: none; }
+  #card, .page { animation: none; }
   body, .social svg, .social .icon, #mark, #home img { transition: none; }
 }
 
