@@ -44,14 +44,14 @@ function padlockedHeart() {
   return heart;
 }
 
-// What a flyer is this time round: a source image and rectangle.
+// What a flyer is this time round: an image, its width to height, and its height relative
+// to the others. Drawn whole at that size: SVG intrinsic sizes differ per browser.
 function pick() {
   const r = Math.random();
-  const whole = (img) => ({ img, sx: 0, sy: 0, sw: img.width || img.naturalWidth, sh: img.height || img.naturalHeight });
-  if (r < 0.2 && padlockedHeart()) return whole(heart);
-  if (r < 0.35 && ready(aidToUkraine)) return whole(aidToUkraine);
-  if (r < 0.5 && ready(wordmark)) return whole(wordmark);
-  return { img: monogram, sx: 0, sy: 0, sw: 603, sh: 781 };
+  if (r < 0.2 && padlockedHeart()) return { img: heart, aspect: 1, scale: 0.8 };
+  if (r < 0.35 && ready(aidToUkraine)) return { img: aidToUkraine, aspect: 1, scale: 0.8 };
+  if (r < 0.5 && ready(wordmark)) return { img: wordmark, aspect: 8, scale: 0.26 };
+  return { img: monogram, aspect: 603 / 781, scale: 1 };
 }
 
 export function start() {
@@ -94,7 +94,11 @@ export function start() {
     g.font = `bold ${size}px system-ui, sans-serif`;
     g.textBaseline = 'middle';
     g.textAlign = 'center';
-    const w = g.measureText('00:00').width;
+    // Fixed cells, so the digits don't shift as they change: the widest digit's width each,
+    // the colon a narrower one.
+    const cell = Math.max(...'0123456789'.split('').map((d) => g.measureText(d).width));
+    const gap = g.measureText(':').width * 1.4;
+    const w = 4 * cell + gap;
     clock.x += clock.vx * dt;
     clock.y += clock.vy * dt;
     const mx = w / 2 / W, my = size / 2 / H;
@@ -102,13 +106,18 @@ export function start() {
     if (clock.y < my || clock.y > 1 - my) { clock.vy = -clock.vy; clock.y = Math.min(1 - my, Math.max(my, clock.y)); }
     const x = clock.x * W;
     const y = clock.y * H;
-    const colon = now.getMilliseconds() < 500 ? ':' : ' ';
+    const colon = now.getMilliseconds() < 500;
+    const chars = [[hh[0], cell], [hh[1], cell], [colon ? ':' : '', gap], [mm[0], cell], [mm[1], cell]];
     g.save();
     g.shadowColor = GLOWS[0];
+    g.fillStyle = '#e8fbff';
     for (const blur of [40, 18, 6]) {
       g.shadowBlur = blur;
-      g.fillStyle = '#e8fbff';
-      g.fillText(`${hh}${colon}${mm}`, x, y);
+      let cx = x - w / 2;
+      for (const [ch, width] of chars) {
+        g.fillText(ch, cx + width / 2, y);
+        cx += width;
+      }
     }
     g.restore();
   }
@@ -140,10 +149,9 @@ export function start() {
       for (const f of flyers) {
         f.u += dt * 0.045 * f.depth;
         if (f.u > 1) { f.u = 0; f.lane = Math.random(); f.sprite = pick(); }
-        const { img, sx, sy, sw, sh } = f.sprite;
-        const fit = Math.min(W, H) * 0.28 * f.depth;
-        const h = img === monogram ? fit : img === wordmark ? fit * 0.26 : fit * 0.8 * Math.min(1, sh / sw);
-        const w = h * sw / sh;
+        const { img, aspect, scale } = f.sprite;
+        const h = Math.min(W, H) * 0.28 * f.depth * scale;
+        const w = h * aspect;
         // Along a diagonal from top right to bottom left, offset by its lane.
         const d = f.u * span;
         const x = W + w - d * 0.75 + (f.lane - 0.5) * W * 0.9;
@@ -154,7 +162,7 @@ export function start() {
         g.shadowColor = f.colour;
         g.shadowBlur = 26 * f.depth;
         g.globalAlpha = 0.5 + 0.5 * f.depth;
-        g.drawImage(img, sx, sy, sw, sh, -w / 2, -h / 2, w, h);
+        g.drawImage(img, -w / 2, -h / 2, w, h);
         g.restore();
       }
     }
