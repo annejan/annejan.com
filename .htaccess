@@ -1,6 +1,13 @@
 # Missing pages get Yuki and the rope
 ErrorDocument 404 /error/404.html
 
+# The new pages need nothing inline, so they get a strict policy. The old demos
+# elsewhere on the site keep the server's looser one.
+<If "%{REQUEST_URI} =~ m#^/(index\.html|portfolio/(nl/)?(index\.html)?)?$#">
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+</If>
+
 # One canonical host: send www.annejan.com to annejan.com
 <IfModule mod_rewrite.c>
     RewriteEngine On

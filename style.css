@@ -210,6 +210,9 @@ h3 {
 }
 section + section { margin-top: 40px; }
 section p { margin: 0 0 12px; }
+/* Links in running text need more than colour to stand out (WCAG 1.4.1). */
+main section p a { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 2px; }
+main section p a:hover, main section p a:focus-visible { text-decoration-color: currentColor; }
 .profile p { color: var(--fg); font-size: 16px; line-height: 1.6; }
 
 .entry { margin-bottom: 24px; }

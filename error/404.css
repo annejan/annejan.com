@@ -1,0 +1,7 @@
+/* The 404 page: Yuki behind a dark panel. */
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; overflow: hidden; }
+#yuki { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.lost { text-align: center; padding: 32px 16px; background: rgba(0, 0, 0, 0.72); }
+.lost .www { color: var(--cyan); margin: 0; font-size: clamp(64px, 18vw, 160px); letter-spacing: 0.2em; margin-right: -0.2em; }
+.lost p { margin: 12px 0 0; color: var(--fg); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; }
+.lost small { display: block; margin-top: 16px; color: var(--muted); font-size: 10px; letter-spacing: 2px; }

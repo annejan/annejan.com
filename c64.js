@@ -80,19 +80,10 @@ export function start() {
 
   // --- DOM ---------------------------------------------------------------
 
-  const style = document.createElement('style');
-  style.textContent = `
-    @font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P-Regular.ttf') format('truetype'); font-display: block; }
-    .c64 { position: fixed; inset: 0; z-index: 20; display: grid; grid-template-columns: ${COLS}em; place-content: center; gap: 1.2em;
-           font-family: 'Press Start 2P', monospace; text-transform: uppercase; cursor: text; }
-    .c64-screen { width: ${COLS}em; height: ${ROWS}em; line-height: 1em; white-space: pre; overflow: hidden; }
-    .c64-screen a { color: inherit; text-decoration: none; }
-    .c64-screen a:hover { background: currentColor; }
-    .c64-screen a:hover span { filter: invert(1); }
-    .c64-cursor { animation: c64-blink 0.66s steps(1) infinite; }
-    @keyframes c64-blink { 50% { visibility: hidden; } }
-    .c64-hint { font-size: max(0.45em, 8px); text-align: center; opacity: 0.8; line-height: 1.6; white-space: pre-line; }
-  `;
+  // The styles live in /c64.css; the screen stays out of the page until they have loaded.
+  const style = document.createElement('link');
+  style.rel = 'stylesheet';
+  style.href = '/c64.css';
   const root = document.createElement('div');
   root.className = 'c64';
   root.setAttribute('role', 'application');
@@ -105,6 +96,10 @@ export function start() {
   hint.textContent = ['LOAD"$",8', 'LIST', 'LOAD"*",8,1', 'RUN', 'NEW', 'SYS 64738', 'POKE 54296,0 = MUTE']
     .map((command) => command.replace(/ /g, '\u00a0')).join(' · ') + '\nESC = RUN/STOP, ESC AGAIN = EXIT';
   root.append(screen, hint);
+  root.style.display = 'none';
+  const show = () => { root.style.display = ''; };
+  style.addEventListener('load', show);
+  style.addEventListener('error', show);
   document.head.append(style);
   document.body.append(root);
   const overflow = document.body.style.overflow;
