@@ -41,6 +41,85 @@ document.querySelectorAll('a.fade').forEach((link) => {
   });
 });
 
+// The neon tube of www.annejan.com. Until the monogram is clicked it just glows (and
+// stutters every nine seconds: that's the CSS). Each click flashes it in that click's
+// colour; the first one also cuts its power, lights it up again letter by letter, and
+// starts a minute-long timeline: a letter goes bad for a while, the colour drifts through
+// the monogram's glows and back, and the power cuts out and it lights up again.
+function startNeon() {
+  const www = document.querySelector('#card .www');
+  if (!www || reduceMotion) return null;
+  const letters = [...www.textContent].map((ch) => {
+    const span = document.createElement('span');
+    span.textContent = ch;
+    return span;
+  });
+  www.replaceChildren(...letters);
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const lit = letters.filter((span) => span.textContent !== '.');
+  const colours = ['#cafe24', '#d60b51', '#0080c8'];
+  let drift = 0;
+
+  async function ignite() {
+    letters.forEach((span) => span.classList.add('off'));
+    const order = [...letters].sort(() => Math.random() - 0.5);
+    for (const span of order) {
+      await sleep(rnd(30, 110));
+      span.classList.remove('off');
+      if (Math.random() < 0.3) {
+        span.classList.add('bad');
+        setTimeout(() => span.classList.remove('bad'), rnd(250, 700));
+      }
+    }
+  }
+
+  async function cut() {
+    letters.forEach((span) => span.classList.add('off'));
+    await sleep(1400);
+    await ignite();
+  }
+
+  async function timeline() {
+    await sleep(1000);                       // after the click's flash
+    await cut();
+    for (;;) {
+      await sleep(15000);
+      const bad = lit[Math.floor(Math.random() * lit.length)];
+      bad.classList.add('bad');
+      await sleep(rnd(3500, 6000));
+      bad.classList.remove('bad');
+
+      await sleep(9000);
+      www.style.setProperty('--neon', colours[drift++ % colours.length]);
+      await sleep(8000);
+      www.style.removeProperty('--neon');
+
+      await sleep(10000);
+      await cut();
+    }
+  }
+
+  let started = false;
+  return {
+    start() {
+      if (started) return;
+      started = true;
+      timeline();
+    },
+    flash(colour) {
+      www.classList.add('flash');
+      www.style.setProperty('--neon', colour);
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        www.classList.remove('flash');
+        www.style.removeProperty('--neon');
+      }, 900);
+    },
+  };
+}
+const neon = startNeon();
+
 // The monogram: each click makes it boing and changes its glow colour.
 // Five clicks in quick succession start the demo.
 const mark = document.getElementById('mark');
@@ -53,6 +132,10 @@ if (mark && !reduceMotion) {
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => { clicks = 0; }, 1500);
     mark.style.setProperty('--glow', glows[(clicks - 1) % glows.length]);
+    if (neon) {
+      neon.flash(glows[(clicks - 1) % glows.length]);
+      neon.start();
+    }
     mark.classList.remove('boing');
     void mark.offsetWidth;
     mark.classList.add('boing');

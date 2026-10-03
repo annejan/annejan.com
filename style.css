@@ -122,24 +122,45 @@ body.home {
   line-height: 1.1;
   white-space: nowrap;
 }
-/* On the home page it's a neon tube: a white-hot core in a cyan glow, which now and then
-   stutters, like a tube that's not quite warmed up. */
-#card .www {
-  color: #e8fbff;
-  text-shadow: 0 0 2px #fff, 0 0 8px var(--cyan), 0 0 18px var(--cyan), 0 0 36px var(--cyan),
-    0 0 70px rgba(36, 202, 254, 0.55);
-  animation: neon 9s infinite;
+/* On the home page it's a neon tube: a white-hot core in a glow, which now and then
+   stutters, like a tube that's not quite warmed up. site.js lights it letter by letter and
+   runs a longer timeline on it: a bad letter, a drift through the monogram's colours, a
+   power cut. --neon is registered so the colour can drift. */
+@property --neon {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #24cafe;
 }
+#card .www {
+  --neon: var(--cyan);
+  color: #e8fbff;
+  text-shadow: 0 0 2px #fff, 0 0 8px var(--neon), 0 0 18px var(--neon), 0 0 36px var(--neon),
+    0 0 70px color-mix(in srgb, var(--neon) 55%, transparent);
+  animation: neon 9s infinite;
+  transition: --neon 2.5s ease;
+}
+#card .www.flash { transition-duration: 0.15s; }
 @keyframes neon {
   0%, 88%, 89.4%, 90.6%, 100% {
     color: #e8fbff;
-    text-shadow: 0 0 2px #fff, 0 0 8px var(--cyan), 0 0 18px var(--cyan), 0 0 36px var(--cyan),
-      0 0 70px rgba(36, 202, 254, 0.55);
+    text-shadow: 0 0 2px #fff, 0 0 8px var(--neon), 0 0 18px var(--neon), 0 0 36px var(--neon),
+      0 0 70px color-mix(in srgb, var(--neon) 55%, transparent);
   }
   88.7%, 90% {
     color: #4f8fa3;
-    text-shadow: 0 0 4px rgba(36, 202, 254, 0.3);
+    text-shadow: 0 0 4px color-mix(in srgb, var(--neon) 30%, transparent);
   }
+}
+/* A letter whose tube is out: just the glass, faintly. */
+#card .www span.off {
+  color: rgba(150, 220, 240, 0.16);
+  text-shadow: none;
+}
+/* A letter whose tube is going: on, off, on, off, irregularly. */
+#card .www span.bad { animation: bad 1.3s steps(1) infinite; }
+@keyframes bad {
+  0%, 9%, 31%, 47%, 72%, 81% { color: rgba(150, 220, 240, 0.16); text-shadow: none; }
+  5%, 22%, 38%, 60%, 76%, 90% { color: inherit; text-shadow: inherit; }
 }
 .tag {
   grid-area: tag;
@@ -267,7 +288,7 @@ aside ul + p { margin-top: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #card, .page, #card .www { animation: none; }
+  #card, .page, #card .www, #card .www span { animation: none; }
   body, .social svg, .social .icon, #mark, #home img { transition: none; }
 }
 
