@@ -14,6 +14,23 @@ document.querySelectorAll('.social a').forEach((link) => {
   });
 });
 
+// The social icons come in a different order on every visit, and pop in one by one.
+const social = document.querySelector('.social');
+if (social) {
+  const items = [...social.children];
+  for (let i = items.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  social.append(...items);
+  if (!reduceMotion) {
+    items.forEach((item, i) => item.animate(
+      [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }],
+      { duration: 400, delay: 900 + i * 140, easing: 'cubic-bezier(0.3, 1.6, 0.6, 1)', fill: 'backwards' },
+    ));
+  }
+}
+
 // Internal links: fade the page out first.
 document.querySelectorAll('a.fade').forEach((link) => {
   link.addEventListener('click', (event) => {
