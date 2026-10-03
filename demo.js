@@ -18,6 +18,9 @@ const GUESTS = ['block', 'qtpass', 'badgeteam', 'block', 'block'];
 // The padlocked heart (AnonMoos, public domain), split in two so the shackle can lift out of the heart.
 const SHACKLE_SRC = '/demo/qtpass-shackle.svg';
 const HEART_SRC = '/demo/qtpass-body.svg';
+const LEFT_LEG = 0.305; // the shackle's left leg, x = -630 in the 3230-wide viewBox
+const HEART_PAD_X = 0.4; // buffer room beside the heart for the swung shackle
+const HEART_PAD_TOP = 0.3; // and above it for the lifted one
 const STAMP_SRC = '/demo/badgeteam-stamp.svg'; // Badge.Team's 80s stamp (CC BY 4.0)
 const HERO_SRC = '/demo/badgeteam-hero.jpg'; // Badge.Team's hero photo (CC BY 4.0)
 const BADGES_SRC = '/demo/badges.webp'; // eight badge drawings in 512 px cells (CC BY 4.0)
@@ -192,7 +195,7 @@ export function start(logoSrc) {
 
     // The QtPass heart is drawn into its own buffer, so it can be darkened and scaled as one.
     heartSize = Math.round(Math.min(floorY * 0.8, bh * 1.6)); // headroom for the lifted shackle
-    heartBuf = make(heartSize, heartSize);
+    heartBuf = make(Math.round(heartSize * (1 + 2 * HEART_PAD_X)), Math.round(heartSize * (1 + HEART_PAD_TOP)));
     heartCtx = heartBuf.getContext('2d');
 
     stampBuf = null;
@@ -300,18 +303,30 @@ export function start(logoSrc) {
   // beat 36 and locks again on 52, darkens while hush closes its filter, and spins away.
   function drawHeart(t, p) {
     const S = heartSize;
-    // Unlocked, the shackle lifts; its legs stay hidden behind the heart.
-    const open = ease(36, 37, p) * (1 - ease(52, 53, p)) * 0.14 * S;
-    heartCtx.clearRect(0, 0, S, S);
-    heartCtx.drawImage(shackle, 0, -open, S, S);
-    heartCtx.drawImage(heart, 0, 0, S, S);
+    const px = HEART_PAD_X * S;
+    const py = HEART_PAD_TOP * S;
+    // Unlocking, like a real padlock: the shackle lifts (36-36.5), swings round its left
+    // leg (36.5-37.5), and on 52-53.5 swings back and drops in again.
+    const lift = ease(36, 36.5, p) * (1 - ease(53, 53.5, p)) * 0.16 * S;
+    const swing = ease(36.5, 37.5, p) * (1 - ease(52, 53, p));
+    const pivot = px + LEFT_LEG * S;
+    heartCtx.clearRect(0, 0, heartBuf.width, heartBuf.height);
+    heartCtx.save();
+    heartCtx.translate(pivot, 0);
+    heartCtx.scale(Math.cos(swing * Math.PI), 1);
+    heartCtx.translate(-pivot, 0);
+    heartCtx.drawImage(shackle, px, py - lift, S, S);
+    heartCtx.restore();
+    heartCtx.drawImage(heart, px, py, S, S);
     const dark = 0.6 * ease(42, 58, p);
     if (dark > 0) {
       heartCtx.globalCompositeOperation = 'source-atop';
       heartCtx.fillStyle = `rgba(0, 0, 0, ${dark})`;
-      heartCtx.fillRect(0, 0, S, S);
+      heartCtx.fillRect(0, 0, heartBuf.width, heartBuf.height);
       heartCtx.globalCompositeOperation = 'source-over';
     }
+    // Draw the buffer so the heart image's centre lands on (x, y) at scale k.
+    const blit = (g, x, y, k) => g.drawImage(heartBuf, x - (px + S / 2) * k, y - (py + S / 2) * k, heartBuf.width * k, heartBuf.height * k);
 
     const s = p - B(32);
     const kick = Math.exp(-9 * (p % BEAT)) * ease(33, 34, p);
@@ -333,13 +348,13 @@ export function start(logoSrc) {
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(ease(56, 60, p) * Math.PI * 2);
-      ctx.drawImage(heartBuf, -size / 2, -size / 2, size, size);
+      blit(ctx, 0, 0, size / S);
       ctx.restore();
     }
     // The water mirrors the resting heart.
     sceneCtx.clearRect(0, 0, scene.width, scene.height);
     const rs = S * (1 + 0.07 * kick) * leave;
-    if (rs > 1) sceneCtx.drawImage(heartBuf, scene.width / 2 - rs / 2, cy - rs / 2, rs, rs);
+    if (rs > 1) blit(sceneCtx, scene.width / 2, cy, rs / S);
     drawWater(t, p);
   }
 
