@@ -47,16 +47,18 @@ path = ["logos/github.svg", "logos/linkedin.svg", "logos/mastodon.svg"]
 SPDX-FileCopyrightText = "Simple Icons contributors"
 SPDX-License-Identifier = "CC0-1.0"
 
-# The QtPass padlocked heart, split into its shackle and its heart for the demo.
+# The QtPass padlocked heart without its shackle, for the demo (which draws the shackle
+# from the logo's geometry).
 [[annotations]]
-path = ["demo/qtpass-shackle.svg", "demo/qtpass-body.svg"]
+path = ["demo/qtpass-body.svg"]
 SPDX-FileCopyrightText = "AnonMoos"
 SPDX-License-Identifier = "CC0-1.0"
 
-# Badge.Team's 80s stamp (unchanged), badge drawings (rendered into one sheet) and hero
-# photo (resized), from https://github.com/badgeteam/website, for the demo.
+# Badge.Team's 80s stamp (unchanged), badge drawings (rendered into one sheet, and the
+# Konsool on its own, cropped) and hero photo (resized), from
+# https://github.com/badgeteam/website, for the demo.
 [[annotations]]
-path = ["demo/badgeteam-stamp.svg", "demo/badges.webp", "demo/badgeteam-hero.jpg"]
+path = ["demo/badgeteam-stamp.svg", "demo/badges.webp", "demo/konsool.webp", "demo/badgeteam-hero.jpg"]
 SPDX-FileCopyrightText = "Stichting Badge.Team"
 SPDX-License-Identifier = "CC-BY-4.0"
 

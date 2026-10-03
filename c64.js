@@ -4,6 +4,8 @@
 // The SID-style sounds are made with Web Audio on the spot, there are no samples.
 // Esc is RUN/STOP; when nothing runs, Esc closes the screen.
 
+import { demoMusic } from '/demo.js';
+
 const COLS = 40;
 const ROWS = 25;
 // The 16 C64 colours (Pepto's measured palette).
@@ -28,6 +30,8 @@ const DISK = [
   divider('---- DEFEEST ---'),
   // Kloten met de broodtrommel (C64, X 2026), as big as on its own disk.
   { name: 'KLOTEN BROODTROM', blocks: 146, url: 'https://www.youtube.com/watch?v=Cj4rynml_qI' },
+  // Its music on its own: RUN plays the release's SID (8580, recorded in VICE) with VU bars.
+  { name: 'KLOTEN.SID', blocks: 62, sid: true },
   // Claude maar wat aan (TIC-80, Outline 2026).
   { name: 'CLAUDE MAAR WAT', blocks: 64, url: 'https://youtu.be/_vUn_xbWBt8' },
   // Outline 2017: realtime wild and animation.
@@ -42,6 +46,8 @@ const DISK = [
     '  DEFEEST. ARRANGED BY ANUS',
     '  WITH KLOOT AND AUGURK.',
     '  SITE REMIX: ANUS + CLAUDE',
+    'KLOTEN.SID: THE RELEASE SID,',
+    '  8580, RECORDED IN VICE',
     'FONT: PRESS START 2P (OFL)',
     'ICONS: SIMPLE ICONS (CC0)',
     '404: YUKI AND THE ROPE',
@@ -136,7 +142,7 @@ export function start() {
         } else if (seg.reverse) {
           const span = document.createElement('span');
           span.textContent = seg.text;
-          span.style.background = PALETTE[colors.text];
+          span.style.background = PALETTE[seg.color ?? colors.text];
           span.style.color = PALETTE[colors.background];
           row.append(span);
         } else {
@@ -166,6 +172,7 @@ export function start() {
   let pulse = null;    // the SID's pulse wave, 25% duty cycle
   let noise = null;    // 20 ms of fading white noise
   let hum = null;      // the drive motor, while LOADING
+  let musicGain = null; // KLOTEN.SID's output, also under the SID volume
 
   function sid() {
     if (!audio) {
@@ -205,6 +212,7 @@ export function start() {
   function setVolume(value) {
     volume = value;
     if (master) master.gain.value = LEVEL * volume / 15;
+    if (musicGain) musicGain.gain.value = volume / 15;
   }
 
   // ?... ERROR: a short, harsh pulse buzz that drops a fifth.
@@ -473,11 +481,104 @@ export function start() {
     ready();
   }
 
+  // KLOTEN.SID: the release's own music, with 16 VU bars in reverse-video blocks driven by
+  // a Web Audio analyser, and a border that flashes on the kick. Esc is RUN/STOP.
+  const VU_BANDS = 12;
+  const VU_ROWS = 14;
+  function playSid() {
+    const track = new Audio();
+    track.src = track.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten-sid.ogg' : '/music/kloten-sid.m4a';
+    track.loop = true;
+    let analyser = null;
+    let bins = null;
+    let nyquist = 24000;
+    try {
+      const context = sid();
+      if (context) {
+        if (!musicGain) {
+          musicGain = context.createGain();
+          musicGain.connect(context.destination);
+        }
+        musicGain.gain.value = volume / 15;
+        analyser = context.createAnalyser();
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.55;
+        context.createMediaElementSource(track).connect(analyser);
+        analyser.connect(musicGain);
+        bins = new Uint8Array(analyser.frequencyBinCount);
+        nyquist = context.sampleRate / 2;
+      }
+    } catch {
+      analyser = null;
+    }
+    track.play().catch(() => {});
+
+    const saved = lines;
+    const border = colors.border;
+    const job = { stop: false };
+    running = job;
+    const clock = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+    function frame() {
+      if (closed || job.stop) {
+        track.pause();
+        track.removeAttribute('src');
+        track.load();
+        if (closed) return;
+        colors.border = border;
+        lines = saved;
+        running = null;
+        println();
+        println('BREAK');
+        ready();
+        return;
+      }
+      const heights = new Array(VU_BANDS).fill(0);
+      if (analyser) {
+        analyser.getByteFrequencyData(bins);
+        for (let b = 0; b < VU_BANDS; b += 1) {
+          const lo = 40 * 300 ** (b / VU_BANDS);          // 40 Hz .. 12 kHz, log-spaced
+          const hi = 40 * 300 ** ((b + 1) / VU_BANDS);
+          const i0 = Math.floor(lo / nyquist * bins.length);
+          const i1 = Math.max(i0 + 1, Math.ceil(hi / nyquist * bins.length));
+          let peak = 0;
+          for (let i = i0; i < i1; i += 1) peak = Math.max(peak, bins[i]);
+          heights[b] = Math.round(Math.max(0, peak - 110) / 145 * VU_ROWS);   // the quiet half is never empty
+        }
+      }
+      colors.border = heights[0] + heights[1] > 23 ? [2, 7, 1, 3][Math.floor(track.currentTime * 8) % 4] : border;
+
+      lines = [[]];
+      println();
+      println('  NOW PLAYING: KLOTEN.SID');
+      println('  KLOTEN MET DE BROODTROMMEL');
+      println('  DEFEEST, X 2026. 8580 SID');
+      println();
+      for (let r = VU_ROWS; r >= 1; r -= 1) {
+        const row = lines[lines.length - 1];
+        const color = r > VU_ROWS - 3 ? 2 : r > VU_ROWS - 7 ? 7 : 5;   // red, yellow, green
+        row.push({ text: '  ' });
+        for (let b = 0; b < VU_BANDS; b += 1) {
+          row.push(heights[b] >= r ? { text: '  ', reverse: true, color } : { text: '  ' });
+          row.push({ text: ' ' });
+        }
+        lines.push([]);
+      }
+      println();
+      const total = Number.isFinite(track.duration) ? ` / ${clock(track.duration)}` : '';
+      println(`  ${clock(track.currentTime)}${total}   ESC = RUN/STOP`);
+      paint();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
   function run() {
+    if (loaded && loaded.sid) return playSid();
     if (loaded && loaded.demo) {
       if (reduceMotion) { error('REDUCED MOTION'); return ready(); }
+      const music = demoMusic();   // inside the key press, so the browser allows the sound
       close();
-      import('/demo.js').then((demo) => demo.start('/ajb.svg'));
+      import('/demo.js').then((demo) => demo.start('/ajb.svg', music));
       return undefined;
     }
     if (loaded && loaded.url) {

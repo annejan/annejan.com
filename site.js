@@ -58,10 +58,24 @@ if (mark && !reduceMotion) {
     mark.classList.add('boing');
     if (clicks >= 5) {
       clicks = 0;
-      import('/demo.js').then((demo) => demo.start(mark.currentSrc || mark.src));
+      // Start the music inside the click: by the time demo.js has loaded, the browser may
+      // no longer count it as the click's doing, and block the sound.
+      const music = new Audio();
+      music.src = music.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten-remix.ogg' : '/music/kloten-remix.m4a';
+      music.loop = true;
+      music.play().catch(() => {});
+      import('/demo.js').then((demo) => demo.start(mark.currentSrc || mark.src, music));
     }
   });
 }
+
+// annejan.com/#demo starts the demo straight away, so it can be shared as a link.
+function demoFromLink() {
+  if (location.hash !== '#demo' || reduceMotion) return;
+  import('/demo.js').then((demo) => demo.start(mark ? mark.currentSrc || mark.src : '/ajb.svg'));
+}
+demoFromLink();
+addEventListener('hashchange', demoFromLink);
 
 // The Konami code turns the page into a C64.
 const konami = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];

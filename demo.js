@@ -3,7 +3,7 @@
 // Then the blocky 2010 logo drops in, with copper in the letters, a column swing and water.
 // In the second and third loop guests take its place: the QtPass heart, and the Badge.Team
 // stamp with a carousel of badges over their hero photo.
-// Click or Esc to leave, M mutes.
+// Click or Esc to leave, M mutes, F goes fullscreen. annejan.com/#demo starts it straight away.
 
 const COLORS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const SCROLL_TEXT =
@@ -14,11 +14,11 @@ const FONT = '"Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive';
 const BLOCK_SRC = '/logo.svg'; // the blocky 2010 AJB wordmark
 const BLOCK_ASPECT = 467 / 220; // from its viewBox, because SVG intrinsic sizes differ per browser
 // The remix is five loops long; this is who drops in on beat 32 of each loop.
-const GUESTS = ['block', 'qtpass', 'badgeteam', 'block', 'block'];
-// The padlocked heart (AnonMoos, public domain), split in two so the shackle can lift out of the heart.
-const SHACKLE_SRC = '/demo/qtpass-shackle.svg';
+const GUESTS = ['block', 'qtpass', 'badgeteam', 'finale', 'konsool'];
+// The padlocked heart (AnonMoos, public domain) without its shackle, which is drawn from the
+// logo's own geometry instead, so the shackle can lift out of the heart and turn.
 const HEART_SRC = '/demo/qtpass-body.svg';
-const LEFT_LEG = 0.305; // the shackle's left leg, x = -630 in the 3230-wide viewBox
+const HEART_VIEW = 3230; // the logo's viewBox is (-1615, -1050) to (1615, 2180)
 const HEART_PAD_X = 0.4; // buffer room beside the heart for the swung shackle
 const HEART_PAD_TOP = 0.3; // and above it for the lifted one
 const STAMP_SRC = '/demo/badgeteam-stamp.svg'; // Badge.Team's 80s stamp (CC BY 4.0)
@@ -26,6 +26,8 @@ const HERO_SRC = '/demo/badgeteam-hero.jpg'; // Badge.Team's hero photo (CC BY 4
 const BADGES_SRC = '/demo/badges.webp'; // eight badge drawings in 512 px cells (CC BY 4.0)
 const BADGE_COUNT = 8;
 const BADGE_CELL = 512;
+const KONSOOL_SRC = '/demo/konsool.webp'; // Badge.Team's Konsool (Tanmatsu) drawing (CC BY 4.0)
+const KONSOOL_SCREEN = { x: 0.1218, y: 0.0932, w: 0.7553, h: 0.4027 }; // its display, as fractions
 const BEAT = 0.48; // Kloten: 24 PAL frames per beat (125 BPM)
 const LOOP = 64 * BEAT; // 16 bars
 // The loop, in beats:
@@ -76,8 +78,11 @@ function strip(rows, line) {
 
 let running = false;
 
-export function start(logoSrc) {
-  if (running) return;
+export function start(logoSrc, remix) {
+  if (running) {
+    if (remix) remix.pause();
+    return;
+  }
   running = true;
 
   const canvas = document.createElement('canvas');
@@ -93,8 +98,6 @@ export function start(logoSrc) {
   logo.src = logoSrc;
   const block = new Image();
   block.src = BLOCK_SRC;
-  const shackle = new Image();
-  shackle.src = SHACKLE_SRC;
   const heart = new Image();
   heart.src = HEART_SRC;
   const stamp = new Image();
@@ -103,13 +106,16 @@ export function start(logoSrc) {
   hero.src = HERO_SRC;
   const badges = new Image();
   badges.src = BADGES_SRC;
+  const konsool = new Image();
+  konsool.src = KONSOOL_SRC;
   const ready = (img) => img.complete && img.naturalWidth > 0;
 
   // The annejan.com remix of "Kloten met de broodtrommel" by deFEEST (X 2026). M mutes.
-  const music = new Audio();
-  music.src = music.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten-remix.ogg' : '/music/kloten-remix.m4a';
-  music.loop = true;
-  music.play().catch(() => {});
+  // A click that starts the demo passes its own, already playing element (see site.js).
+  const music = remix || demoMusic();
+  // Started from a link, the browser blocks sound until a click or key: the first one turns it on.
+  let needSound = false;
+  music.play().catch((error) => { if (error.name === 'NotAllowedError') needSound = true; });
   const stars = Array.from({ length: 240 }, () => ({ x: Math.random(), y: Math.random(), z: Math.random() }));
 
   let w, h, dpr, logoCanvas, fontSize, charWidths, textWidth;
@@ -119,6 +125,7 @@ export function start(logoSrc) {
   let extrude, face, faceCtx, stage, stageCtx, scene, sceneCtx, copper, barStrips;
   let heartSize = 0, heartBuf, heartCtx;
   let stampBuf = null; // the stamp SVG, rasterised once per layout at its drawn size
+  let prev = null, prevCtx; // the previous frame, for the Konsool's display
 
   function layout() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -197,6 +204,9 @@ export function start(logoSrc) {
     heartSize = Math.round(Math.min(floorY * 0.8, bh * 1.6)); // headroom for the lifted shackle
     heartBuf = make(Math.round(heartSize * (1 + 2 * HEART_PAD_X)), Math.round(heartSize * (1 + HEART_PAD_TOP)));
     heartCtx = heartBuf.getContext('2d');
+
+    prev = make(w, h);
+    prevCtx = prev.getContext('2d');
 
     stampBuf = null;
     if (ready(stamp)) {
@@ -299,6 +309,120 @@ export function start(logoSrc) {
     }
   }
 
+  // The heart into its buffer: the shackle lifted by `lift` px and swung round its left leg
+  // (swing 0 closed, 1 swung round), the whole darkened by `dark`.
+  function renderHeart(lift, swing, dark) {
+    const S = heartSize;
+    const px = HEART_PAD_X * S;
+    const py = HEART_PAD_TOP * S;
+    heartCtx.clearRect(0, 0, heartBuf.width, heartBuf.height);
+    // The shackle is a round bar: turned round its left leg, its centre line is foreshortened,
+    // but from any side the bar stays as thick as it is. So foreshorten only the path, and
+    // stroke it untransformed. Logo units, y up, as in the logo's own transform.
+    const k = S / HEART_VIEW;
+    heartCtx.save();
+    heartCtx.setTransform(k, 0, 0, -k, px + 1615 * k, py - lift + 2186 * k);
+    heartCtx.save();
+    heartCtx.translate(-630, 0);
+    heartCtx.scale(Math.cos(swing * Math.PI), 1);
+    heartCtx.translate(630, 0);
+    heartCtx.beginPath();
+    heartCtx.moveTo(-630, 0);
+    heartCtx.lineTo(-630, 1320);
+    heartCtx.arc(0, 1320, 630, Math.PI, 0, true);
+    // A padlock's short leg: just into the heart (its top is at y 1030-1080 here), so lifted, it's out.
+    heartCtx.lineTo(630, 900);
+    heartCtx.restore();
+    // The logo's grey-silver-grey bar, as rings that look the same from every side.
+    for (const [width, colour] of [[360, 'gray'], [280, '#9c9c9c'], [200, '#b0b0b0'], [120, 'silver']]) {
+      heartCtx.lineWidth = width;
+      heartCtx.strokeStyle = colour;
+      heartCtx.stroke();
+    }
+    heartCtx.restore();
+    heartCtx.drawImage(heart, px, py, S, S);
+    if (dark > 0) {
+      heartCtx.globalCompositeOperation = 'source-atop';
+      heartCtx.fillStyle = `rgba(0, 0, 0, ${dark})`;
+      heartCtx.fillRect(0, 0, heartBuf.width, heartBuf.height);
+      heartCtx.globalCompositeOperation = 'source-over';
+    }
+  }
+
+  // Sprites circling (cx, cy) on an ellipse, sorted back to front, each jumping on the beat.
+  // A sprite is a source rectangle { img, sx, sy, sw, sh }.
+  function orbit(t, p, sprites, cx, cy, rx, ry, size0, speed, fade) {
+    return sprites.map((sp, i) => {
+      const a = t * speed + (i * 2 * Math.PI) / sprites.length;
+      const z = Math.sin(a);
+      const jump = Math.exp(-8 * ((p + i * BEAT / 4) % BEAT)) * 0.22 * size0;
+      const size = size0 * (0.62 + 0.38 * (z + 1) / 2) * fade;
+      return { sp, z, size, x: cx + Math.cos(a) * rx, y: cy + z * ry - jump };
+    }).sort((u, v) => u.z - v.z);
+  }
+  function drawSprite(b) {
+    const { img, sx, sy, sw, sh } = b.sp;
+    const k = b.size / Math.max(sw, sh);
+    ctx.globalAlpha = 0.55 + 0.45 * (b.z + 1) / 2;
+    ctx.drawImage(img, sx, sy, sw, sh, b.x - sw * k / 2, b.y - sh * k / 2, sw * k, sh * k);
+    ctx.globalAlpha = 1;
+  }
+  const badgeSprites = () => Array.from({ length: BADGE_COUNT },
+    (_, i) => ({ img: badges, sx: i * BADGE_CELL, sy: 0, sw: BADGE_CELL, sh: BADGE_CELL }));
+
+  // The finale (coda): the block AJB as in the first loop, with every guest circling it, faster.
+  function drawFinale(t, p) {
+    const fade = ease(35, 37, p) * (1 - ease(55, 57, p));
+    const sprites = ready(badges) ? badgeSprites() : [];
+    if (stampBuf) sprites.splice(4, 0, { img: stampBuf, sx: 0, sy: 0, sw: stampBuf.width, sh: stampBuf.height });
+    if (ready(heart)) {
+      renderHeart(0, 0, 0);
+      const S = heartSize;
+      sprites.unshift({ img: heartBuf, sx: HEART_PAD_X * S, sy: HEART_PAD_TOP * S, sw: S, sh: S });
+    }
+    const size0 = bh * 0.7;
+    const items = fade > 0
+      ? orbit(t, p, sprites, bx + scene.width / 2, by + bh * 0.5, Math.min(w * 0.5 - size0 * 0.55, bw * 0.95), bh * 0.55, size0, 1.2, fade)
+      : [];
+    items.filter((b) => b.z <= 0).forEach(drawSprite);
+    drawBlock(t, p);
+    items.filter((b) => b.z > 0).forEach(drawSprite);
+  }
+
+  // The Konsool (Tanmatsu) drops in, and its display shows the demo itself: the previous
+  // frame, every frame, so the picture tunnels in forever. The camera moves in on 44-48.
+  function drawKonsool(t, p) {
+    const s = p - B(32);
+    const kh = Math.min(floorY * 0.9, scene.width * konsool.naturalHeight / konsool.naturalWidth);
+    const kw = kh * konsool.naturalWidth / konsool.naturalHeight;
+    const fall = floorY + kh;
+    const amp = s < BEAT ? fall : Math.min(fall, 3.5 * by);
+    const lift = amp * Math.exp(-1.6 * s) * Math.abs(Math.cos(Math.PI * s / (2 * BEAT)));
+    const sink = p >= B(56) ? (p - B(56)) ** 2 * bh * 2 : 0;
+    const top = floorY - 0.04 * kh - kh - lift + sink;
+    const left = (scene.width - kw) / 2;
+    sceneCtx.clearRect(0, 0, scene.width, scene.height);
+    sceneCtx.drawImage(konsool, left, top, kw, kh);
+
+    const sx = bx + left + KONSOOL_SCREEN.x * kw;
+    const sy = top + KONSOOL_SCREEN.y * kh;
+    const sw = KONSOOL_SCREEN.w * kw;
+    const sh = KONSOOL_SCREEN.h * kh;
+    const zoom = 1 + 1.3 * ease(44, 48, p) * (1 - ease(52, 55, p));
+    ctx.save();
+    ctx.translate(sx + sw / 2, sy + sh / 2);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-(sx + sw / 2), -(sy + sh / 2));
+    ctx.drawImage(scene, bx, 0);
+    if (prev) ctx.drawImage(prev, 0, 0, prev.width, prev.height, sx, sy, sw, sh);
+    // LCD scanlines over the display.
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+    const line = Math.max(1, sh / 90);
+    for (let y = sy; y < sy + sh; y += line * 2) ctx.fillRect(sx, y, sw, line);
+    drawWater(t, p);
+    ctx.restore();
+  }
+
   // QtPass: the padlocked heart punches in on the drop, beats on every kick, unlocks on
   // beat 36 and locks again on 52, darkens while hush closes its filter, and spins away.
   function drawHeart(t, p) {
@@ -307,24 +431,8 @@ export function start(logoSrc) {
     const py = HEART_PAD_TOP * S;
     // Unlocking, like a real padlock: the shackle lifts (36-36.5), swings round its left
     // leg (36.5-37.5), and on 52-53.5 swings back and drops in again.
-    const lift = ease(36, 36.5, p) * (1 - ease(53, 53.5, p)) * 0.16 * S;
-    const swing = ease(36.5, 37.5, p) * (1 - ease(52, 53, p));
-    const pivot = px + LEFT_LEG * S;
-    heartCtx.clearRect(0, 0, heartBuf.width, heartBuf.height);
-    heartCtx.save();
-    heartCtx.translate(pivot, 0);
-    heartCtx.scale(Math.cos(swing * Math.PI), 1);
-    heartCtx.translate(-pivot, 0);
-    heartCtx.drawImage(shackle, px, py - lift, S, S);
-    heartCtx.restore();
-    heartCtx.drawImage(heart, px, py, S, S);
-    const dark = 0.6 * ease(42, 58, p);
-    if (dark > 0) {
-      heartCtx.globalCompositeOperation = 'source-atop';
-      heartCtx.fillStyle = `rgba(0, 0, 0, ${dark})`;
-      heartCtx.fillRect(0, 0, heartBuf.width, heartBuf.height);
-      heartCtx.globalCompositeOperation = 'source-over';
-    }
+    renderHeart(ease(36, 36.5, p) * (1 - ease(53, 53.5, p)) * 0.16 * S,
+      ease(36.5, 37.5, p) * (1 - ease(52, 53, p)), 0.6 * ease(42, 58, p));
     // Draw the buffer so the heart image's centre lands on (x, y) at scale k.
     const blit = (g, x, y, k) => g.drawImage(heartBuf, x - (px + S / 2) * k, y - (py + S / 2) * k, heartBuf.width * k, heartBuf.height * k);
 
@@ -385,47 +493,39 @@ export function start(logoSrc) {
     const cx = bx + scene.width / 2;
     const cy = floorY - 0.5 * sH;
     const fade = ease(35, 37, p) * (1 - ease(55, 57, p));
-    const items = [];
-    if (fade > 0 && ready(badges)) {
-      const size0 = bh * 0.62;
-      const rx = Math.min(w * 0.5 - size0 * 0.55, scene.width * 0.9); // the front badges stay on screen
-      const ry = sH * 0.28;
-      for (let i = 0; i < BADGE_COUNT; i++) {
-        const a = t * 0.7 + (i * 2 * Math.PI) / BADGE_COUNT;
-        const z = Math.sin(a);
-        const jump = Math.exp(-8 * ((p + i * BEAT / 4) % BEAT)) * 0.22 * size0;
-        const size = size0 * (0.62 + 0.38 * (z + 1) / 2) * fade;
-        items.push({ i, z, size, x: cx + Math.cos(a) * rx, y: cy + z * ry - jump });
-      }
-      items.sort((u, v) => u.z - v.z);
-    }
-    const drawBadge = (b) => {
-      ctx.globalAlpha = 0.55 + 0.45 * (b.z + 1) / 2;
-      ctx.drawImage(badges, b.i * BADGE_CELL, 0, BADGE_CELL, BADGE_CELL, b.x - b.size / 2, b.y - b.size / 2, b.size, b.size);
-      ctx.globalAlpha = 1;
-    };
-    items.filter((b) => b.z <= 0).forEach(drawBadge);
+    const size0 = bh * 0.62;
+    const rx = Math.min(w * 0.5 - size0 * 0.55, scene.width * 0.9); // the front badges stay on screen
+    const items = fade > 0 && ready(badges) ? orbit(t, p, badgeSprites(), cx, cy, rx, sH * 0.28, size0, 0.7, fade) : [];
+    items.filter((b) => b.z <= 0).forEach(drawSprite);
 
     sceneCtx.clearRect(0, 0, scene.width, scene.height);
     sceneCtx.drawImage(stampBuf, (scene.width - sw) / 2, top);
     ctx.drawImage(scene, bx, 0);
     drawWater(t, p);
 
-    items.filter((b) => b.z > 0).forEach(drawBadge);
+    items.filter((b) => b.z > 0).forEach(drawSprite);
   }
 
   function frame() {
     const t = (performance.now() - t0) / 1000;
-    // Latch the timeline to the music once, during part 1, so the first pass lands on its beat grid.
-    // After a late start or a track loop it runs on its own clock.
-    if (!latched && t < 8 && music.currentTime > 0) {
+    // Latch the timeline to the music once, when it starts, so the visuals land on its beat grid.
+    // After a track loop it runs on its own clock.
+    if (!latched && music.currentTime > 0) {
       latched = true;
       mt0 = Math.max(0, t - music.currentTime);
     }
     // Without the block logo, stay in part 1 forever.
     const p = mask ? (t - mt0) % LOOP : 0;
     let guest = GUESTS[Math.floor(Math.max(0, t - mt0) / LOOP) % GUESTS.length];
-    if ((guest === 'qtpass' && !(ready(shackle) && ready(heart))) || (guest === 'badgeteam' && !stampBuf)) guest = 'block';
+    // Where the remix is (bar 0-79), for the beat-reactive bits: its drums play in bars 4-15
+    // and 23-63, and greets and coda (bars 32-63) are the drop, with a crash every 4 bars.
+    const songT = Math.max(0, t - mt0) % (5 * LOOP);
+    const bar = Math.floor(songT / (4 * BEAT));
+    const kick = (bar >= 4 && bar < 16) || (bar >= 23 && bar < 64) ? Math.exp(-9 * (songT % BEAT)) : 0;
+    const drop = bar >= 32 && bar < 64;
+    const crash = drop && bar % 4 === 0 ? Math.exp(-6 * (songT % (4 * BEAT))) : 0;
+    if ((guest === 'qtpass' && !(ready(heart))) || (guest === 'badgeteam' && !stampBuf) ||
+        (guest === 'konsool' && !ready(konsool))) guest = 'block';
     // Part weights: the monogram leaves on beats 30-33 and comes back on 59-62.
     const mono = 1 - ease(30, 33, p) * (1 - ease(59, 62, p));
     const out = 1 - mono;
@@ -438,10 +538,10 @@ export function start(logoSrc) {
 
     // Starfield, scrolling left with parallax. It streaks while the logos swap.
     for (const s of stars) {
-      s.x -= (0.0004 + s.z * 0.003) * (1 + 8 * warp);
+      s.x -= (0.0004 + s.z * 0.003) * (1 + 8 * warp + 5 * kick);
       if (s.x < 0) s.x += 1;
       const size = (1 + s.z * 2) * dpr;
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.25 + s.z * 0.75})`;
+      ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, 0.25 + s.z * 0.75 + 0.35 * kick)})`;
       ctx.fillRect(s.x * w, s.y * h, size + warp * s.z * 120 * dpr, size);
     }
 
@@ -490,7 +590,15 @@ export function start(logoSrc) {
     if (mask && p >= B(32) && p < B(60)) {
       if (guest === 'qtpass') drawHeart(t, p);
       else if (guest === 'badgeteam') drawBadgeTeam(t, p);
+      else if (guest === 'finale') drawFinale(t, p);
+      else if (guest === 'konsool') drawKonsool(t, p);
       else drawBlock(t, p);
+    }
+
+    // A white flash on every crash in the drop.
+    if (crash > 0.01) {
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.22 * crash})`;
+      ctx.fillRect(0, 0, w, h);
     }
 
     // Sine scroller.
@@ -501,18 +609,31 @@ export function start(logoSrc) {
     [...SCROLL_TEXT].forEach((c, i) => {
       const cw = charWidths[i];
       if (x > -cw && x < w) {
-        const y = base + Math.sin(t * 4 + x / (90 * dpr)) * fontSize * 0.45;
+        const y = base + Math.sin(t * 4 + x / (90 * dpr)) * fontSize * (drop ? 0.6 : 0.45) - kick * fontSize * 0.15;
         ctx.fillStyle = COLORS[Math.floor(i / 3 + t * 2) % COLORS.length];
         ctx.fillText(c, x, y);
       }
       x += cw;
     });
 
+    if (needSound) {
+      ctx.font = `bold ${Math.round(fontSize * 0.4)}px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.6 + 0.4 * Math.sin(t * 4)})`;
+      ctx.fillText('CLICK OR PRESS A KEY FOR SOUND', w / 2, h * 0.05);
+      ctx.textAlign = 'start';
+    }
+
+    // The Konsool's display shows this frame next time.
+    if (guest === 'konsool' && prev) prevCtx.drawImage(canvas, 0, 0);
+
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 
   function stop() {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (location.hash === '#demo') history.replaceState(null, '', location.pathname + location.search);
     music.pause();
     music.removeAttribute('src');
     music.load();
@@ -524,10 +645,29 @@ export function start(logoSrc) {
     removeEventListener('keydown', onKey);
     running = false;
   }
-  function onKey(event) {
-    if (event.key === 'Escape') stop();
-    if (event.key === 'm' || event.key === 'M') music.muted = !music.muted;
+  function sound() {
+    needSound = false;
+    music.play().catch((error) => { if (error.name === 'NotAllowedError') needSound = true; });
   }
-  canvas.addEventListener('click', stop);
+  function onKey(event) {
+    if (event.key === 'Escape') return stop();
+    if (needSound) sound();
+    if (event.key === 'm' || event.key === 'M') music.muted = !music.muted;
+    if (event.key === 'f' || event.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      else if (canvas.requestFullscreen) canvas.requestFullscreen().catch(() => {});
+    }
+  }
+  canvas.addEventListener('click', () => (needSound ? sound() : stop()));
   addEventListener('keydown', onKey);
+}
+
+// The demo's music, playing. Browsers only allow sound from a click or key, and the dynamic
+// import of this file can outlast that, so a click handler calls this first, synchronously.
+export function demoMusic() {
+  const music = new Audio();
+  music.src = music.canPlayType('audio/ogg; codecs=opus') ? '/music/kloten-remix.ogg' : '/music/kloten-remix.m4a';
+  music.loop = true;
+  music.play().catch(() => {});
+  return music;
 }
