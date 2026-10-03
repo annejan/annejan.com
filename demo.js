@@ -336,10 +336,12 @@ export function start(logoSrc, remix) {
     // A padlock's short leg: just into the heart (its top is at y 1030-1080 here), so lifted, it's out.
     heartCtx.lineTo(630, 900);
     heartCtx.restore();
-    // The logo's grey-silver-grey bar, as rings that look the same from every side.
-    for (const [width, colour] of [[360, 'gray'], [280, '#9c9c9c'], [200, '#b0b0b0'], [120, 'silver']]) {
+    // The logo's shading across the bar: gray at the edges, silver in the middle. As nested
+    // strokes, outside in, it looks the same from every side.
+    for (let width = 360; width > 0; width -= 12) {
+      const v = Math.round(128 + 64 * Math.min(1, Math.max(0, (0.45 - width / 720) / 0.35)));
       heartCtx.lineWidth = width;
-      heartCtx.strokeStyle = colour;
+      heartCtx.strokeStyle = `rgb(${v}, ${v}, ${v})`;
       heartCtx.stroke();
     }
     heartCtx.restore();
