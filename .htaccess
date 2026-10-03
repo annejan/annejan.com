@@ -8,6 +8,17 @@ ErrorDocument 404 /error/404.html
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 </If>
 
+# Caching: code and text are always revalidated (a cheap 304 when unchanged), so a
+# new demo.js is never stuck behind an old one; media may be kept for a day.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|js|css|txt|xml|toml)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+    <FilesMatch "\.(ogg|m4a|ttf|png|svg|jpg|ico)$">
+        Header set Cache-Control "max-age=86400"
+    </FilesMatch>
+</IfModule>
+
 # Old side documents that now live elsewhere
 Redirect 301 /media/qtpass.pdf https://qtpass.org/
 
