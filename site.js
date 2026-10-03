@@ -133,7 +133,7 @@ if (document.getElementById('card') && !reduceMotion) {
   const rest = () => {
     clearTimeout(idle);
     idle = setTimeout(() => {
-      if (!busy()) import('/fx/screensaver.js').then((fx) => fx.start());
+      if (!busy()) import('/fx/screensaver.js').then((fx) => fx.start()).catch(() => {});   // offline: no screensaver
       rest();
     }, 60000);
   };
