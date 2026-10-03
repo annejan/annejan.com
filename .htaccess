@@ -8,6 +8,9 @@ ErrorDocument 404 /error/404.html
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 </If>
 
+# Old side documents that now live elsewhere
+Redirect 301 /media/qtpass.pdf https://qtpass.org/
+
 # One canonical host: send www.annejan.com, and any other name that lands here,
 # to annejan.com (but leave certificate challenges alone)
 <IfModule mod_rewrite.c>
