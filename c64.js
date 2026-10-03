@@ -276,8 +276,23 @@ export function start() {
     thock.stop(t + 0.06);
   });
 
-  // Switching on: the thump of the power and the crackle of a TV's picture tube.
+  // Switching on: the thump of the power and the crackle of a TV's picture tube, and then
+  // the tube's line whistle, 15,625 Hz on a PAL set (625 lines, 25 frames a second): very
+  // quiet, inaudible to most grown-ups and to many speakers, unmissable for children and
+  // dogs. It's the TV, not the SID, so POKE 54296,0 doesn't stop it either.
   const powerOn = () => sound((context, t) => {
+    const whistle = context.createOscillator();
+    whistle.frequency.value = 15625;
+    const faint = context.createGain();
+    faint.gain.setValueAtTime(0, t);
+    faint.gain.linearRampToValueAtTime(0.006, t + 0.6);
+    whistle.connect(faint).connect(context.destination);
+    whistle.start(t);
+    document.addEventListener('visibilitychange', () => {
+      if (closed) return;
+      if (document.hidden) context.suspend();
+      else context.resume();
+    });
     const thump = context.createOscillator();
     thump.frequency.setValueAtTime(70, t);
     thump.frequency.exponentialRampToValueAtTime(32, t + 0.3);
