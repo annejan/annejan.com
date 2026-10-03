@@ -1,8 +1,8 @@
 // After a minute of nothing on the home page, a screensaver, After Dark style: a starfield
 // with things flying through it, each glowing in one of the monogram's colours: mostly AJB
 // monograms, and the causes from the home page: QtPass's padlocked heart, Aid to Ukraine,
-// and Badge.Team, as a name tag. A neon clock drifts slowly over it all. Any mouse move,
-// touch or key brings the page back.
+// and Badge.Team's name in its marker lettering. A neon clock drifts slowly over it all.
+// Any mouse move, touch or key brings the page back.
 
 const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const load = (src) => {
@@ -13,7 +13,7 @@ const load = (src) => {
 const monogram = load('/ajb.svg');
 const heartBody = load('/demo/qtpass-body.svg');
 const aidToUkraine = load('/logos/aidtoukraine.png');   // white, as on the home page
-const stamp = load('/demo/badgeteam-stamp.svg');         // Badge.Team's 80s logo, 567 x 425
+const wordmark = load('/fx/badgeteam-wordmark.svg');      // white, 80 x 10
 const ready = (img) => img.complete && img.naturalWidth > 0;
 let running = false;
 
@@ -44,48 +44,13 @@ function padlockedHeart() {
   return heart;
 }
 
-// Badge.Team as what it makes: a name tag. HELLO, my name is: the 80s logo.
-let tag = null;
-function nameTag() {
-  if (tag || !ready(stamp)) return tag;
-  const W = 360, H = 250, R = 22;
-  tag = document.createElement('canvas');
-  tag.width = W;
-  tag.height = H;
-  const g = tag.getContext('2d');
-  const card = () => {
-    g.beginPath();
-    g.roundRect(0, 0, W, H, R);
-  };
-  card();
-  g.fillStyle = '#fff';
-  g.fill();
-  g.save();
-  card();
-  g.clip();
-  g.fillStyle = '#d60b51';
-  g.fillRect(0, 0, W, 78);
-  g.fillRect(0, H - 16, W, 16);
-  g.restore();
-  g.fillStyle = '#fff';
-  g.textAlign = 'center';
-  g.font = '900 40px system-ui, sans-serif';
-  g.fillText('HELLO', W / 2, 44);
-  g.font = '16px system-ui, sans-serif';
-  g.fillText('my name is', W / 2, 66);
-  const h = H - 78 - 16 - 16;
-  const w = h * 567 / 425;
-  g.drawImage(stamp, (W - w) / 2, 78 + 8, w, h);
-  return tag;
-}
-
 // What a flyer is this time round: a source image and rectangle.
 function pick() {
   const r = Math.random();
   const whole = (img) => ({ img, sx: 0, sy: 0, sw: img.width || img.naturalWidth, sh: img.height || img.naturalHeight });
   if (r < 0.2 && padlockedHeart()) return whole(heart);
   if (r < 0.35 && ready(aidToUkraine)) return whole(aidToUkraine);
-  if (r < 0.5 && nameTag()) return whole(tag);
+  if (r < 0.5 && ready(wordmark)) return whole(wordmark);
   return { img: monogram, sx: 0, sy: 0, sw: 603, sh: 781 };
 }
 
@@ -177,7 +142,7 @@ export function start() {
         if (f.u > 1) { f.u = 0; f.lane = Math.random(); f.sprite = pick(); }
         const { img, sx, sy, sw, sh } = f.sprite;
         const fit = Math.min(W, H) * 0.28 * f.depth;
-        const h = img === monogram ? fit : img === tag ? fit * 0.75 : fit * 0.8 * Math.min(1, sh / sw);
+        const h = img === monogram ? fit : img === wordmark ? fit * 0.26 : fit * 0.8 * Math.min(1, sh / sw);
         const w = h * sw / sh;
         // Along a diagonal from top right to bottom left, offset by its lane.
         const d = f.u * span;
