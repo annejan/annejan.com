@@ -149,6 +149,7 @@ body.fading { opacity: 0; }
   .social { justify-content: center; gap: 12px; }
   .social a { width: 34px; height: 34px; }
   .www { letter-spacing: 0.12em; }
+  .tag { font-size: 12px; letter-spacing: 2px; }
 }
 
 /* CV page */
