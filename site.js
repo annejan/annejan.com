@@ -125,7 +125,8 @@ addEventListener('keydown', (event) => {
   }
 });
 
-// A minute of nothing on the home page brings on the screensaver (fx/screensaver.js).
+// Three minutes of nothing on the home page bring on the screensaver (fx/screensaver.js):
+// long enough not to take the page away from someone still reading it.
 if (document.getElementById('card') && !reduceMotion) {
   let idle;
   const busy = () => document.hidden || document.fullscreenElement || document.querySelector('.c64')
@@ -135,7 +136,7 @@ if (document.getElementById('card') && !reduceMotion) {
     idle = setTimeout(() => {
       if (!busy()) import('/fx/screensaver.js').then((fx) => fx.start()).catch(() => {});   // offline: no screensaver
       rest();
-    }, 60000);
+    }, 180000);
   };
   for (const type of ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll']) addEventListener(type, rest, { passive: true });
   rest();
@@ -200,7 +201,7 @@ console.log(
   '  * click the AJB logo, once, four times, then five times fast\n' +
   '  * up up down down left right left right B A\n' +
   '  * type pass, badger or snake\n' +
-  '  * or just leave it alone for a minute\n' +
+  '  * or just leave it alone for a few minutes\n' +
   '  * ajb.help()\n\n' +
   'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack, Evoke and Outline.',
   'color: #cafe24; font: 12px monospace;',

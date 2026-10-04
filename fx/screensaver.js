@@ -1,4 +1,4 @@
-// After a minute of nothing on the home page, a screensaver, After Dark style: a starfield
+// After three minutes of nothing on the home page, a screensaver, After Dark style: a starfield
 // with things flying through it, each glowing in one of the monogram's colours: mostly AJB
 // monograms, and the causes from the home page, flat white as there: QtPass's padlocked
 // heart, Aid to Ukraine, and Badge.Team's name in its marker lettering. A neon clock

@@ -177,6 +177,7 @@ export function start() {
   let noise = null;    // 20 ms of fading white noise
   let hum = null;      // the drive motor, while LOADING
   let musicGain = null; // KLOTEN.SID's output, also under the SID volume
+  let whistleGain = null; // the TV's line whistle (powerOn)
 
   function sid() {
     if (!audio) {
@@ -217,6 +218,10 @@ export function start() {
     volume = value;
     if (master) master.gain.value = LEVEL * volume / 15;
     if (musicGain) musicGain.gain.value = volume / 15;
+    if (whistleGain) {
+      whistleGain.gain.cancelScheduledValues(0);   // also cuts short the switch-on fade
+      whistleGain.gain.value = volume ? 0.006 : 0;
+    }
   }
 
   // ?... ERROR: a short, harsh pulse buzz that drops a fifth.
@@ -282,11 +287,12 @@ export function start() {
   // Switching on: the thump of the power and the crackle of a TV's picture tube, and then
   // the tube's line whistle, 15,625 Hz on a PAL set (625 lines, 25 frames a second): very
   // quiet, inaudible to most grown-ups and to many speakers, unmissable for children and
-  // dogs. It's the TV, not the SID, so POKE 54296,0 doesn't stop it either.
+  // dogs. Some people find it painful, though, so POKE 54296,0 (mute) silences it too.
   const powerOn = () => sound((context, t) => {
     const whistle = context.createOscillator();
     whistle.frequency.value = 15625;
     const faint = context.createGain();
+    whistleGain = faint;
     faint.gain.setValueAtTime(0, t);
     faint.gain.linearRampToValueAtTime(0.006, t + 0.6);
     whistle.connect(faint).connect(context.destination);
@@ -588,6 +594,7 @@ export function start() {
 
     const saved = lines;
     const border = colors.border;
+    let borderAt = -1;   // when the border last changed
     const job = { stop: false };
     running = job;
     const clock = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
@@ -618,7 +625,13 @@ export function start() {
           heights[b] = Math.round(Math.max(0, peak - 110) / 145 * VU_ROWS);   // the quiet half is never empty
         }
       }
-      colors.border = heights[0] + heights[1] > 23 ? [2, 7, 1, 3][Math.floor(track.currentTime * 8) % 4] : border;
+      // The border thumps with the bass, but between two blues and at most twice a second:
+      // fast, bright, full-screen flashes can trigger seizures (WCAG 2.3.1).
+      const thump = heights[0] + heights[1] > 23 ? 6 : border;
+      if (thump !== colors.border && Math.abs(track.currentTime - borderAt) >= 0.5) {
+        colors.border = thump;
+        borderAt = track.currentTime;
+      }
 
       lines = [[]];
       println();
