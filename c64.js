@@ -27,6 +27,9 @@ const DISK = [
   { name: 'GITHUB', blocks: 1, url: 'https://github.com/annejan' },
   { name: 'MASTODON', blocks: 1, url: 'https://mastodon.social/@annejan' },
   { name: 'LINKEDIN', blocks: 1, url: 'https://www.linkedin.com/in/annejanbrouwer/' },
+  { name: 'QTPASS.ORG', blocks: 1, url: 'https://qtpass.org/' },
+  { name: 'BADGE.RS', blocks: 1, url: 'https://badge.rs/' },
+  { name: 'SCENE.RS', blocks: 1, url: 'https://scene.rs/' },
   divider('---- DEFEEST ---'),
   // Kloten met de broodtrommel (C64, X 2026), as big as on its own disk.
   { name: 'KLOTEN BROODTROM', blocks: 146, url: 'https://www.youtube.com/watch?v=Cj4rynml_qI' },

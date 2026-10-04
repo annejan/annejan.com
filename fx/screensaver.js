@@ -57,6 +57,23 @@ export function start() {
     colour: GLOWS[i % GLOWS.length], wobble: Math.random() * Math.PI * 2, sprite: pick(),
   })).sort((a, b) => a.depth - b.depth);
 
+  // In December it snows.
+  const snow = new Date().getMonth() === 11
+    ? Array.from({ length: 140 }, () => ({ x: Math.random(), y: Math.random(), r: 1 + Math.random() * 2.5, v: 0.03 + Math.random() * 0.05, sway: Math.random() * 6 }))
+    : [];
+  function drawSnow(t, dt) {
+    g.fillStyle = '#fff';
+    for (const f of snow) {
+      f.y += f.v * dt;
+      if (f.y > 1.02) { f.y = -0.02; f.x = Math.random(); }
+      g.globalAlpha = 0.5 + f.r / 7;
+      g.beginPath();
+      g.arc((f.x + Math.sin(t * 0.8 + f.sway) * 0.01) * W, f.y * H, f.r, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.globalAlpha = 1;
+  }
+
   // The clock: a neon HH:MM, drifting and bouncing off the edges, slowly.
   const clock = { x: Math.random(), y: Math.random(), vx: 0.025, vy: 0.018 };
   function drawClock(t, dt) {
@@ -139,6 +156,7 @@ export function start() {
         g.restore();
       }
     }
+    drawSnow(t, dt);
     drawClock(t, dt);
     raf = requestAnimationFrame(frame);
   }

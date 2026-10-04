@@ -141,6 +141,49 @@ if (document.getElementById('card') && !reduceMotion) {
   rest();
 }
 
+// Away from the tab: it calls you back.
+const title = document.title;
+document.addEventListener('visibilitychange', () => {
+  document.title = document.hidden ? (document.documentElement.lang === 'nl' ? 'Kom terug… · AJB' : 'Come back… · AJB') : title;
+});
+
+// Dates: on 1 April the CV is set in Comic Sans, like the monogram (style.css, html.april);
+// at 13:37 the address on the home page goes green, and the tab reads 1337, for that minute.
+const today = new Date();
+if (today.getMonth() === 3 && today.getDate() === 1) document.documentElement.classList.add('april');
+if (www) {
+  const leet = () => {
+    const now = new Date();
+    const on = now.getHours() === 13 && now.getMinutes() === 37;
+    www.classList.toggle('leet', on);
+    if (!document.hidden) document.title = on ? `1337 · ${title}` : title;
+  };
+  leet();
+  setInterval(leet, 20000);
+}
+
+// For the developer tools: ajb.help() lists the tricks, and each can be called.
+window.ajb = {
+  help() {
+    console.log([
+      'ajb.demo()          the AJB demo, with the remix',
+      'ajb.c64()           the C64',
+      "ajb.neon('#d60b51') light the neon (home page), in a colour",
+      'ajb.screensaver()   the screensaver (home page)',
+      'ajb.unlock()        the QtPass heart',
+      'ajb.badgers()       badgers',
+      'ajb.snake()         a snake',
+    ].join('\n'));
+  },
+  demo() { location.hash = 'demo'; },
+  c64() { import('/c64.js').then((c64) => c64.start()); },
+  neon(colour = '#24cafe') { if (www) neonClick(colour); else console.log('The neon is on the home page.'); },
+  screensaver() { if (www) import('/fx/screensaver.js').then((fx) => fx.start()); else console.log('The screensaver is on the home page.'); },
+  unlock: words.pass,
+  badgers: words.badger,
+  snake: words.snake,
+};
+
 // Something for whoever opens the developer tools.
 console.log(
   '%c' + [
@@ -157,7 +200,8 @@ console.log(
   '  * click the AJB logo, once, four times, then five times fast\n' +
   '  * up up down down left right left right B A\n' +
   '  * type pass, badger or snake\n' +
-  '  * or just leave it alone for a minute\n\n' +
+  '  * or just leave it alone for a minute\n' +
+  '  * ajb.help()\n\n' +
   'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack, Evoke and Outline.',
   'color: #cafe24; font: 12px monospace;',
 );

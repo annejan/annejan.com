@@ -305,3 +305,27 @@ aside ul + p { margin-top: 12px; }
 .prods .meta { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
 .prods .win { color: var(--lime); font-weight: bold; }
 .prods small { margin-left: auto; font-size: 12px; }
+
+/* 13:37 on the home page (site.js): the address goes leet green for a minute. */
+#card .www.leet {
+  --neon: #39ff14;
+  color: #39ff14;
+}
+
+/* 1 April (site.js): the CV in Comic Sans, like the monogram. */
+html.april body.cv,
+html.april body.cv * {
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive !important;
+}
+
+/* Printed, the CV signs off with a tiny monogram. */
+@media print {
+  body.cv::after {
+    content: "    _       _ ____  \A   / \\     | | __ ) \A  / _ \\ _  | |  _ \\ \A / ___ \\ |_| | |_) |\A/_/   \\_\\___/|____/ ";
+    display: block;
+    margin-top: 2em;
+    white-space: pre;
+    font: 6pt/1.1 monospace;
+    color: #999;
+  }
+}
