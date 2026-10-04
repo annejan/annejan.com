@@ -1,5 +1,6 @@
 // The 404 page: Yuki and the rope, mirrored four ways like the old /media/ page,
-// as an endless rotozoomer. Goes home after 15 seconds, like that page did.
+// as an endless rotozoomer. Goes home after 15 seconds, like that page did, unless you do
+// anything at all: then it stays.
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('yuki');
@@ -55,10 +56,12 @@ resize();
 addEventListener('resize', () => { resize(); if (reduceMotion) draw(); });
 photo.addEventListener('load', () => { makePattern(); draw(); });
 
-// Count down and go home.
+// Count down and go home; any key, click, touch or scroll (or leaving the tab) stops it, so
+// nobody is sent away while reading.
 const countdown = document.getElementById('countdown');
 let left = 15;
 const tick = setInterval(() => {
+  if (document.hidden) return;
   left -= 1;
   countdown.textContent = `(${left})`;
   if (left <= 0) {
@@ -67,3 +70,8 @@ const tick = setInterval(() => {
   }
 }, 1000);
 countdown.textContent = `(${left})`;
+const stay = () => {
+  clearInterval(tick);
+  countdown.textContent = '';
+};
+for (const type of ['keydown', 'pointerdown', 'wheel', 'touchstart']) addEventListener(type, stay, { once: true, passive: true });
