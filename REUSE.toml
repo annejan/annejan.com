@@ -114,3 +114,10 @@ SPDX-License-Identifier = "MIT"
 path = ["logos/konsool.png", "logos/portals.png", "logos/tic80.png"]
 SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "CC-BY-4.0"
+
+# A still from Claude maar wat aan (deFEEST, Outline 2026), the TIC-80 demo the page plays; the
+# demo is MIT (https://github.com/annejan/outline26-claude-tic80).
+[[annotations]]
+path = "tic80/demo.webp"
+SPDX-FileCopyrightText = "2026 deFEEST"
+SPDX-License-Identifier = "MIT"

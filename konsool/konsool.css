@@ -10,6 +10,33 @@
   border: 1px solid var(--rule);
   image-rendering: pixelated;
 }
+/* A YouTube film that loads only when played (video.js). */
+.yt { position: relative; }
+.yt .film { display: block; }
+.yt iframe.film { border: 1px solid var(--rule); aspect-ratio: 16 / 9; height: auto; }
+.yt img.film { aspect-ratio: 960 / 544; }
+.yt-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 1px solid var(--fg);
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--fg);
+  font: bold 14px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.yt-play small { display: block; margin-top: 6px; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+.yt-play:hover, .yt-play:focus-visible { background: var(--fg); color: var(--bg); }
+.yt-play:hover small, .yt-play:focus-visible small { color: var(--bg); }
+.yt-play:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.app .caption { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+
 .app .lede { color: var(--fg); font-size: 16px; line-height: 1.6; margin-top: 24px; }
 
 .konsool {

@@ -11,7 +11,7 @@ ErrorDocument 404 /error/404.html
 # The Konsool pages (the app store and two apps): the same, but they talk to a Konsool over WebUSB, and fetch its apps
 # from the app repository the Konsool's own app store uses.
 <If "%{REQUEST_URI} =~ m#^/(portals|tic80|konsool)/(index\.html)?$#">
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://apps.tanmatsu.cloud; font-src 'self'; media-src 'self'; connect-src 'self' https://apps.tanmatsu.cloud; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://apps.tanmatsu.cloud; font-src 'self'; media-src 'self'; connect-src 'self' https://apps.tanmatsu.cloud; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(self)"
 </If>
 
