@@ -251,5 +251,5 @@
     return loaded;
   }
 
-  for (const root of document.querySelectorAll('.konsool[data-apps]')) init(root);
+  for (const root of document.querySelectorAll('.konsool[data-app]')) init(root);
 })();
