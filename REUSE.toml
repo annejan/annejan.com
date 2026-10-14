@@ -108,3 +108,9 @@ SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
 path = ["portals/portals-startup.mp4", "portals/poster.webp"]
 SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "MIT"
+
+# The Konsool icon on the front page: drawn for this site (a palmtop: screen and keys).
+[[annotations]]
+path = "logos/konsool.png"
+SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
+SPDX-License-Identifier = "CC-BY-4.0"
