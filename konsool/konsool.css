@@ -225,3 +225,25 @@ h4.sub { margin: 24px 0 8px; color: var(--fg); font-size: 14px; }
   .feats { grid-template-columns: 1fr 1fr; gap: 12px; }
   .feats figcaption { font-size: 12px; }
 }
+
+/* /portals/: the big links. */
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 0; }
+a.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font: bold 13px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+a.cta.lime { border-color: var(--lime); color: var(--lime); }
+a.cta:hover, a.cta:focus-visible { background: var(--cyan); color: var(--bg); }
+a.cta.lime:hover, a.cta.lime:focus-visible { background: var(--lime); color: var(--bg); }
+a.cta:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { a.cta { transition: none; } }
