@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Konsool apps – Anne Jan Brouwer</title>
+    <meta name="description" content="Every app in the Konsool's (Tanmatsu's) app repository, to install, update or remove from the browser, over USB." />
+    <meta name="author" content="Anne Jan Brouwer" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="canonical" href="https://annejan.com/konsool/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://annejan.com/konsool/" />
+    <meta property="og:site_name" content="Anne Jan Brouwer" />
+    <meta property="og:title" content="Konsool apps" />
+    <meta property="og:description" content="The Konsool's app store, in the browser: install apps on your badge over USB." />
+    <meta name="fediverse:creator" content="@annejan@mastodon.social" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/konsool/konsool.css" />
+    <script src="/konsool/badgelink.js" defer></script>
+    <script src="/konsool/konsool.js" defer></script>
+    <script src="/konsool/store.js" defer></script>
+  </head>
+  <body class="cv app">
+    <div class="page">
+      <header>
+        <a href="/" id="home" class="fade" title="Home"><img src="/ajb.svg" width="603" height="781" alt="Anne Jan Brouwer – home" /></a>
+        <div>
+          <h1>Konsool apps</h1>
+          <h2>From the browser</h2>
+        </div>
+        <p class="www">annejan.com</p>
+      </header>
+
+      <main class="store">
+        <section class="konsool" aria-labelledby="connect-title">
+          <h3 id="connect-title">Your Konsool</h3>
+          <p>Every app in the Konsool's app repository, the one its launcher's app store uses. Install, update or remove them from here, over USB.</p>
+          <ol>
+            <li>Connect the Konsool to this computer with USB.</li>
+            <li>On the Konsool, press the purple diamond: a USB icon shows top right. That is BadgeLink mode.</li>
+            <li>Press <strong>Connect</strong> and pick the Konsool, to see what it has. Or press Install on any app.</li>
+          </ol>
+          <div class="actions">
+            <button type="button" id="connect" class="install">Connect</button>
+          </div>
+          <p id="badge-status" class="status" role="status"></p>
+          <p class="note">It works in Chrome and Edge. On Linux the browser may only open the Konsool with badgelink's udev rule, <code>60-badgelink.rules</code>, in <code>/etc/udev/rules.d/</code>.</p>
+        </section>
+
+        <section class="filters" aria-label="Find an app">
+          <input id="search" type="search" placeholder="Search apps" aria-label="Search apps" autocomplete="off" />
+          <div id="categories" class="chips" role="group" aria-label="Categories"></div>
+          <div id="only" class="chips" role="group" aria-label="Show" hidden>
+            <button type="button" data-only="" aria-pressed="true">every app</button>
+            <button type="button" data-only="installed" aria-pressed="false">on my Konsool</button>
+            <button type="button" data-only="updates" aria-pressed="false">updates</button>
+          </div>
+        </section>
+
+        <section id="apps" class="cards" aria-label="Apps" aria-live="polite">
+          <p>Loading the app repository…</p>
+        </section>
+        <p id="none" hidden>No app matches.</p>
+
+        <p class="made">Made with Claude: this page was written with an AI. The apps are their makers' own; this page only fetches them from <a href="https://tanmatsu.cloud/">tanmatsu.cloud</a>, as the Konsool would. See also <a href="/portals/">Portals</a> and <a href="/tic80/">TIC-80</a>.</p>
+      </main>
+    </div>
+
+    <template id="app-card">
+      <article class="card">
+        <img class="icon" width="64" height="64" alt="" loading="lazy" />
+        <div class="body">
+          <h4 class="name"></h4>
+          <p class="facts"></p>
+          <p class="about"></p>
+          <p class="badge" hidden></p>
+          <div class="actions"></div>
+          <div class="progress" hidden><div class="bar"></div></div>
+          <p class="line" role="status"></p>
+        </div>
+      </article>
+    </template>
+  </body>
+</html>
