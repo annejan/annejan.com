@@ -4,7 +4,8 @@
 // heart, Aid to Ukraine, and Badge.Team's name in its marker lettering. A neon clock
 // drifts slowly over it all. Any mouse move, touch or key brings the page back.
 
-const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
+import { GLOWS } from '/fx/glows.js';
+
 const load = (src) => {
   const img = new Image();
   img.src = src;

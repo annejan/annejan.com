@@ -6,8 +6,8 @@
 // Click or Esc to leave, M mutes, F goes fullscreen. annejan.com/#demo starts it straight away.
 
 import { HEART_SRC, PAD_X as HEART_PAD_X, PAD_TOP as HEART_PAD_TOP, drawPadlock } from '/fx/padlock.js';
+import { GLOWS as COLORS } from '/fx/glows.js';
 
-const COLORS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const SCROLL_TEXT =
   'AJB IS BACK ... THE 2010 LOGO RETURNS IN 2026 ... YES, IT IS MADE OF COMIC SANS ... ' +
   'GREETINGS TO EVERYONE AT BADGE.TEAM, HACKER HOTEL, TREPAAN, POOBRAIN, BORNHACK, EVOKE, OUTLINE ... ' +

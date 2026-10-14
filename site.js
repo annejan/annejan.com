@@ -63,7 +63,7 @@ function neonClick(colour) {
 // Five clicks in quick succession start the demo.
 const mark = document.getElementById('mark');
 if (mark && !reduceMotion) {
-  const glows = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
+  const glows = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];   // as fx/glows.js
   let clicks = 0;
   let resetTimer;
   mark.addEventListener('click', () => {
