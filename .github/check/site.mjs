@@ -200,6 +200,7 @@ console.log('Easter eggs');
   await run('badgers', () => ajb.badgers(), 9500);
   await run('snake', () => ajb.snake(), 4000);
   await run('C64', () => ajb.c64(), 1000);
+  check(await page.evaluate(() => document.fonts.check('16px "Press Start 2P"')), 'C64: its font, Press Start 2P, is loaded');
   for (const key of 'LOAD"$",8'.split('')) await page.keyboard.type(key);
   await page.keyboard.press('Enter');
   await page.waitForTimeout(2500);

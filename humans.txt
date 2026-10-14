@@ -12,7 +12,7 @@
   Cinder/deFEEST, for the instaFAIL music (Outline 2011)
 
   The Press Start 2P Project Authors (cody@zone38.net),
-    for the Press Start 2P font on the C64 screen (SIL OFL 1.1, unmodified)
+    for the Press Start 2P font on the C64 screen (SIL OFL 1.1, unmodified, as WOFF2)
   Simple Icons contributors, for the GitHub, LinkedIn and Mastodon icons (CC0 1.0)
   AnonMoos, for the padlocked heart of the QtPass logo (public domain),
     which also beats and unlocks in the AJB demo
