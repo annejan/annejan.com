@@ -14,78 +14,7 @@ document.querySelectorAll('.social a:not(.zoom)').forEach((link) => {
   });
 });
 
-// The Konsool icons: fly into the icon's screen (data-screen: left, top, width and height, as
-// fractions of the icon; data-round for an oval one) until it is the window; the page then
-// switches on in it (konsool/konsool.js).
-document.querySelectorAll('.social a.zoom:not([data-effect])').forEach((link) => {
-  link.addEventListener('click', (event) => {
-    if (!plainClick(event)) return;
-    event.preventDefault();
-    const [sl, st, sw, sh] = link.dataset.screen.split(' ').map(Number);
-    const round = link.hasAttribute('data-round');
-    const r = link.getBoundingClientRect();
-    const fly = document.createElement('div');
-    fly.className = 'konsool-fly';
-    Object.assign(fly.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
-    fly.style.setProperty('--icon', getComputedStyle(link.querySelector('.icon')).getPropertyValue('--icon'));
-    const screen = document.createElement('div');
-    screen.className = 'konsool-screen' + (round ? ' round' : '');
-    Object.assign(screen.style, { left: sl * 100 + '%', top: st * 100 + '%', width: sw * 100 + '%', height: sh * 100 + '%' });
-    fly.append(screen);
-    document.body.append(fly);
-    // Move the screen's middle to the window's, and grow until the screen covers the window
-    // (an oval needs half as much again to reach the corners).
-    const cx = r.left + r.width * (sl + sw / 2);
-    const cy = r.top + r.height * (st + sh / 2);
-    const scale = (round ? 1.5 : 1.1) * Math.max(innerWidth / (r.width * sw), innerHeight / (r.height * sh));
-    fly.style.transformOrigin = `${cx - r.left}px ${cy - r.top}px`;
-    document.body.classList.add('zooming');
-    try { sessionStorage.setItem('konsool-on', '1'); } catch (e) { /* no storage: no switch-on */ }
-    fly.animate(
-      [{ transform: 'none' }, { transform: `translate(${innerWidth / 2 - cx}px, ${innerHeight / 2 - cy}px) scale(${scale})` }],
-      { duration: 1100, easing: 'cubic-bezier(0.7, 0, 0.84, 0)', fill: 'forwards' },
-    ).finished.then(() => { window.location = link.href; });
-  });
-});
-
-// Portals: a blue portal opens on the icon and swallows the card, then opens until it is the
-// window; /portals/ comes out of an orange one (konsool/konsool.js).
-document.querySelectorAll('.social a[data-effect="portal"]').forEach((link) => {
-  link.addEventListener('click', async (event) => {
-    if (!plainClick(event)) return;
-    event.preventDefault();
-    const r = link.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    const portal = document.createElement('div');
-    portal.className = 'portal-out';
-    Object.assign(portal.style, { left: cx + 'px', top: cy + 'px' });
-    document.body.append(portal);
-    document.body.classList.add('zooming', 'portaling');
-    try { sessionStorage.setItem('konsool-on', 'portal'); } catch (e) { /* no storage: no orange portal */ }
-    const card = document.querySelector('#card');
-    const cardBox = card.getBoundingClientRect();
-    card.style.transformOrigin = `${cx - cardBox.left}px ${cy - cardBox.top}px`;
-    // Open: a portal about twice the icon's size.
-    await portal.animate(
-      [{ width: '0px', height: '0px' }, { width: r.width * 1.1 + 'px', height: r.height * 2 + 'px' }],
-      { duration: 350, easing: 'cubic-bezier(0.2, 1.4, 0.4, 1)', fill: 'forwards' },
-    ).finished;
-    // Swallow: the card falls in, turning.
-    await card.animate(
-      [{ transform: 'none', opacity: 1 }, { transform: 'scale(0.02) rotate(-200deg)', opacity: 0.2 }],
-      { duration: 700, easing: 'cubic-bezier(0.6, 0, 0.9, 0.6)', fill: 'forwards' },
-    ).finished;
-    card.style.visibility = 'hidden';
-    // Through: the portal grows until its inside is the window.
-    const reach = 2.4 * Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
-    await portal.animate(
-      [{ width: r.width * 1.1 + 'px', height: r.height * 2 + 'px' }, { width: reach + 'px', height: reach * 1.4 + 'px' }],
-      { duration: 500, easing: 'cubic-bezier(0.7, 0, 0.9, 0.4)', fill: 'forwards' },
-    ).finished;
-    window.location = link.href;
-  });
-});
+// The Konsool icons (.zoom) go their own way: fx/transit.js.
 
 // The social icons come in a different order on every visit, and pop in one by one.
 const social = document.querySelector('.social');
@@ -283,13 +212,6 @@ console.log(
 // Restore the page if the browser brings it back from the back/forward cache.
 addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
-  document.body.classList.remove('leaving', 'fading', 'zooming');
-  document.querySelectorAll('.konsool-fly, .portal-out').forEach((el) => el.remove());
-  document.body.classList.remove('portaling');
-  const card = document.querySelector('#card');
-  if (card) {
-    card.getAnimations().forEach((a) => a.cancel());
-    card.style.visibility = '';
-  }
+  document.body.classList.remove('leaving', 'fading');
   document.querySelectorAll('.social a.launch').forEach((link) => link.classList.remove('launch'));
 });
