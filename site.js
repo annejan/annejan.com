@@ -3,8 +3,9 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const plainClick = (event) =>
   !reduceMotion && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
 
-// Social icon: zoom out of the page while it fades to white.
-document.querySelectorAll('.social a').forEach((link) => {
+// Social icon to another site: zoom out of the page while it fades to white. One to this site
+// (.fade) fades out like any internal link.
+document.querySelectorAll('.social a:not(.fade)').forEach((link) => {
   link.addEventListener('click', (event) => {
     if (!plainClick(event)) return;
     event.preventDefault();
