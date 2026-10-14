@@ -14,7 +14,6 @@
     const button = $(root, '.install');
     const startButton = $(root, '.start');
     const status = $(root, '.status');
-    const bar = $(root, '.bar');
     const progress = $(root, '.progress');
     const list = $(root, '.apps');
     let chain = null;   // [interpreter?, app] as the repository has them
@@ -57,7 +56,7 @@
     async function withBadge(fn) {
       if (busy || !chain) return;
       busy = true;
-      button.disabled = true;
+      Konsool.hold(button, true);
       let bl = null;
       try {
         bl = await Konsool.connect();
@@ -68,7 +67,7 @@
         if (bl) {
           try { await bl.close(); } catch (_) { /* gone already */ }
         }
-        button.disabled = !('usb' in navigator);
+        Konsool.hold(button, false);
         busy = false;
       }
     }
@@ -106,16 +105,16 @@
         }
       }
       progress.hidden = false;
-      bar.style.width = '0';
+      Konsool.progress(progress, 0);
       for (let k = 0; k < todo.length; k++) {
         const [e, where] = todo[k];
         await Konsool.install(bl, e.slug, where, (text, done, total) => {
           say(text);
-          bar.style.width = (100 * (k + done / total) / todo.length).toFixed(1) + '%';
+          Konsool.progress(progress, (k + done / total) / todo.length);
         });
         row(e, where === 'sd' ? 'installed on the SD card' : 'installed');
       }
-      bar.style.width = '100%';
+      Konsool.progress(progress, 1);
       state = await Konsool.scan(bl);
       say(`${main.project.name} ${main.project.version || ''} is on your Konsool. Start it from its Apps menu${Konsool.canStart(main, state) ? ', or from here' : ''}.`, 'ok');
       startButton.hidden = !Konsool.canStart(main, state);
@@ -125,6 +124,11 @@
       const main = chain[chain.length - 1];
       await Konsool.start(bl, main, state);
       say(`${main.project.name} is starting on your Konsool.`, 'ok');
+      // The button goes: the keyboard focus goes to what happened, not to the top of the page.
+      if (document.activeElement === startButton) {
+        status.tabIndex = -1;
+        status.focus();
+      }
       startButton.hidden = true;
     }));
   }

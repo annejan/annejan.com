@@ -64,6 +64,7 @@
             <button type="button" data-only="installed" aria-pressed="false">on my Konsool</button>
             <button type="button" data-only="updates" aria-pressed="false">updates</button>
           </div>
+          <p id="shown" class="note" role="status"></p>
         </section>
 
         <section id="apps" class="cards" aria-label="Apps">
@@ -85,7 +86,7 @@
           <details class="more"><summary>More</summary><dl></dl></details>
           <p class="badge" hidden></p>
           <div class="actions"></div>
-          <div class="progress" hidden><div class="bar"></div></div>
+          <div class="progress" role="progressbar" aria-label="Install progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><div class="bar"></div></div>
           <p class="line" role="status"></p>
         </div>
       </article>

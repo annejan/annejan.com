@@ -296,5 +296,19 @@
     return (e && e.message) || String(e);
   }
 
-  globalThis.Konsool = { REPO, compare, sizes, updated: () => updated, list, project, appFor, places, baseFor, iconUrl, dataUrl, connect, scan, install, uninstall, canStart, start, hasInterpreter, explain };
+  // While the badge is busy a button must not be pressed, but it keeps the keyboard focus: a
+  // disabled button would drop it to the top of the page. Its click handler checks `busy`.
+  function hold(button, on) {
+    if (on) button.setAttribute('aria-disabled', 'true');
+    else button.removeAttribute('aria-disabled');
+  }
+
+  // A progress bar (.progress, role progressbar, with its .bar): drawn, and told to screen readers.
+  function progress(box, fraction) {
+    const f = Math.min(1, Math.max(0, fraction || 0));
+    box.querySelector('.bar').style.width = (100 * f).toFixed(1) + '%';
+    box.setAttribute('aria-valuenow', String(Math.round(100 * f)));
+  }
+
+  globalThis.Konsool = { REPO, hold, progress, compare, sizes, updated: () => updated, list, project, appFor, places, baseFor, iconUrl, dataUrl, connect, scan, install, uninstall, canStart, start, hasInterpreter, explain };
 })();
