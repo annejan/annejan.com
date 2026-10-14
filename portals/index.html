@@ -24,6 +24,7 @@
     <script src="/konsool/badgelink.js" defer></script>
     <script src="/konsool/konsool.js" defer></script>
     <script src="/konsool/install.js" defer></script>
+    <script src="/konsool/video.js" defer></script>
   </head>
   <body class="cv app">
     <div class="page">
@@ -39,7 +40,10 @@
       <div class="columns">
         <main>
           <section>
-            <video class="film" src="/portals/portals-startup.mp4" poster="/portals/poster.webp" width="800" height="480" controls preload="none"></video>
+            <div class="yt playable">
+              <video class="film" src="/portals/portals-startup.mp4" poster="/portals/poster.webp" width="800" height="480" controls preload="none"></video>
+              <button type="button" class="yt-play" aria-label="Play the film of Portals starting up"><span aria-hidden="true">▶</span> Play</button>
+            </div>
             <p class="lede">A Portal-like puzzle game for the Konsool. Twenty test chambers, two portals, and GLaDOS watching. Then stories: packs of new chambers told from a desk between the rounds.</p>
             <p>Ghost races against your best runs, and other people's. Lifts between the chambers. Cubes, buttons, turrets, faith plates, light bridges and energy pellets. A chamber editor on the badge itself. GLaDOS speaks, through SAM, the C64's Software Automatic Mouth.</p>
           </section>
