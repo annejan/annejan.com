@@ -7,7 +7,9 @@ SPDX-PackageDownloadLocation = "https://annejan.com/"
 [[annotations]]
 path = [
     "**.js",
+    "**.mjs",
     "**.css",
+    ".github/**",
     ".htaccess",
     ".gitignore",
     "robots.txt",

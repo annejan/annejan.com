@@ -1,0 +1,36 @@
+# Every push to master and every pull request: licensing (REUSE), and the site itself, served
+# as it is (.github/check/site.mjs: script errors, WCAG 2.2 AA, reflow, the easter eggs, and
+# the Konsool pages' keyboard focus).
+name: Check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  reuse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: fsfe/reuse-action@v5
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright and axe-core
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 axe-core@4.10.2
+          npx playwright install --with-deps chromium
+      - name: Serve the site and check it
+        run: |
+          python3 -m http.server 8000 >/dev/null 2>&1 &
+          sleep 1
+          node .github/check/site.mjs http://localhost:8000
