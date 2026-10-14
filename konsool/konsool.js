@@ -15,11 +15,22 @@
 (function () {
   // Came in through one of the front page's Konsool icons: the page switches on (konsool.css).
   try {
-    if (sessionStorage.getItem('konsool-on')) {
+    const how = sessionStorage.getItem('konsool-on');
+    if (how) {
       sessionStorage.removeItem('konsool-on');
-      document.body.classList.add('switch-on');
+      if (how === 'portal') portalIn();
+      else document.body.classList.add('switch-on');
     }
   } catch (e) { /* no storage: no switch-on */ }
+
+  // Out of an orange portal: the page shows through a growing oval with a glowing orange rim.
+  function portalIn() {
+    const veil = document.createElement('div');
+    veil.className = 'portal-in';
+    document.body.append(veil);
+    veil.animate([{ '--portal': 0 }, { '--portal': 1 }], { duration: 1100, easing: 'cubic-bezier(0.25, 0.8, 0.3, 1)', fill: 'forwards' })
+      .finished.then(() => veil.remove());
+  }
 
   const REPO = 'https://apps.tanmatsu.cloud';
   const TARGETS = ['konsool', 'tanmatsu'];

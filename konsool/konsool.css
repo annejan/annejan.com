@@ -104,7 +104,22 @@ body.switch-on .page { animation: switch-on 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 
   100% { transform: none; filter: none; }
 }
 
+/* Arriving through the Portals icon: out of an orange portal (konsool.js). A black veil with an
+   oval hole that grows, its rim glowing orange. */
+@property --portal { syntax: "<number>"; inherits: false; initial-value: 0; }
+.portal-in {
+  --portal: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse calc(var(--portal) * 90vmax) calc(var(--portal) * 130vmax) at 50% 50%,
+      transparent 96%, #ff8a1c 97%, #ffb15c 98.5%, #000 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .portal-in { display: none; }
   body.switch-on .page { animation: none; }
   .app .bar, .app button { transition: none; }
 }
