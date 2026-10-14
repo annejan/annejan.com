@@ -265,7 +265,7 @@
   // What went wrong, said so that someone can do something about it.
   function explain(e) {
     const name = e && e.name ? e.name : '';
-    if (name === 'NotFoundError') return 'No Konsool picked. Is it connected, and in BadgeLink mode (the purple diamond)?';
+    if (name === 'NotFoundError') return 'No Konsool picked (it is "Tanmatsu" in the list). Is it connected, and in BadgeLink mode (the purple diamond)?';
     if (name === 'SecurityError' || name === 'NotAllowedError') return 'The browser may not open the Konsool. On Linux it needs badgelink\'s udev rule (see above).';
     if (name === 'NetworkError') return 'The Konsool is busy or was unplugged. Unplug it, plug it in, press the purple diamond, and try again.';
     if (name === 'BadgeLinkError') {
