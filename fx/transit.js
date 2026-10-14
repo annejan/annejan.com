@@ -15,7 +15,7 @@
   // Each page's icon (logos/), and the screen in it: left, top, width and height as fractions.
   const TARGETS = {
     '/konsool/': { icon: '/logos/konsool.png', screen: [0.207, 0.148, 0.586, 0.332] },
-    '/tic80/': { icon: '/logos/tic80.png', screen: [0.22, 0.26, 0.56, 0.48] },
+    '/tic80/': { icon: '/logos/tic80.png', screen: [0.16, 0.26, 0.56, 0.48] },
     '/portals/': { icon: '/logos/portals.png', portal: true },
   };
 
