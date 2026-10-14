@@ -240,6 +240,23 @@
     return bl.startApp(entry.slug, '');
   }
 
+  // Compare two versions number by number ("0.12.10" > "0.12.9"): <0, 0 or >0. Text after the
+  // numbers ("-rc1") only breaks a tie, and then sorts before none.
+  function compare(a, b) {
+    const parts = (v) => String(v || '').trim().replace(/^v/i, '').split(/[.+-]/);
+    const pa = parts(a), pb = parts(b);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const x = pa[i], y = pb[i];
+      if (x === undefined) return y && /^\d+$/.test(y) ? -1 : 1;
+      if (y === undefined) return x && /^\d+$/.test(x) ? 1 : -1;
+      const nx = /^\d+$/.test(x), ny = /^\d+$/.test(y);
+      if (nx && ny && Number(x) !== Number(y)) return Number(x) - Number(y);
+      if (nx !== ny) return nx ? 1 : -1;
+      if (!nx && x !== y) return x < y ? -1 : 1;
+    }
+    return 0;
+  }
+
   // Is an interpreter there, as the launcher checks: in AppFS, or its binary in an app folder.
   function hasInterpreter(slug, state) {
     return state.appfs.has(slug) || state.apps.has(slug);
@@ -261,5 +278,5 @@
     return (e && e.message) || String(e);
   }
 
-  globalThis.Konsool = { REPO, list, project, appFor, places, baseFor, iconUrl, dataUrl, connect, scan, install, uninstall, canStart, start, hasInterpreter, explain };
+  globalThis.Konsool = { REPO, compare, list, project, appFor, places, baseFor, iconUrl, dataUrl, connect, scan, install, uninstall, canStart, start, hasInterpreter, explain };
 })();

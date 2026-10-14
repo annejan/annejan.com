@@ -28,7 +28,12 @@
   function installedOf(e) { return state ? state.apps.get(e.slug) || null : null; }
   function hasUpdate(e) {
     const have = installedOf(e);
-    return !!have && !!have.version && have.version !== (e.project.version || '');
+    return !!have && !!have.version && Konsool.compare(e.project.version, have.version) > 0;
+  }
+  // The badge has a newer version than the repository (a test build, or a release not merged yet).
+  function isNewer(e) {
+    const have = installedOf(e);
+    return !!have && !!have.version && Konsool.compare(have.version, e.project.version) > 0;
   }
 
   function facts(e) {
@@ -64,7 +69,8 @@
       if (p.int) add('Install', 'install', (bl, step) => install(bl, e, 'int', step));
       if (p.sd) add(p.int ? 'On SD card' : 'Install on SD card', p.int ? 'alt' : 'install', (bl, step) => install(bl, e, 'sd', step));
     } else {
-      add(hasUpdate(e) ? `Update to ${e.project.version}` : 'Install again', hasUpdate(e) ? 'install' : 'alt', (bl, step) => install(bl, e, where, step));
+      if (isNewer(e)) add(`Go back to ${e.project.version}`, 'alt', (bl, step) => install(bl, e, where, step));
+      else add(hasUpdate(e) ? `Update to ${e.project.version}` : 'Install again', hasUpdate(e) ? 'install' : 'alt', (bl, step) => install(bl, e, where, step));
       if (state && Konsool.canStart(e, state)) add('Start', 'start', async (bl) => {
         await Konsool.start(bl, e, state);
         return `${e.project.name} is starting on your Konsool.`;
@@ -78,8 +84,9 @@
     const badge = card.querySelector('.badge');
     badge.hidden = !have;
     if (have) {
-      badge.textContent = hasUpdate(e) ? `${have.version} installed: update` : `installed${where === 'sd' ? ' on SD' : ''}`;
-      badge.className = 'badge' + (hasUpdate(e) ? ' update' : '');
+      badge.textContent = isNewer(e) ? `${have.version} on your Konsool: newer than the repository`
+        : hasUpdate(e) ? `${have.version} installed: update` : `installed${where === 'sd' ? ' on SD' : ''}`;
+      badge.className = 'badge' + (isNewer(e) ? ' newer' : hasUpdate(e) ? ' update' : '');
     }
   }
 
@@ -260,8 +267,10 @@
     if (!state) return;
     const mine = entries.filter(installedOf);
     const updates = entries.filter(hasUpdate);
+    const newer = entries.filter(isNewer);
     say(`Your Konsool has ${mine.length} of these app${mine.length === 1 ? '' : 's'}` +
-      (updates.length ? `, ${updates.length} with an update: ${updates.map((e) => e.project.name).join(', ')}.` : ', all up to date.'), 'ok');
+      (updates.length ? `, ${updates.length} with an update: ${updates.map((e) => e.project.name).join(', ')}.` : ', all up to date.') +
+      (newer.length ? ` Newer than the repository: ${newer.map((e) => `${e.project.name} ${installedOf(e).version}`).join(', ')}; Update all leaves ${newer.length === 1 ? 'it' : 'them'} alone.` : ''), 'ok');
     $('#only').hidden = false;
     updateAll.hidden = !updates.length;
     updateAll.textContent = updates.length > 1 ? `Update all ${updates.length}` : 'Update it';

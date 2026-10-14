@@ -20,6 +20,7 @@
     let chain = null;   // [interpreter?, app] as the repository has them
     let state = null;   // what the badge had after the last install
     let busy = false;
+    let olderOk = false;   // the badge has a newer version, and the visitor pressed again anyway
 
     function say(text, kind) {
       status.className = 'status' + (kind ? ' ' + kind : '');
@@ -77,11 +78,24 @@
       progress.hidden = true;
       say('Looking at what is on your Konsool…');
       const found = await Konsool.scan(bl);
+      // A newer version on the badge than the repository has: say so, and only go back to the
+      // repository's on a second press.
+      const main = chain[chain.length - 1];
+      const mine = found.apps.get(main.slug);
+      if (mine && mine.version && Konsool.compare(mine.version, main.project.version) > 0 && !olderOk) {
+        row(main, `${mine.version} on your Konsool: newer than the app repository`);
+        say(`Your Konsool has ${main.project.name} ${mine.version}, newer than the app repository's ${main.project.version}. Press again to install ${main.project.version} anyway.`, 'warn');
+        button.textContent = `Install ${main.project.version} anyway`;
+        olderOk = true;
+        return;
+      }
+      olderOk = false;
+      button.textContent = 'Install';
       const todo = [];
       for (const e of chain) {
         const have = found.apps.get(e.slug);
         const inAppfs = found.appfs.get(e.slug);
-        const current = have && have.version === (e.project.version || '') &&
+        const current = have && Konsool.compare(have.version, e.project.version) >= 0 &&
           (e.app.type !== 'appfs' || !have.base.startsWith('/int') || (inAppfs && inAppfs.version === (e.app.revision || 0)));
         if (current && e.slug !== slug) row(e, 'on your Konsool already');
         else {
@@ -103,7 +117,6 @@
       }
       bar.style.width = '100%';
       state = await Konsool.scan(bl);
-      const main = chain[chain.length - 1];
       say(`${main.project.name} ${main.project.version || ''} is on your Konsool. Start it from its Apps menu${Konsool.canStart(main, state) ? ', or from here' : ''}.`, 'ok');
       startButton.hidden = !Konsool.canStart(main, state);
     }));

@@ -75,6 +75,7 @@
 .konsool .status { min-height: 1.5em; margin: 12px 0 0; }
 .konsool .status.ok { color: var(--lime); }
 .konsool .status.error { color: #ff8a80; }
+.konsool .status.warn { color: #ff8a1c; }
 .konsool .note { color: var(--muted); font-size: 12px; margin: 16px 0 0; }
 
 .made { margin-top: 40px; color: var(--muted); font-size: 12px; font-style: italic; }
@@ -115,6 +116,7 @@
 .card .about { margin: 0; overflow-wrap: anywhere; }
 .card .badge { margin: 0; color: var(--lime); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
 .card .badge.update { color: var(--cyan); }
+.card .badge.newer { color: #ff8a1c; }
 .card .actions { gap: 8px; margin-top: auto; padding-top: 8px; }
 .card .actions button { min-height: 32px; padding: 6px 10px; font-size: 11px; letter-spacing: 2px; }
 .card .progress { margin-top: 4px; }
