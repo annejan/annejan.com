@@ -94,21 +94,115 @@
             <p class="note">Straight from the Konsool's own app repository, as its app store would: Portals, and Graceloader, the loader it runs under, if your Konsool does not have that version yet. It works in Chrome and Edge. On Linux the browser may only open the Konsool with badgelink's udev rule, <code>60-badgelink.rules</code>, in <code>/etc/udev/rules.d/</code>.</p>
           </section>
 
-          <section>
-            <h3>Stories</h3>
+          <section aria-labelledby="play-title">
+            <h3 id="play-title">How it plays</h3>
+            <p>Shoot two holes in the white panels of a test chamber, one blue and one orange. Walk into one and come out of the other, keeping your speed: fall far enough into a floor portal and a wall portal flings you across the room. Then the chamber starts adding things.</p>
+            <div class="feats">
+              <figure><img src="/portals/feat/portals.webp" width="480" height="270" alt="The player seen through a blue portal" loading="lazy" /><figcaption><b>Portals.</b> White panels only. Look through one at the other and you see yourself.</figcaption></figure>
+              <figure><img src="/portals/feat/cubes.webp" width="480" height="270" alt="A cube on a floor button" loading="lazy" /><figcaption><b>Cubes and buttons.</b> Carry a cube, stand on it, send it through a portal. A door stays open while all its buttons are down.</figcaption></figure>
+              <figure><img src="/portals/feat/fizzlers.webp" width="480" height="270" alt="A blue fizzler grill across a room" loading="lazy" /><figcaption><b>Grills and glass.</b> A grill destroys the cube you carry and shuts your portals. Glass stops a shot, not your eyes.</figcaption></figure>
+              <figure><img src="/portals/feat/platforms.webp" width="480" height="270" alt="A moving platform over goo" loading="lazy" /><figcaption><b>Platforms and faith plates.</b> A platform keeps its own schedule. A faith plate throws you, or a cube, over the goo.</figcaption></figure>
+              <figure><img src="/portals/feat/lasers.webp" width="480" height="270" alt="A reflection cube in a red laser beam" loading="lazy" /><figcaption><b>Lasers.</b> Turn a beam with a reflection cube, or send it through a portal, into a catcher or a relay. Laser fields burn.</figcaption></figure>
+              <figure><img src="/portals/feat/bridges.webp" width="480" height="270" alt="A light bridge over goo" loading="lazy" /><figcaption><b>Light bridges.</b> Hard light you can walk on. Put a portal in its way and it comes out of the other.</figcaption></figure>
+              <figure><img src="/portals/feat/gel.webp" width="480" height="270" alt="Blue gel under an orange portal" loading="lazy" /><figcaption><b>Gel.</b> Blue bounces you 3.7 m up, orange runs you at 11 m/s, white makes any wall take a portal. It drips through portals too.</figcaption></figure>
+              <figure><img src="/portals/feat/pellets.webp" width="480" height="270" alt="An orange portal by a pellet receiver" loading="lazy" /><figcaption><b>Energy pellets.</b> A glowing ball that bounces off everything, through portals, into its receiver. Or into you.</figcaption></figure>
+              <figure><img src="/portals/feat/crushers.webp" width="480" height="270" alt="Crushers in a corridor" loading="lazy" /><figcaption><b>Crushers.</b> They slam down one after the other, every three seconds. Keep to the beat.</figcaption></figure>
+              <figure><img src="/portals/feat/spheres.webp" width="480" height="270" alt="A sphere on a white floor" loading="lazy" /><figcaption><b>Spheres.</b> Carried like a cube, but it rolls when you walk into it. It has a cup somewhere.</figcaption></figure>
+              <figure><img src="/portals/feat/turrets.webp" width="480" height="270" alt="A turret in a test chamber" loading="lazy" /><figcaption><b>Turrets.</b> One sees you for 0.6 s and fires. Drop something on it, or carry it off.</figcaption></figure>
+              <figure><img src="/portals/feat/funnels.webp" width="480" height="270" alt="An excursion funnel across a canyon" loading="lazy" /><figcaption><b>Excursion funnels.</b> A tractor beam that carries you and your cubes along it, through portals too.</figcaption></figure>
+            </div>
+            <details class="chambers">
+              <summary>The twenty test chambers</summary>
+              <ol>
+                <li><b>The gap</b>: get across a pit of goo.</li>
+                <li><b>The ledge</b>: up onto a ledge no jump reaches.</li>
+                <li><b>The fling</b>: fall 10 m into a floor portal and fly out of a wall.</li>
+                <li><b>The button</b>: a cube on a button holds a door open.</li>
+                <li><b>Delivery</b>: the cube is up on a ledge, the button down below.</li>
+                <li><b>Faith plate</b>: a plate throws you over the goo.</li>
+                <li><b>The grill</b>: send the cube across through a portal instead.</li>
+                <li><b>Through the glass</b>: you can see the exit, not shoot at it. Look over it.</li>
+                <li><b>The ferry</b>: ride a moving platform across the goo.</li>
+                <li><b>Two buttons</b>: a door that needs both at once.</li>
+                <li><b>Against the clock</b>: three seconds of door, four seconds of walk.</li>
+                <li><b>Redirection</b>: a laser, a catcher out of its line, and a cube to turn the beam.</li>
+                <li><b>Hard light</b>: a bridge pointing the wrong way.</li>
+                <li><b>Repulsion</b>: blue gel in the wrong place, a ledge too high.</li>
+                <li><b>Catch</b>: an energy pellet, and a receiver out of its line.</li>
+                <li><b>Relay</b>: a platform that waits for a laser, and a laser field on the ledge you hoped to use.</li>
+                <li><b>Gauntlet</b>: a corridor under three crushers.</li>
+                <li><b>Edgeless</b>: a sphere, and a cup behind glass.</li>
+                <li><b>Sentry</b>: a turret guards the exit. It cannot see straight up.</li>
+                <li><b>Excursion</b>: a tractor beam, and a ledge across the goo, high up.</li>
+              </ol>
+            </details>
+            <p>Behind the title screen the chambers play themselves. With <strong>Lifts</strong> on, each chamber ends in a lift that carries you up through the chamber and down into the next. GLaDOS reads every chamber's line out loud, in SAM's voice, and the turrets talk back.</p>
+          </section>
+
+          <section aria-labelledby="keys-title">
+            <h3 id="keys-title">On the Konsool's keyboard</h3>
+            <table class="keys">
+              <tbody>
+                <tr><th scope="row"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></th><td>walk</td></tr>
+                <tr><th scope="row">cursor keys</th><td>look</td></tr>
+                <tr><th scope="row"><kbd>Space</kbd></th><td>jump</td></tr>
+                <tr><th scope="row"><kbd>Q</kbd> / <kbd>E</kbd></th><td>fire the blue / orange portal</td></tr>
+                <tr><th scope="row"><kbd>F</kbd></th><td>pick up or put down</td></tr>
+                <tr><th scope="row"><kbd>G</kbd></th><td>gyroscope: look round by turning the badge</td></tr>
+                <tr><th scope="row"><kbd>R</kbd></th><td>restart the chamber</td></tr>
+                <tr><th scope="row"><kbd>Esc</kbd></th><td>the menu: chambers, settings, editor, recordings</td></tr>
+              </tbody>
+            </table>
+            <p>Every key but Esc can be changed under Esc → Controls. Settings has the rest: portal depth (how many portals deep you see through a portal), quarter resolution, music and menu music, sound, GLaDOS's voice, lifts, ghost races, frame times, screen and keyboard light, and Portal LEDs, which light the badge's LEDs blue and orange while your portals are open.</p>
+          </section>
+
+          <section aria-labelledby="editor-title">
+            <h3 id="editor-title">Make your own chambers</h3>
+            <figure class="shot"><img src="/portals/feat/editor.webp" width="800" height="480" alt="The chamber editor: a top-down map of Redirection, with a list of brushes" loading="lazy" /><figcaption>The chamber editor on Redirection, a layer at a time from above. Drawn from the game's own drawing code.</figcaption></figure>
+            <p>Esc → <strong>Chamber editor</strong> opens the chamber you are in, as a copy. It shows one layer at a time from above: <kbd>Q</kbd> and <kbd>E</kbd> go down and up, the arrows move, a key picks a brush, <kbd>Space</kbd> paints (hold it to paint a line) and <kbd>B</kbd> fills a box. Every piece above has a brush: white panels, goo, doors and their buttons, droppers, lasers, bridges, gel, pellets, crushers, turrets, funnels.</p>
+            <p><kbd>P</kbd> play-tests it on the spot; <kbd>F</kbd> saves it to <code>/sd/portals/chambers/</code>, and Chamber select lists it after the twenty. If it has a mistake, a door that is not a box for instance, the editor says what and does not save.</p>
+            <p>A chamber is a plain text file, a picture of each layer in letters, so you can also write one on a computer:</p>
+            <pre class="chamber"><code>name: 11  Two rooms
+hint: The button opens the door.
+size: 8 5 9
+facing: north
+
+layer 1
+########
+#......#
+#......#
+#......#
+###aa###
+#......#
+#.1..C.#
+#...S..#
+########</code></pre>
+            <p class="caption">One layer of five: <code>#</code> metal, <code>.</code> air, <code>a</code> a door, <code>1</code> its button, <code>C</code> a cube, <code>S</code> where you start. The layer under it is the floor: white panels (<code>W</code>) and the exit (<code>E</code>).</p>
+            <p><a href="https://github.com/annejan/tanmatsu-portals-grace/blob/main/chambers/README.md">Every letter, and the rest of the format</a></p>
+          </section>
+
+          <section aria-labelledby="race-title">
+            <h3 id="race-title">Race yourself</h3>
+            <figure class="shot"><img src="/portals/feat/tas.webp" width="800" height="480" alt="The ferry chamber with a race timer in the corner" loading="lazy" /><figcaption>The tool-assisted run on The ferry, 21.40 s into all twenty.</figcaption></figure>
+            <p>With <strong>Ghost races</strong> on, every attempt is recorded. Beat your best and that run becomes the chamber's ghost, racing beside you next time. Put a friend's ghosts in <code>/sd/portals/ghosts/rivals/</code> and race theirs.</p>
+            <p><strong>Record a run</strong> saves what you press, frame by frame, to the SD card; <strong>Watch a recording</strong> plays it back and times every chamber. The tool-assisted run, attached to every release, finishes all twenty chambers in 40.07 s.</p>
+          </section>
+
+          <section aria-labelledby="stories-title">
+            <h3 id="stories-title">Stories</h3>
             <p>After the twenty test chambers: stories. Each is a pack of new chambers with its own music, and some are told from a desk between the rounds. They go on the SD card; put them on your Konsool from <a href="https://scene.rs/stories/">scene.rs/stories</a>, the same way as Portals itself.</p>
             <div class="stories">
               <article class="story">
                 <img src="/portals/stories/human-in-the-loop.webp" width="400" height="240" alt="A round of Human in the loop" loading="lazy" />
                 <h4>Human in the loop</h4>
-                <p>Aperture's test generator needs a human to break its drafts. You are the human. From a DOS desk: GLaDOS's flawed chambers to cheese, a debugger for the broken ones, mail, and a birthday cake that keeps moving.</p>
-                <p class="meta">A desk story · office music</p>
+                <p>Aperture's test generator needs a human to break its drafts. You are the human. From a DOS desk: GLaDOS's flawed chambers to cheese, a debugger for the broken ones, mail, a birthday cake that keeps moving, and a choice: the cake or the queue.</p>
+                <p class="meta">A desk story · eight chambers · office music</p>
               </article>
               <article class="story">
                 <img src="/portals/stories/hackfest.webp" width="400" height="240" alt="A round of Off to Hackfest" loading="lazy" />
                 <h4>Off to Hackfest</h4>
                 <p>Hackfest is on Saturday, at Sickhouse in Enschede. A few geeky chores first, then the way there: by train, by bike or by van.</p>
-                <p class="meta">A desk story · chiptune</p>
+                <p class="meta">A desk story · three ways there · chiptune</p>
               </article>
               <article class="story">
                 <img src="/portals/stories/after-hours.webp" width="400" height="240" alt="A chamber of After hours" loading="lazy" />
@@ -117,7 +211,20 @@
                 <p class="meta">Fourteen chambers · synthwave</p>
               </article>
             </div>
+            <h4 class="sub">Told from a desk</h4>
+            <p>A desk story starts at a terminal, not in a chamber. Read the files, the mail and the calendar; type <code>GLADOS</code> (or <code>GO</code>) for the next round. In Human in the loop the rounds are GLaDOS's drafts: solving a draft the way she meant teaches her nothing, so you cheese it, she patches the flaw, and you play the patched draft again until it is final. A broken draft opens in a debugger, with a few changes to spend; play-test it and reach the exit.</p>
+            <div class="pair">
+              <figure><img src="/portals/feat/desk.webp" width="800" height="480" alt="The terminal: rounds logged, mail, the calendar" loading="lazy" /><figcaption>The desk: flaws logged, mail in, the cake moved again.</figcaption></figure>
+              <figure><img src="/portals/feat/debugger.webp" width="800" height="480" alt="The debugger: a top-down map with a fizzler taken out" loading="lazy" /><figcaption>The debugger: one change of three made.</figcaption></figure>
+            </div>
             <p><a href="https://scene.rs/stories/">Put a story on your Konsool</a> · <a href="https://github.com/annejan/tanmatsu-portals-grace/blob/main/dlc/README.md">Write your own</a></p>
+          </section>
+
+
+          <section aria-labelledby="hood-title">
+            <h3 id="hood-title">Under the hood</h3>
+            <p>Portals runs on the Konsool's ESP32-P4 under <a href="https://github.com/nullislandspace/tanmatsu-graceloader">Graceloader</a>, on <a href="https://github.com/nullislandspace/synthengine3D">SynthEngine 3D</a>, a software renderer. The engine has no stencil buffer, so the view through a portal is drawn first, clipped to the portal's edges, and the room after it, with holes where the portals are; nested views go up to three deep.</p>
+            <p>GLaDOS's voice is SAM, the C64's Software Automatic Mouth from 1982. The music is made as it plays, a tune for each story, and it follows the game: up when a turret spots you, dull when you die, muffled in a lift. Every chamber has a scripted solution, and every build has a player on the PC solve all of them first: a change that breaks one does not build.</p>
           </section>
 
           <p class="made">Made with Claude: Portals and this page were written with an AI, and played on a real badge.</p>
@@ -125,9 +232,21 @@
 
         <aside>
           <section>
+            <h3>On this page</h3>
+            <ul>
+              <li><a href="#install-title">Put it on your Konsool</a></li>
+              <li><a href="#play-title">How it plays</a></li>
+              <li><a href="#keys-title">Keys and settings</a></li>
+              <li><a href="#editor-title">The chamber editor</a></li>
+              <li><a href="#race-title">Ghosts and recordings</a></li>
+              <li><a href="#stories-title">Stories</a></li>
+              <li><a href="#hood-title">Under the hood</a></li>
+            </ul>
+          </section>
+          <section>
             <h3>Download</h3>
             <ul>
-              <li><a href="https://github.com/annejan/tanmatsu-portals-grace/releases/download/v0.12.5/portals-0.12.5.zip">portals-0.12.5.zip</a> <small>to unzip into /int/apps/ by hand</small></li>
+              <li><a href="https://github.com/annejan/tanmatsu-portals-grace/releases/download/v0.12.6/portals-0.12.6.zip">portals-0.12.6.zip</a> <small>to unzip into /int/apps/ by hand</small></li>
               <li><a href="https://github.com/annejan/tanmatsu-portals-grace/releases">Releases</a> <small>with the story packs and the TAS</small></li>
               <li><a href="/konsool/">Konsool apps</a> <small>every app in the repository, from the browser</small></li>
             </ul>

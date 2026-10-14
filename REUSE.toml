@@ -114,10 +114,10 @@ path = "music/**"
 SPDX-FileCopyrightText = "2026 deFEEST (music arranged and sequenced by Anus, with help from Kloot and Augurk; remix by Anus with Claude)"
 SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
 
-# Portals' startup film and a still from its film of the twenty chambers: the game's own renders
-# (https://github.com/annejan/tanmatsu-portals-grace, MIT).
+# Portals' startup film, stills from its films, and its editor and debugger drawn as the game
+# draws them: the game's own renders (https://github.com/annejan/tanmatsu-portals-grace, MIT).
 [[annotations]]
-path = ["portals/portals-startup.mp4", "portals/poster.webp", "portals/stories/*.webp"]
+path = ["portals/portals-startup.mp4", "portals/poster.webp", "portals/stories/*.webp", "portals/feat/*.webp"]
 SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "MIT"
 
