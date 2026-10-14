@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TIC-80 for the Konsool – Anne Jan Brouwer</title>
+    <meta name="description" content="TIC-80, the fantasy computer, running natively on the Konsool (Tanmatsu): the whole studio, on a palmtop with a keyboard. Put it on your Konsool from this page, over USB." />
+    <meta name="author" content="Anne Jan Brouwer" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="canonical" href="https://annejan.com/tic80/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://annejan.com/tic80/" />
+    <meta property="og:site_name" content="Anne Jan Brouwer" />
+    <meta property="og:title" content="TIC-80 for the Konsool" />
+    <meta property="og:description" content="The TIC-80 fantasy computer on the Konsool. Put it on your badge from the browser, over USB." />
+    <meta name="fediverse:creator" content="@annejan@mastodon.social" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/konsool/konsool.css" />
+    <script src="/konsool/badgelink.js" defer></script>
+    <script src="/konsool/install.js" defer></script>
+  </head>
+  <body class="cv app">
+    <div class="page">
+      <header>
+        <a href="/" id="home" class="fade" title="Home"><img src="/ajb.svg" width="603" height="781" alt="Anne Jan Brouwer – home" /></a>
+        <div>
+          <h1>TIC-80</h1>
+          <h2>For the Konsool</h2>
+        </div>
+        <p class="www">annejan.com</p>
+      </header>
+
+      <div class="columns">
+        <main>
+          <section>
+            <p class="lede">TIC-80, the fantasy computer for making, playing and sharing tiny games, running natively on the Konsool. The whole studio is there: console, code editor, sprite, map, sound and music editors, and the surf browser.</p>
+            <p>Write carts in Lua on the Konsool's own keyboard. Fn turns the arrow keys into a mouse pointer, or plug a USB keyboard, mouse or gamepad into its port. The picture is scaled and turned by the ESP32-P4's pixel processing accelerator, so the CPU is left for the game.</p>
+          </section>
+
+          <section class="konsool" data-app="com.annejan.tic80" aria-labelledby="install-title">
+            <h3 id="install-title">Put it on your Konsool</h3>
+            <ol>
+              <li>Connect the Konsool to this computer with USB.</li>
+              <li>On the Konsool, press the purple diamond: a USB icon shows top right. That is BadgeLink mode.</li>
+              <li>Press <strong>Install</strong> and pick the Konsool.</li>
+            </ol>
+            <ul class="apps" aria-live="polite"></ul>
+            <div class="actions">
+              <button type="button" class="install">Install</button>
+              <button type="button" class="start" hidden>Start it</button>
+            </div>
+            <div class="progress" hidden><div class="bar"></div></div>
+            <p class="status" role="status"></p>
+            <p class="note">Straight from the Konsool's own app repository, as its app store would. It works in Chrome and Edge. On Linux the browser may only open the Konsool with badgelink's udev rule, <code>60-badgelink.rules</code>, in <code>/etc/udev/rules.d/</code>.</p>
+          </section>
+
+          <p class="made">Made with Claude: this port and this page were written with an AI, and run on a real badge.</p>
+        </main>
+
+        <aside>
+          <section>
+            <h3>Source</h3>
+            <ul>
+              <li><a href="https://github.com/annejan/TIC-80">TIC-80 for the Konsool</a> <small>MIT</small></li>
+              <li><a href="https://tic80.com/">tic80.com</a> <small>TIC-80 by nesbox</small></li>
+              <li><a href="https://tanmatsu.cloud/">tanmatsu.cloud</a> <small>the app repository</small></li>
+            </ul>
+          </section>
+          <section>
+            <h3>Made with it</h3>
+            <ul>
+              <li><a href="https://www.pouet.net/prod.php?which=106370">Claude maar wat aan</a> <small>Outline 2026</small></li>
+            </ul>
+          </section>
+          <section>
+            <h3>Konsool</h3>
+            <ul>
+              <li><a href="https://nicolaielectronics.nl/tanmatsu/">Tanmatsu / Konsool</a></li>
+              <li><a href="/portals/">Portals for the Konsool</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

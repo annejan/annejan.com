@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Portals for the Konsool – Anne Jan Brouwer</title>
+    <meta name="description" content="Portals: a Portal-like puzzle game for the Konsool (Tanmatsu). Twenty test chambers, stories, ghost races and GLaDOS. Put it on your Konsool from this page, over USB." />
+    <meta name="author" content="Anne Jan Brouwer" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="canonical" href="https://annejan.com/portals/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://annejan.com/portals/" />
+    <meta property="og:site_name" content="Anne Jan Brouwer" />
+    <meta property="og:title" content="Portals for the Konsool" />
+    <meta property="og:description" content="A Portal-like puzzle game for the Konsool. Put it on your badge from the browser, over USB." />
+    <meta property="og:image" content="https://annejan.com/portals/poster.webp" />
+    <meta property="og:image:width" content="800" />
+    <meta property="og:image:height" content="480" />
+    <meta property="og:image:alt" content="A test chamber in Portals, seen through a blue portal" />
+    <meta name="fediverse:creator" content="@annejan@mastodon.social" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/konsool/konsool.css" />
+    <script src="/konsool/badgelink.js" defer></script>
+    <script src="/konsool/install.js" defer></script>
+  </head>
+  <body class="cv app">
+    <div class="page">
+      <header>
+        <a href="/" id="home" class="fade" title="Home"><img src="/ajb.svg" width="603" height="781" alt="Anne Jan Brouwer – home" /></a>
+        <div>
+          <h1>Portals</h1>
+          <h2>For the Konsool</h2>
+        </div>
+        <p class="www">annejan.com</p>
+      </header>
+
+      <div class="columns">
+        <main>
+          <section>
+            <video class="film" src="/portals/portals-startup.mp4" poster="/portals/poster.webp" width="800" height="480" controls preload="none"></video>
+            <p class="lede">A Portal-like puzzle game for the Konsool. Twenty test chambers, two portals, and GLaDOS watching. Then stories: packs of new chambers told from a desk between the rounds.</p>
+            <p>Ghost races against your best runs, and other people's. Lifts between the chambers. Cubes, buttons, turrets, faith plates, light bridges and energy pellets. A chamber editor on the badge itself. GLaDOS speaks, through SAM, the C64's Software Automatic Mouth.</p>
+          </section>
+
+          <section class="konsool" data-app="com.annejan.portals" aria-labelledby="install-title">
+            <h3 id="install-title">Put it on your Konsool</h3>
+            <ol>
+              <li>Connect the Konsool to this computer with USB.</li>
+              <li>On the Konsool, press the purple diamond: a USB icon shows top right. That is BadgeLink mode.</li>
+              <li>Press <strong>Install</strong> and pick the Konsool.</li>
+            </ol>
+            <ul class="apps" aria-live="polite"></ul>
+            <div class="actions">
+              <button type="button" class="install">Install</button>
+              <button type="button" class="start" hidden>Start it</button>
+            </div>
+            <div class="progress" hidden><div class="bar"></div></div>
+            <p class="status" role="status"></p>
+            <p class="note">Straight from the Konsool's own app repository, as its app store would: Portals, and Graceloader, the loader it runs under, if your Konsool does not have that version yet. It works in Chrome and Edge. On Linux the browser may only open the Konsool with badgelink's udev rule, <code>60-badgelink.rules</code>, in <code>/etc/udev/rules.d/</code>.</p>
+          </section>
+
+          <section>
+            <h3>Stories</h3>
+            <p>Story packs go on the SD card. Put them on your Konsool the same way at <a href="https://scene.rs/stories/">scene.rs/stories</a>, or write your own: <a href="https://github.com/annejan/tanmatsu-portals-grace/blob/main/dlc/README.md">how a story pack works</a>.</p>
+          </section>
+
+          <p class="made">Made with Claude: Portals and this page were written with an AI, and played on a real badge.</p>
+        </main>
+
+        <aside>
+          <section>
+            <h3>Download</h3>
+            <ul>
+              <li><a href="https://github.com/annejan/tanmatsu-portals-grace/releases/download/v0.12.5/portals-0.12.5.zip">portals-0.12.5.zip</a> <small>to unzip into /int/apps/ by hand</small></li>
+              <li><a href="https://github.com/annejan/tanmatsu-portals-grace/releases">Releases</a> <small>with the story packs and the TAS</small></li>
+              <li><a href="https://tanmatsu.cloud/">tanmatsu.cloud</a> <small>the app repository</small></li>
+            </ul>
+          </section>
+          <section>
+            <h3>Source</h3>
+            <ul>
+              <li><a href="https://github.com/annejan/tanmatsu-portals-grace">Portals</a></li>
+              <li><a href="https://github.com/nullislandspace/tanmatsu-graceloader">Graceloader</a> <small>MIT</small></li>
+              <li><a href="https://github.com/nullislandspace/synthengine3D">SynthEngine 3D</a></li>
+            </ul>
+          </section>
+          <section>
+            <h3>Konsool</h3>
+            <ul>
+              <li><a href="https://nicolaielectronics.nl/tanmatsu/">Tanmatsu / Konsool</a></li>
+              <li><a href="/tic80/">TIC-80 for the Konsool</a></li>
+            </ul>
+          </section>
+          <p><small>Portals is a fan game in honour of Valve's Portal. Portal, Aperture Science and GLaDOS are Valve's.</small></p>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

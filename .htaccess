@@ -8,6 +8,13 @@ ErrorDocument 404 /error/404.html
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 </If>
 
+# The Konsool app pages: the same, but they talk to a Konsool over WebUSB, and fetch its apps
+# from the app repository the Konsool's own app store uses.
+<If "%{REQUEST_URI} =~ m#^/(portals|tic80)/(index\.html)?$#">
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'self' https://apps.tanmatsu.cloud; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(self)"
+</If>
+
 # Compress every text type (Debian's deflate.conf does not reach this vhost).
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript text/plain application/xml image/svg+xml application/toml
@@ -19,7 +26,7 @@ ErrorDocument 404 /error/404.html
     <FilesMatch "\.(html|js|css|txt|xml|toml)$">
         Header set Cache-Control "no-cache"
     </FilesMatch>
-    <FilesMatch "\.(ogg|m4a|ttf|png|svg|jpg|ico)$">
+    <FilesMatch "\.(ogg|m4a|mp4|ttf|png|svg|jpg|webp|ico|zip)$">
         Header set Cache-Control "max-age=86400"
     </FilesMatch>
 </IfModule>

@@ -1,0 +1,54 @@
+/* Pages for Konsool apps (/portals/, /tic80/), on top of /style.css: a film or a shot, the app,
+   and a panel that puts it on a Konsool over USB (/konsool/install.js). */
+
+.app .film {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 3;
+  background: #000;
+  border: 1px solid var(--rule);
+  image-rendering: pixelated;
+}
+.app .lede { color: var(--fg); font-size: 16px; line-height: 1.6; margin-top: 24px; }
+
+.konsool {
+  border: 1px solid var(--rule);
+  padding: 20px 24px;
+}
+.konsool ol { margin: 0 0 16px; padding-left: 1.4em; }
+.konsool ol li { margin-bottom: 4px; }
+.konsool .apps { list-style: none; margin: 0 0 16px; padding: 0; }
+.konsool .apps li { margin-bottom: 4px; }
+.konsool .apps b { color: var(--fg); }
+.konsool .apps span { color: var(--muted); }
+.konsool .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.konsool button {
+  min-height: 40px;
+  padding: 8px 18px;
+  border: 1px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  font: bold 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.konsool button:hover, .konsool button:focus-visible { background: var(--cyan); color: var(--bg); }
+.konsool button.start { border-color: var(--lime); color: var(--lime); }
+.konsool button.start:hover, .konsool button.start:focus-visible { background: var(--lime); color: var(--bg); }
+.konsool button:disabled { border-color: var(--rule); color: var(--muted); background: transparent; cursor: not-allowed; }
+.konsool button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.konsool .progress { height: 4px; margin-top: 16px; background: var(--rule); }
+.konsool .bar { height: 100%; width: 0; background: var(--cyan); transition: width 0.15s; }
+.konsool .status { min-height: 1.5em; margin: 12px 0 0; }
+.konsool .status.ok { color: var(--lime); }
+.konsool .status.error { color: #ff8a80; }
+.konsool .note { color: var(--muted); font-size: 12px; margin: 16px 0 0; }
+
+.made { margin-top: 40px; color: var(--muted); font-size: 12px; font-style: italic; }
+
+@media (prefers-reduced-motion: reduce) {
+  .konsool .bar, .konsool button { transition: none; }
+}
