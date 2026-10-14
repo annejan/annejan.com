@@ -1,14 +1,13 @@
 // Type "pass" and the QtPass padlocked heart unlocks (the same easter egg as on
 // qtpass.org): it punches in, beats, its shackle lifts and swings open round its long leg,
 // the heart beats free for a moment, then it locks again and fades away. The shackle is
-// drawn from the logo's own geometry as a round bar. Click or Esc ends it early.
+// drawn from the logo's own geometry as a round bar (fx/padlock.js). Click or Esc ends it early.
 
-const VIEW = 3230; // the logo's viewBox runs from (-1615, -1050) to (1615, 2180)
-const PAD_X = 0.4; // room beside the heart for the swung shackle
-const PAD_TOP = 0.3; // and above it for the lifted one
+import { HEART_SRC, PAD_X, PAD_TOP, drawPadlock } from '/fx/padlock.js';
+
 const LENGTH = 5.6; // seconds
 const heart = new Image();
-heart.src = '/demo/qtpass-body.svg';
+heart.src = HEART_SRC;
 let running = false;
 
 const ease = (a, b, t) => Math.min(1, Math.max(0, (t - a) / (b - a)));
@@ -20,33 +19,6 @@ const beat = (t, from, period) => {
   const p = (t - from) % period;
   return Math.exp(-14 * p) + (p > 0.18 ? 0.6 * Math.exp(-14 * (p - 0.18)) : 0);
 };
-
-function drawPadlock(g, S, lift, swing) {
-  const px = PAD_X * S;
-  const py = PAD_TOP * S;
-  const k = S / VIEW;
-  g.save();
-  g.setTransform(k, 0, 0, -k, px + 1615 * k, py - lift + 2186 * k);   // logo units, y up
-  g.save();
-  g.translate(-630, 0);
-  g.scale(Math.cos(swing * Math.PI), 1);   // turned round its long left leg
-  g.translate(630, 0);
-  g.beginPath();
-  g.moveTo(-630, 0);
-  g.lineTo(-630, 1320);
-  g.arc(0, 1320, 630, Math.PI, 0, true);
-  g.lineTo(630, 900);                      // the short leg
-  g.restore();
-  // The logo's shading across the bar, gray-silver-gray, as nested strokes.
-  for (let w = 360; w > 0; w -= 12) {
-    const v = Math.round(128 + 64 * Math.min(1, Math.max(0, (0.45 - w / 720) / 0.35)));
-    g.lineWidth = w;
-    g.strokeStyle = `rgb(${v}, ${v}, ${v})`;
-    g.stroke();
-  }
-  g.restore();
-  g.drawImage(heart, px, py, S, S);
-}
 
 function smallHeart(g, x, y, r) {
   g.beginPath();
@@ -127,7 +99,7 @@ function unlock() {
 
     bg.setTransform(dpr, 0, 0, dpr, 0, 0);
     bg.clearRect(0, 0, buf.width, buf.height);
-    drawPadlock(bg, S, lift, swing);
+    drawPadlock(bg, heart, S, lift, swing);
     const scale = appear * (1 + 0.1 * pulse) * (1 - 0.3 * leave);
     g.save();
     g.globalAlpha = 1 - leave;
