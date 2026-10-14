@@ -1,0 +1,10 @@
+# Keeps the actions in .github/workflows/ current: a pull request for each new version, which
+# the checks then try. The site itself has no dependencies to keep.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "CI:"
