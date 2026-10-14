@@ -5,7 +5,8 @@
 // does, and ticks and crackles when it flickers: Web Audio, no samples; M mutes it.
 // From the fourth click on the monogram (site.js), the pointer leaves a trail of sparks.
 
-const GLOWS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
+import { GLOWS } from '/fx/glows.js';
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const rnd = (a, b) => a + Math.random() * (b - a);
 
