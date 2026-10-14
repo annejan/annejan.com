@@ -95,6 +95,16 @@
 .card .line.ok { color: var(--lime); }
 .card .line.error { color: #ff8a80; }
 
+/* Arriving through the Konsool's screen from the front page: it switches on, as an old screen
+   does, a bright line opening up (store.js sets the class). */
+body.switch-on .page { animation: switch-on 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes switch-on {
+  0% { transform: scale(1, 0.004); filter: brightness(6); opacity: 1; }
+  45% { transform: scale(1, 0.004); filter: brightness(6); }
+  100% { transform: none; filter: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  body.switch-on .page { animation: none; }
   .app .bar, .app button { transition: none; }
 }

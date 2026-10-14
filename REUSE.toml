@@ -109,8 +109,8 @@ path = ["portals/portals-startup.mp4", "portals/poster.webp"]
 SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "MIT"
 
-# The Konsool icon on the front page: drawn for this site (a palmtop: screen and keys).
+# The Konsool, Portals and TIC-80 icons on the front page: drawn for this site.
 [[annotations]]
-path = "logos/konsool.png"
+path = ["logos/konsool.png", "logos/portals.png", "logos/tic80.png"]
 SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "CC-BY-4.0"

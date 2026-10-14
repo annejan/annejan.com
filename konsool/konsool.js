@@ -13,6 +13,14 @@
 'use strict';
 
 (function () {
+  // Came in through one of the front page's Konsool icons: the page switches on (konsool.css).
+  try {
+    if (sessionStorage.getItem('konsool-on')) {
+      sessionStorage.removeItem('konsool-on');
+      document.body.classList.add('switch-on');
+    }
+  } catch (e) { /* no storage: no switch-on */ }
+
   const REPO = 'https://apps.tanmatsu.cloud';
   const TARGETS = ['konsool', 'tanmatsu'];
 

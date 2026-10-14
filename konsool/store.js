@@ -7,6 +7,7 @@
   const grid = $('#apps');
   const status = $('#badge-status');
   const connectButton = $('#connect');
+  const updateAll = $('#update-all');
   const search = $('#search');
   const cats = $('#categories');
   const tpl = $('#app-card');
@@ -136,6 +137,56 @@
     }
   }
 
+  // Every app with an update, one after the other, each where it is now.
+  updateAll.addEventListener('click', async () => {
+    if (busy || !state) return;
+    const todo = entries.filter(hasUpdate);
+    if (!todo.length) return;
+    busy = true;
+    connectButton.disabled = updateAll.disabled = true;
+    renderButtons();
+    let bl = null;
+    const failed = [];
+    try {
+      say('Connecting to the Konsool…');
+      bl = await Konsool.connect();
+      for (let k = 0; k < todo.length; k++) {
+        const e = todo[k];
+        const card = grid.querySelector(`[data-slug="${e.slug}"]`);
+        const line = card && card.querySelector('.line');
+        const progress = card && card.querySelector('.progress');
+        const bar = card && card.querySelector('.bar');
+        try {
+          await install(bl, e, state.apps.get(e.slug).base.split('/')[1], (text, done, total) => {
+            say(`Updating ${k + 1} of ${todo.length}: ${e.project.name}. ${text}`);
+            if (line) { line.className = 'line'; line.textContent = text; }
+            if (progress) { progress.hidden = false; bar.style.width = (100 * done / (total || 1)).toFixed(1) + '%'; }
+          });
+          if (line) { line.className = 'line ok'; line.textContent = `Updated to ${e.project.version}.`; }
+        } catch (err) {
+          if (err instanceof BadgeLinkError && (err.status === 'Timeout' || err.status === 'Disconnected')) throw err;
+          failed.push(e.project.name);
+          if (line) { line.className = 'line error'; line.textContent = Konsool.explain(err); }
+        } finally {
+          if (progress) setTimeout(() => { progress.hidden = true; }, 1500);
+        }
+      }
+      state = await Konsool.scan(bl);
+      sayState();
+      if (failed.length) say(`Updated, except ${failed.join(', ')}: see there.`, 'error');
+    } catch (err) {
+      say(Konsool.explain(err), 'error');
+    } finally {
+      if (bl) {
+        try { await bl.close(); } catch (_) { /* gone already */ }
+      }
+      connectButton.disabled = updateAll.disabled = false;
+      busy = false;
+      renderButtons();
+      filter();
+    }
+  });
+
   function renderButtons() {
     for (const card of grid.children) {
       const e = entries.find((x) => x.slug === card.dataset.slug);
@@ -212,6 +263,8 @@
     say(`Your Konsool has ${mine.length} of these app${mine.length === 1 ? '' : 's'}` +
       (updates.length ? `, ${updates.length} with an update: ${updates.map((e) => e.project.name).join(', ')}.` : ', all up to date.'), 'ok');
     $('#only').hidden = false;
+    updateAll.hidden = !updates.length;
+    updateAll.textContent = updates.length > 1 ? `Update all ${updates.length}` : 'Update it';
   }
 
   connectButton.addEventListener('click', async () => {

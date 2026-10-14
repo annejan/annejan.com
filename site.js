@@ -3,15 +3,48 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const plainClick = (event) =>
   !reduceMotion && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
 
-// Social icon to another site: zoom out of the page while it fades to white. One to this site
-// (.fade) fades out like any internal link.
-document.querySelectorAll('.social a:not(.fade)').forEach((link) => {
+// Social icon to another site: zoom out of the page while it fades to white.
+document.querySelectorAll('.social a:not(.zoom)').forEach((link) => {
   link.addEventListener('click', (event) => {
     if (!plainClick(event)) return;
     event.preventDefault();
     link.classList.add('launch');
     document.body.classList.add('leaving');
     setTimeout(() => { window.location = link.href; }, 1000);
+  });
+});
+
+// The Konsool icons: fly into the icon's screen (data-screen: left, top, width and height, as
+// fractions of the icon; data-round for an oval one) until it is the window; the page then
+// switches on in it (konsool/konsool.js).
+document.querySelectorAll('.social a.zoom').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    if (!plainClick(event)) return;
+    event.preventDefault();
+    const [sl, st, sw, sh] = link.dataset.screen.split(' ').map(Number);
+    const round = link.hasAttribute('data-round');
+    const r = link.getBoundingClientRect();
+    const fly = document.createElement('div');
+    fly.className = 'konsool-fly';
+    Object.assign(fly.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    fly.style.setProperty('--icon', getComputedStyle(link.querySelector('.icon')).getPropertyValue('--icon'));
+    const screen = document.createElement('div');
+    screen.className = 'konsool-screen' + (round ? ' round' : '');
+    Object.assign(screen.style, { left: sl * 100 + '%', top: st * 100 + '%', width: sw * 100 + '%', height: sh * 100 + '%' });
+    fly.append(screen);
+    document.body.append(fly);
+    // Move the screen's middle to the window's, and grow until the screen covers the window
+    // (an oval needs half as much again to reach the corners).
+    const cx = r.left + r.width * (sl + sw / 2);
+    const cy = r.top + r.height * (st + sh / 2);
+    const scale = (round ? 1.5 : 1.1) * Math.max(innerWidth / (r.width * sw), innerHeight / (r.height * sh));
+    fly.style.transformOrigin = `${cx - r.left}px ${cy - r.top}px`;
+    document.body.classList.add('zooming');
+    try { sessionStorage.setItem('konsool-on', '1'); } catch (e) { /* no storage: no switch-on */ }
+    fly.animate(
+      [{ transform: 'none' }, { transform: `translate(${innerWidth / 2 - cx}px, ${innerHeight / 2 - cy}px) scale(${scale})` }],
+      { duration: 1100, easing: 'cubic-bezier(0.7, 0, 0.84, 0)', fill: 'forwards' },
+    ).finished.then(() => { window.location = link.href; });
   });
 });
 
@@ -211,6 +244,7 @@ console.log(
 // Restore the page if the browser brings it back from the back/forward cache.
 addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
-  document.body.classList.remove('leaving', 'fading');
+  document.body.classList.remove('leaving', 'fading', 'zooming');
+  document.querySelectorAll('.konsool-fly').forEach((fly) => fly.remove());
   document.querySelectorAll('.social a.launch').forEach((link) => link.classList.remove('launch'));
 });

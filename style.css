@@ -71,7 +71,8 @@ body.home {
   align-self: start;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
+  max-width: calc(5 * 40px + 4 * 16px);   /* two rows of five */
   list-style: none;
   margin: 24px 0 0;
   padding: 0;
@@ -102,6 +103,8 @@ body.home {
 .icon.badgeteam { --icon: url(/logos/badgeteam.png); }
 .icon.aidtoukraine { --icon: url(/logos/aidtoukraine.png); }
 .icon.konsool { --icon: url(/logos/konsool.png); }
+.icon.portals { --icon: url(/logos/portals.png); }
+.icon.tic80 { --icon: url(/logos/tic80.png); }
 .social a:hover :is(svg, .icon), .social a:focus-visible :is(svg, .icon) {
   color: var(--cyan);
   transform: scale(1.5);
@@ -178,6 +181,25 @@ body.leaving .social li, body.leaving .www, body.leaving .tag {
 }
 body.leaving .social li:has(.launch) { opacity: 1; }
 body.fading { opacity: 0; }
+/* Into the Konsool's screen: the card fades while the icon flies at you (site.js). */
+body.zooming { overflow: hidden; }
+body.zooming #card { opacity: 0; transition: opacity 0.7s ease-in; }
+.konsool-fly {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  will-change: transform;
+}
+.konsool-fly::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--fg);
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+}
+.konsool-screen { position: absolute; background: var(--bg); }
+.konsool-screen.round { border-radius: 50%; }
 
 @media (max-width: 560px) {
   #card {
@@ -187,7 +209,7 @@ body.fading { opacity: 0; }
     text-align: center;
   }
   #mark { width: min(60vw, 240px); margin-bottom: 24px; }
-  .social { justify-content: center; gap: 12px; }
+  .social { justify-content: center; gap: 12px; max-width: calc(5 * 34px + 4 * 12px); }
   .social a { width: 34px; height: 34px; }
   .www { letter-spacing: 0.12em; }
   .tag { font-size: 12px; letter-spacing: 2px; }
