@@ -376,12 +376,15 @@
 
   // /konsool/#slug: that app, found and lit.
   function seek() {
-    const slug = decodeURIComponent(location.hash.slice(1));
+    let slug = '';
+    try { slug = decodeURIComponent(location.hash.slice(1)); } catch (e) { return; }   // a mangled link
     const card = slug && document.getElementById(slug);
     if (!card || !card.classList.contains('card')) return;
     search.value = '';
     category = '';
+    only = '';
     for (const x of cats.children) x.setAttribute('aria-pressed', String(x === cats.firstChild));
+    for (const x of document.querySelectorAll('#only button')) x.setAttribute('aria-pressed', String(x.dataset.only === ''));
     filter();
     for (const c of grid.querySelectorAll('.card.lit')) c.classList.remove('lit');
     card.classList.add('lit');
