@@ -94,7 +94,10 @@
   async function list() {
     if (!listed) {
       await dataUrl('', '');   // the data folder, for the icons
-      const all = await (await get(REPO + '/v1/projects?device=konsool', 'the app repository')).json();
+      // The Konsool and the Tanmatsu are the same hardware: apps for either one run on it.
+      const lists = await Promise.all(TARGETS.map(async (t) =>
+        (await get(`${REPO}/v1/projects?device=${t}`, 'the app repository')).json()));
+      const all = [...new Map(lists.flat().map((e) => [e.slug, e])).values()];
       listed = all.map((e) => ({ slug: e.slug, project: e.project, app: appFor(e.project) }))
         .filter((e) => e.app)
         .sort((a, b) => (a.project.name || a.slug).localeCompare(b.project.name || b.slug));
