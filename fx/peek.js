@@ -1,6 +1,7 @@
 // Hover over the Badge.Team icon on the home page for a while (site.js) and the badger, its
 // badge round its neck and its snake at its feet, comes up from the bottom of the window
-// below the icon to see who is there. It goes back down when you move on. The drawing is
+// below the icon to see who is there. It goes back down when you move on, and whoever catches
+// it before it is gone is taken home to badge.rs. The drawing is
 // Badge.Team's mascot, from its docs (badge.team/docs; CC BY 4.0).
 
 const SRC = '/fx/badger-snake.webp';
@@ -20,10 +21,14 @@ export function peek(link) {
   const left = Math.min(innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2));
   Object.assign(img.style, {
     position: 'fixed', left: `${left}px`, bottom: '0', width: `${w}px`, height: `${h}px`,
-    zIndex: '25', pointerEvents: 'none', transform: 'translateY(110%)',
+    zIndex: '25', cursor: 'pointer', transform: 'translateY(110%)',
     // Its black outline would vanish on the black page: a faint light behind it.
     filter: 'drop-shadow(0 0 1px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 14px rgba(36, 202, 254, 0.35))',
   });
+
+  // Caught: to badge.rs, where it lives.
+  img.title = 'badge.rs';
+  img.addEventListener('click', () => { window.location = 'https://badge.rs/'; });
 
   let gone = false;
   const away = () => {
