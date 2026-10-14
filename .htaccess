@@ -1,8 +1,9 @@
 # Missing pages get Yuki and the rope
 ErrorDocument 404 /error/404.html
 
-# The repository's own files are not part of the site: its history, its checks, their tools.
-RedirectMatch 404 ^/(\.git|\.github|node_modules)(/|$)
+# The repository's own files are not part of the site: its history, its checks, their tools,
+# and the BadgeLink client's tests.
+RedirectMatch 404 ^/(\.git|\.github|node_modules|konsool/test)(/|$)
 
 # The new pages need nothing inline, so they get a strict policy. The old demos
 # elsewhere on the site keep the server's looser one.

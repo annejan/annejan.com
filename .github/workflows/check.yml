@@ -1,6 +1,7 @@
-# Every push to master and every pull request: licensing (REUSE), and the site itself, served
+# Every push to master and every pull request: licensing (REUSE), the site itself, served
 # as it is (.github/check/site.mjs: script errors, WCAG 2.2 AA, reflow, the easter eggs, and
-# the Konsool pages' keyboard focus).
+# the Konsool pages' keyboard focus), and konsool/badgelink.js against the badge's own
+# BadgeLink code (konsool/test/: mock.sh builds it as a host program).
 name: Check
 
 on:
@@ -34,3 +35,13 @@ jobs:
           python3 -m http.server 8000 >/dev/null 2>&1 &
           sleep 1
           node .github/check/site.mjs http://localhost:8000
+
+  badgelink:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: BadgeLink client against the badge's code
+        run: node --test konsool/test/badgelink.test.js

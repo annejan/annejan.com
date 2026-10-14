@@ -10,6 +10,7 @@ path = [
     "**.mjs",
     "**.css",
     ".github/**",
+    "konsool/test/**",
     ".htaccess",
     ".gitignore",
     "robots.txt",
