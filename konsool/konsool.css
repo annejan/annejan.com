@@ -79,6 +79,14 @@
 .konsool .status.warn { color: #ff8a1c; }
 .konsool .note { color: var(--muted); font-size: 12px; margin: 16px 0 0; }
 
+/* Portals' stories: a card each. */
+.stories { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin: 16px 0; }
+.story { border: 1px solid var(--rule); }
+.story img { display: block; width: 100%; height: auto; aspect-ratio: 5 / 3; image-rendering: pixelated; }
+.story h4 { margin: 12px 12px 4px; color: var(--fg); font-size: 14px; }
+.story p { margin: 0 12px 12px; }
+.story .meta { color: var(--lime); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+
 .made { margin-top: 40px; color: var(--muted); font-size: 12px; font-style: italic; }
 
 /* The store: /konsool/ */

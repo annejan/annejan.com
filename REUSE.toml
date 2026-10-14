@@ -105,7 +105,7 @@ SPDX-License-Identifier = "LicenseRef-AllRightsReserved"
 # Portals' startup film and a still from its film of the twenty chambers: the game's own renders
 # (https://github.com/annejan/tanmatsu-portals-grace, MIT).
 [[annotations]]
-path = ["portals/portals-startup.mp4", "portals/poster.webp"]
+path = ["portals/portals-startup.mp4", "portals/poster.webp", "portals/stories/*.webp"]
 SPDX-FileCopyrightText = "2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "MIT"
 
