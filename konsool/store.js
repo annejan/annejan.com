@@ -167,12 +167,11 @@
     renderButtons();
     const line = card.querySelector('.line');
     const progress = card.querySelector('.progress');
-    const bar = card.querySelector('.bar');
     const step = (text, done, total) => {
       line.className = 'line';
       line.textContent = text;
       progress.hidden = false;
-      bar.style.width = (100 * done / (total || 1)).toFixed(1) + '%';
+      Konsool.progress(progress, done / (total || 1));
     };
     let bl = null;
     try {
@@ -181,7 +180,7 @@
       bl = await Konsool.connect();
       if (!state) state = await Konsool.scan(bl);
       const msg = await fn(bl, step);
-      bar.style.width = '100%';
+      Konsool.progress(progress, 1);
       state = await Konsool.scan(bl);
       line.className = 'line ok';
       line.textContent = msg || 'Done.';
@@ -205,7 +204,8 @@
     const todo = entries.filter(hasUpdate);
     if (!todo.length) return;
     busy = true;
-    connectButton.disabled = updateAll.disabled = true;
+    Konsool.hold(connectButton, true);
+    Konsool.hold(updateAll, true);
     renderButtons();
     let bl = null;
     const failed = [];
@@ -217,12 +217,11 @@
         const card = grid.querySelector(`[data-slug="${e.slug}"]`);
         const line = card && card.querySelector('.line');
         const progress = card && card.querySelector('.progress');
-        const bar = card && card.querySelector('.bar');
         try {
           await install(bl, e, state.apps.get(e.slug).base.split('/')[1], (text, done, total) => {
             say(`Updating ${k + 1} of ${todo.length}: ${e.project.name}. ${text}`);
             if (line) { line.className = 'line'; line.textContent = text; }
-            if (progress) { progress.hidden = false; bar.style.width = (100 * done / (total || 1)).toFixed(1) + '%'; }
+            if (progress) { progress.hidden = false; Konsool.progress(progress, done / (total || 1)); }
           });
           if (line) { line.className = 'line ok'; line.textContent = `Updated to ${e.project.version}.`; }
         } catch (err) {
@@ -242,7 +241,8 @@
       if (bl) {
         try { await bl.close(); } catch (_) { /* gone already */ }
       }
-      connectButton.disabled = updateAll.disabled = false;
+      Konsool.hold(connectButton, false);
+      Konsool.hold(updateAll, false);
       busy = false;
       renderButtons();
       filter();
@@ -285,6 +285,7 @@
     return [e.project.name, e.project.description, e.project.author, e.slug, interp].some((s) => (s || '').toLowerCase().includes(q));
   }
 
+  let shownTimer;
   function filter() {
     let shown = 0;
     for (const card of grid.children) {
@@ -293,6 +294,11 @@
       if (!card.hidden) shown++;
     }
     $('#none').hidden = shown > 0;
+    // Said once typing stops, not at every letter.
+    clearTimeout(shownTimer);
+    shownTimer = setTimeout(() => {
+      $('#shown').textContent = shown === entries.length ? '' : shown ? `${shown} of ${entries.length} apps shown.` : 'No app matches.';
+    }, 500);
   }
 
   function render() {
@@ -354,7 +360,7 @@
   connectButton.addEventListener('click', async () => {
     if (busy) return;
     busy = true;
-    connectButton.disabled = true;
+    Konsool.hold(connectButton, true);
     let bl = null;
     try {
       say('Connecting to the Konsool…');
@@ -368,7 +374,7 @@
       if (bl) {
         try { await bl.close(); } catch (_) { /* gone already */ }
       }
-      connectButton.disabled = false;
+      Konsool.hold(connectButton, false);
       busy = false;
       renderButtons();
       filter();

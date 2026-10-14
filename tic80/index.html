@@ -63,7 +63,7 @@
               <button type="button" class="install">Install</button>
               <button type="button" class="start" hidden>Start it</button>
             </div>
-            <div class="progress" hidden><div class="bar"></div></div>
+            <div class="progress" role="progressbar" aria-label="Install progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><div class="bar"></div></div>
             <p class="status" role="status"></p>
             <p class="note">Straight from the Konsool's own app repository, as its app store would. It works in Chrome and Edge. On Linux the browser may only open the Konsool with badgelink's udev rule, <code>60-badgelink.rules</code>, in <code>/etc/udev/rules.d/</code>.</p>
           </section>

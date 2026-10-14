@@ -72,7 +72,7 @@ aside li:has(> small) > a:hover, aside li:has(> small) > a:focus-visible { text-
 .app .actions button.alt, .app .actions button.remove { border-color: var(--rule); color: var(--text); }
 .app .actions button.alt:hover, .app .actions button.alt:focus-visible { background: var(--text); color: var(--bg); }
 .app .actions button.remove:hover, .app .actions button.remove:focus-visible { background: #ff8a80; border-color: #ff8a80; color: var(--bg); }
-.app .actions button:disabled { border-color: var(--rule); color: var(--muted); background: transparent; cursor: not-allowed; }
+.app .actions button:is(:disabled, [aria-disabled="true"]) { border-color: var(--rule); color: var(--muted); background: transparent; cursor: not-allowed; }
 .app button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .app .progress { height: 4px; margin-top: 16px; background: var(--rule); }
 .app .bar { height: 100%; width: 0; background: var(--cyan); transition: width 0.15s; }
