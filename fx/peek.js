@@ -1,7 +1,7 @@
 // Hover over the Badge.Team icon on the home page for a while (site.js) and the badger, its
 // badge round its neck and its snake at its feet, comes up from the bottom of the window
 // below the icon to see who is there. It goes back down when you move on. The drawing is
-// Badge.Team's (CC BY 4.0).
+// Badge.Team's mascot, from its docs (badge.team/docs; CC BY 4.0).
 
 const SRC = '/fx/badger-snake.webp';
 const ASPECT = 600 / 635;

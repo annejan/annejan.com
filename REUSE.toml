@@ -58,11 +58,18 @@ SPDX-License-Identifier = "CC0-1.0"
 # Badge.Team's 80s stamp (unchanged), badge drawings (rendered into one sheet, and the
 # Konsool on its own, cropped) and hero photo (resized), from
 # https://github.com/badgeteam/website, for the demo; and its badger and snake, from
-# badge.rs (https://github.com/annejan/badge.rs), for the typed easter eggs; the badger with
-# its snake, for hovering over the Badge.Team icon; and its wordmark (assets/icons/logo.svg,
-# unchanged), for the screensaver.
+# badge.rs (https://github.com/annejan/badge.rs), for the typed easter eggs; and its
+# wordmark (assets/icons/logo.svg, unchanged), for the screensaver.
 [[annotations]]
-path = ["demo/badgeteam-stamp.svg", "demo/badges.webp", "demo/konsool.webp", "demo/badgeteam-hero.jpg", "fx/badger.webp", "fx/badger-snake.webp", "fx/snake.webp", "fx/badgeteam-wordmark.svg"]
+path = ["demo/badgeteam-stamp.svg", "demo/badges.webp", "demo/konsool.webp", "demo/badgeteam-hero.jpg", "fx/badger.webp", "fx/snake.webp", "fx/badgeteam-wordmark.svg"]
+SPDX-FileCopyrightText = "Stichting Badge.Team"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Badge.Team's mascot, the badger with its badge and its snake, from its docs
+# (https://badge.team/docs/; content/en/docs/mascot.png in https://github.com/badgeteam/website),
+# as WebP, for hovering over the Badge.Team icon.
+[[annotations]]
+path = "fx/badger-snake.webp"
 SPDX-FileCopyrightText = "Stichting Badge.Team"
 SPDX-License-Identifier = "CC-BY-4.0"
 
