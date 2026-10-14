@@ -1,5 +1,5 @@
 /* The C64 screen, opened with the Konami code (see c64.js). 40 columns by 25 rows. */
-@font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P-Regular.ttf') format('truetype'); font-display: block; }
+@font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P-Regular.woff2') format('woff2'); font-display: block; }
 .c64 { position: fixed; inset: 0; z-index: 20; display: grid; grid-template-columns: 40em; place-content: center; gap: 1.2em;
        font-family: 'Press Start 2P', monospace; text-transform: uppercase; cursor: text; }
 .c64-screen { width: 40em; height: 25em; line-height: 1em; white-space: pre; overflow: hidden; }

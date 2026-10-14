@@ -37,7 +37,7 @@ RedirectMatch 404 ^/(\.git|\.github|node_modules|konsool/test)(/|$)
     <FilesMatch "\.(html|js|css|txt|xml|toml)$">
         Header set Cache-Control "no-cache"
     </FilesMatch>
-    <FilesMatch "\.(ogg|m4a|mp4|ttf|png|svg|jpg|webp|ico|zip)$">
+    <FilesMatch "\.(ogg|m4a|mp4|ttf|woff2|png|svg|jpg|webp|ico|zip)$">
         Header set Cache-Control "max-age=86400"
     </FilesMatch>
 </IfModule>

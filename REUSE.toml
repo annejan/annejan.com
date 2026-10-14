@@ -100,9 +100,10 @@ path = "logos/aidtoukraine.png"
 SPDX-FileCopyrightText = "Aid to Ukraine"
 SPDX-License-Identifier = "LicenseRef-Trademark"
 
-# Press Start 2P, used by the C64 screen: the unmodified upstream font file.
+# Press Start 2P, used by the C64 screen: the upstream font, losslessly repacked as WOFF2
+# (every glyph as it was; only the obsolete DSIG signature, which repacking voids, is gone).
 [[annotations]]
-path = ["fonts/PressStart2P-Regular.ttf", "fonts/OFL.txt"]
+path = ["fonts/PressStart2P-Regular.woff2", "fonts/OFL.txt"]
 SPDX-FileCopyrightText = "2012 The Press Start 2P Project Authors (cody@zone38.net)"
 SPDX-License-Identifier = "OFL-1.1"
 
