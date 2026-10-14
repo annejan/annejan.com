@@ -1,7 +1,10 @@
 // The site's checks, run by .github/workflows/check.yml against the site served as it is:
 //
-//   - every page: no script errors, WCAG 2.2 AA by axe-core, structured data that parses, and
-//     no sideways scrolling at 320 CSS px (WCAG 1.4.10);
+//   - every page, under the Content-Security-Policy .htaccess gives it: no script errors (a
+//     blocked script or style is one), WCAG 2.2 AA by axe-core, structured data that parses,
+//     and no sideways scrolling at 320 CSS px (WCAG 1.4.10);
+//   - links: every link, canonical, hreflang and share image to this site leads somewhere, and
+//     every #anchor to its id; the sitemap lists every page and only what is there;
 //   - every easter egg on the home page runs without an error;
 //   - the Konsool pages keep the keyboard focus where it was, and say what a search leaves.
 //
@@ -20,7 +23,26 @@ const { chromium } = require('playwright');
 const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 const BASE = process.argv[2] || 'http://localhost:8000';
+const SITE = 'https://annejan.com';
 const PAGES = ['/', '/portfolio/', '/portfolio/nl/', '/konsool/', '/portals/', '/tic80/', '/error/404.html'];
+// On the server, but not in this repository: the old demos, talks and the 40 page. Checked on
+// the live site when it can be reached, and only as a warning: it is not this repository's.
+const ELSEWHERE = ['/40/', '/media/360/', '/media/The%20Badge%20Is%20the%20Demo.odp', '/bagger/', '/baggerParty/',
+  '/kansloos/', '/kansloosParty/', '/html5/instafail/', '/html5/instafailParty/'];
+// Anchors that a script answers, not an id: annejan.com/#demo starts the demo (site.js).
+const SCRIPTED = ['/#demo'];
+
+// The Content-Security-Policy .htaccess sets for a path: the first <If "%{REQUEST_URI} =~ m#..#">
+// block that matches it. The test server sends none of its own. Over plain http (the test
+// server), upgrade-insecure-requests would send every request to an https port that is not there.
+const htaccess = readFileSync(new URL('../../.htaccess', import.meta.url), 'utf8');
+const POLICIES = [...htaccess.matchAll(/<If "%\{REQUEST_URI\} =~ m#(.+?)#">([\s\S]*?)<\/If>/g)]
+  .map(([, re, body]) => [new RegExp(re), (body.match(/Header set Content-Security-Policy "([^"]+)"/) || [])[1]])
+  .filter(([, csp]) => csp);
+const policyFor = (path) => {
+  const hit = POLICIES.find(([re]) => re.test(path));
+  return hit && (BASE.startsWith('http:') ? hit[1].replace(/;\s*upgrade-insecure-requests/, '') : hit[1]);
+};
 const failures = [];
 const fail = (what) => { failures.push(what); console.log(`  FAIL ${what}`); };
 const pass = (what) => console.log(`  ok   ${what}`);
@@ -36,9 +58,18 @@ const APPS = [app('com.example.one', 'One'), app('com.example.two', 'Two')];
 
 const browser = await chromium.launch();
 
-// A page with its errors collected, the app repository and YouTube stood in for.
-async function open(path, viewport = { width: 1280, height: 800 }) {
+// A page with its errors collected, its security policy as the server sends it, and the app
+// repository and YouTube stood in for. With `axe`, axe-core is loaded in before the page's own
+// scripts, the way the policy allows (an injected <script> it would block).
+async function open(path, { viewport = { width: 1280, height: 800 }, axe = false } = {}) {
   const page = await browser.newPage({ viewport });
+  if (axe) await page.addInitScript({ content: axeSource });
+  await page.route(`${BASE}/**`, async (route) => {
+    if (route.request().resourceType() !== 'document') return route.fallback();
+    const response = await route.fetch();
+    const csp = policyFor(new URL(route.request().url()).pathname);
+    return route.fulfill({ response, headers: { ...response.headers(), ...(csp ? { 'content-security-policy': csp } : {}) } });
+  });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
@@ -62,10 +93,11 @@ const focused = (page) => page.evaluate(() => {
 });
 
 console.log('Pages');
+const links = [];   // [from, url] for every way a page points into this site
 for (const path of PAGES) {
-  const { page, errors } = await open(path);
+  const { page, errors } = await open(path, { axe: true });
   await page.waitForTimeout(2000);   // the home page's icons pop in
-  await page.addScriptTag({ content: axeSource });
+  check(path === '/error/404.html' || !!policyFor(path), `${path}: has a Content-Security-Policy in .htaccess`);
   const result = await page.evaluate(() => axe.run(document, {
     runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'],
   }));
@@ -78,11 +110,80 @@ for (const path of PAGES) {
     try { return JSON.parse(s.textContent)['@type'] || 'no @type'; } catch (e) { return `broken: ${e.message}`; }
   }));
   if (ld.length) check(!ld.some((t) => /^(broken|no @type)/.test(t)), `${path}: structured data (${ld.join(', ')})`);
+  const canonical = await page.evaluate(() => document.querySelector('link[rel="canonical"]')?.href || null);
+  if (path !== '/error/404.html') check(canonical === SITE + path, `${path}: canonical is ${SITE + path} (${canonical})`);
+  for (const url of await page.evaluate(() => [
+    ...[...document.querySelectorAll('a[href], link[rel="canonical"], link[rel="alternate"][hreflang], link[rel="icon"], link[rel="apple-touch-icon"], link[rel="author"], link[rel="stylesheet"]')].map((e) => e.href),
+    ...[...document.querySelectorAll('script[src], img[src], video[src], video[poster]')].map((e) => e.src || e.poster),
+    ...[...document.querySelectorAll('meta[property="og:url"], meta[property="og:image"]')].map((e) => e.content),
+  ])) links.push([path, url]);
+  // Anchors into this same page are looked up in it as it is drawn: /konsool/'s app cards, and
+  // their ids, are made by its script.
+  const missing = await page.evaluate((path) => [...document.querySelectorAll('a[href*="#"]')]
+    .map((a) => new URL(a.href))
+    .filter((u) => u.origin === location.origin && u.pathname === path && u.hash.length > 1)
+    .map((u) => u.hash.slice(1))
+    .filter((id) => !document.getElementById(decodeURIComponent(id))), path);
+  for (const id of new Set(missing)) fail(`${path}: #${id}: no such id on the page`);
   await page.setViewportSize({ width: 320, height: 640 });
   await page.waitForTimeout(300);
   const { sw, cw } = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
   check(sw <= cw, `${path}: reflows at 320 px (${sw} <= ${cw})`);
   await page.close();
+}
+
+console.log('Links');
+{
+  const local = (url) => {   // this site's URL as a path on the test server, or null for another site's
+    const u = new URL(url, BASE + '/');
+    if (u.origin !== new URL(BASE).origin && u.origin !== SITE) return null;
+    return { path: u.pathname, hash: u.hash.slice(1) };
+  };
+  const pages = new Map();   // path -> its text, or null when it is not there
+  const get = async (path) => {
+    if (!pages.has(path)) {
+      const r = await fetch(BASE + path, { redirect: 'manual' });
+      pages.set(path, r.status === 200 ? await r.text() : null);
+    }
+    return pages.get(path);
+  };
+  const elsewhere = new Set();
+  const seen = new Set();
+  for (const [from, url] of links) {
+    const to = local(url);
+    if (!to || seen.has(`${from} ${to.path}#${to.hash}`)) continue;
+    seen.add(`${from} ${to.path}#${to.hash}`);
+    if (ELSEWHERE.includes(to.path)) { elsewhere.add(to.path); continue; }
+    const text = await get(to.path);
+    if (text === null) { fail(`${from}: ${to.path} is not there`); continue; }
+    if (to.hash && to.path !== from && !SCRIPTED.includes(`${to.path}#${to.hash}`)) {
+      const id = decodeURIComponent(to.hash).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (!new RegExp(`\\sid="${id}"`).test(text)) fail(`${from}: ${to.path}#${to.hash}: no such id`);
+    }
+  }
+  check(!failures.some((f) => / is not there|no such id$/.test(f)), `every link into this site leads somewhere (${seen.size} checked)`);
+
+  // The sitemap: every page in it, and nothing in it that is not there.
+  const sitemap = await get('/sitemap.xml');
+  const listed = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  const alternates = [...sitemap.matchAll(/hreflang="[^"]+" href="([^"]+)"/g)].map((m) => m[1]);
+  for (const path of PAGES.filter((p) => p !== '/error/404.html')) {
+    check(listed.includes(SITE + path), `sitemap.xml lists ${path}`);
+  }
+  for (const url of new Set([...listed, ...alternates])) {
+    const to = local(url);
+    if (!to) { fail(`sitemap.xml: ${url} is not on ${SITE}`); continue; }
+    if (ELSEWHERE.includes(to.path)) { elsewhere.add(to.path); continue; }
+    if ((await get(to.path)) === null) fail(`sitemap.xml: ${to.path} is not there`);
+  }
+  check(/^Sitemap: https:\/\/annejan\.com\/sitemap\.xml$/m.test(await get('/robots.txt') || ''), 'robots.txt points to the sitemap');
+
+  // What lives elsewhere on the server: asked of the live site, a warning at most.
+  for (const path of [...elsewhere].sort()) {
+    const status = await fetch(SITE + path, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(10000) })
+      .then((r) => r.status, (e) => e.cause?.code || e.name);
+    console.log(`  ${status === 200 ? 'ok  ' : 'warn'} ${path}: on the live site, ${status}`);
+  }
 }
 
 console.log('Easter eggs');

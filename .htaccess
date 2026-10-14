@@ -12,6 +12,13 @@ RedirectMatch 404 ^/(\.git|\.github|node_modules|konsool/test)(/|$)
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 </If>
 
+# The 404 page (Yuki and the rope): it needs nothing inline either. Shown for a missing page,
+# it is an internal redirect to /error/404.html, so this rule covers it there too.
+<If "%{REQUEST_URI} =~ m#^/error/#">
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+</If>
+
 # The Konsool pages (the app store and two apps): the same, but they talk to a Konsool over WebUSB, and fetch its apps
 # from the app repository the Konsool's own app store uses.
 <If "%{REQUEST_URI} =~ m#^/(portals|tic80|konsool)/(index\.html)?$#">
