@@ -32,10 +32,13 @@
   transition: background-color 0.2s, color 0.2s;
 }
 .yt-play[hidden] { display: none; }
-.yt-play small { display: block; margin-top: 6px; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+.yt-play small { display: block; margin-top: 6px; font-size: 10px; letter-spacing: 2px; color: var(--text); }
 .yt-play:hover, .yt-play:focus-visible { background: var(--fg); color: var(--bg); }
 .yt-play:hover small, .yt-play:focus-visible small { color: var(--bg); }
 .yt-play:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+/* A link with a note beside it reads as running text: underline it (WCAG 1.4.1). */
+aside li:has(> small) > a { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 2px; }
+aside li:has(> small) > a:hover, aside li:has(> small) > a:focus-visible { text-decoration-color: currentColor; }
 .app .caption { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
 
 .app .lede { color: var(--fg); font-size: 16px; line-height: 1.6; margin-top: 24px; }

@@ -249,10 +249,25 @@
     }
   });
 
+  // Rebuilding the buttons would drop the keyboard focus: keep it in its card, on the same
+  // button if it is still there and can be pressed, else on the card's status line.
   function renderButtons() {
-    for (const card of grid.children) {
-      const e = entries.find((x) => x.slug === card.dataset.slug);
-      if (e) actions(card, e);
+    const was = document.activeElement;
+    const card = was && was.closest && was.closest('.actions') ? was.closest('.card') : null;
+    const label = card && was.textContent;
+    const kind = card && was.className;
+    for (const c of grid.children) {
+      const e = entries.find((x) => x.slug === c.dataset.slug);
+      if (e) actions(c, e);
+    }
+    if (!card) return;
+    const buttons = [...card.querySelectorAll('.actions button')].filter((b) => !b.disabled);
+    const same = buttons.find((b) => b.textContent === label) || buttons.find((b) => b.className === kind);
+    if (same) same.focus();
+    else {
+      const line = card.querySelector('.line');
+      line.tabIndex = -1;
+      line.focus();
     }
   }
 
@@ -401,5 +416,6 @@
     seek();
   }).catch((e) => {
     grid.textContent = 'The app repository could not be loaded: ' + Konsool.explain(e);
+    say(grid.textContent, 'error');
   });
 })();
