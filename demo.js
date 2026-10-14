@@ -5,6 +5,8 @@
 // stamp with a carousel of badges over their hero photo.
 // Click or Esc to leave, M mutes, F goes fullscreen. annejan.com/#demo starts it straight away.
 
+import { HEART_SRC, PAD_X as HEART_PAD_X, PAD_TOP as HEART_PAD_TOP, drawPadlock } from '/fx/padlock.js';
+
 const COLORS = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];
 const SCROLL_TEXT =
   'AJB IS BACK ... THE 2010 LOGO RETURNS IN 2026 ... YES, IT IS MADE OF COMIC SANS ... ' +
@@ -15,12 +17,6 @@ const BLOCK_SRC = '/logo.svg'; // the blocky 2010 AJB wordmark
 const BLOCK_ASPECT = 467 / 220; // from its viewBox, because SVG intrinsic sizes differ per browser
 // The remix is five loops long; this is who drops in on beat 32 of each loop.
 const GUESTS = ['block', 'qtpass', 'badgeteam', 'finale', 'konsool'];
-// The padlocked heart (AnonMoos, public domain) without its shackle, which is drawn from the
-// logo's own geometry instead, so the shackle can lift out of the heart and turn.
-const HEART_SRC = '/demo/qtpass-body.svg';
-const HEART_VIEW = 3230; // the logo's viewBox is (-1615, -1050) to (1615, 2180)
-const HEART_PAD_X = 0.4; // buffer room beside the heart for the swung shackle
-const HEART_PAD_TOP = 0.3; // and above it for the lifted one
 const STAMP_SRC = '/demo/badgeteam-stamp.svg'; // Badge.Team's 80s stamp (CC BY 4.0)
 const HERO_SRC = '/demo/badgeteam-hero.jpg'; // Badge.Team's hero photo (CC BY 4.0)
 const BADGES_SRC = '/demo/badges.webp'; // eight badge drawings in 512 px cells (CC BY 4.0)
@@ -316,37 +312,8 @@ export function start(logoSrc, remix) {
   // The heart into its buffer: the shackle lifted by `lift` px and swung round its left leg
   // (swing 0 closed, 1 swung round), the whole darkened by `dark`.
   function renderHeart(lift, swing, dark) {
-    const S = heartSize;
-    const px = HEART_PAD_X * S;
-    const py = HEART_PAD_TOP * S;
     heartCtx.clearRect(0, 0, heartBuf.width, heartBuf.height);
-    // The shackle is a round bar: turned round its left leg, its centre line is foreshortened,
-    // but from any side the bar stays as thick as it is. So foreshorten only the path, and
-    // stroke it untransformed. Logo units, y up, as in the logo's own transform.
-    const k = S / HEART_VIEW;
-    heartCtx.save();
-    heartCtx.setTransform(k, 0, 0, -k, px + 1615 * k, py - lift + 2186 * k);
-    heartCtx.save();
-    heartCtx.translate(-630, 0);
-    heartCtx.scale(Math.cos(swing * Math.PI), 1);
-    heartCtx.translate(630, 0);
-    heartCtx.beginPath();
-    heartCtx.moveTo(-630, 0);
-    heartCtx.lineTo(-630, 1320);
-    heartCtx.arc(0, 1320, 630, Math.PI, 0, true);
-    // A padlock's short leg: just into the heart (its top is at y 1030-1080 here), so lifted, it's out.
-    heartCtx.lineTo(630, 900);
-    heartCtx.restore();
-    // The logo's shading across the bar: gray at the edges, silver in the middle. As nested
-    // strokes, outside in, it looks the same from every side.
-    for (let width = 360; width > 0; width -= 12) {
-      const v = Math.round(128 + 64 * Math.min(1, Math.max(0, (0.45 - width / 720) / 0.35)));
-      heartCtx.lineWidth = width;
-      heartCtx.strokeStyle = `rgb(${v}, ${v}, ${v})`;
-      heartCtx.stroke();
-    }
-    heartCtx.restore();
-    heartCtx.drawImage(heart, px, py, S, S);
+    drawPadlock(heartCtx, heart, heartSize, lift, swing);
     if (dark > 0) {
       heartCtx.globalCompositeOperation = 'source-atop';
       heartCtx.fillStyle = `rgba(0, 0, 0, ${dark})`;
@@ -651,6 +618,7 @@ export function start(logoSrc, remix) {
     document.documentElement.style.overflow = overflow;
     logo.removeEventListener('load', layout);
     block.removeEventListener('load', layout);
+    stamp.removeEventListener('load', layout);
     removeEventListener('resize', layout);
     removeEventListener('keydown', onKey);
     running = false;
