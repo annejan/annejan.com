@@ -36,17 +36,72 @@
     return !!have && !!have.version && Konsool.compare(have.version, e.project.version) > 0;
   }
 
-  function facts(e) {
-    const out = [e.project.version ? 'v' + e.project.version : '', e.project.author || ''];
+  const nameOf = (slug) => { const x = entries.find((y) => y.slug === slug); return x ? x.project.name : slug; };
+  const runsOn = (slug) => entries.filter((x) => x.app.type === 'script' && x.app.interpreter === slug);
+
+  // A word that finds its kind: an author's apps, an interpreter's.
+  function finder(text, query) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'find';
+    b.textContent = text;
+    b.title = `Show ${query}'s apps`;
+    b.addEventListener('click', () => { search.value = query; filter(); search.scrollIntoView({ block: 'nearest' }); });
+    return b;
+  }
+
+  // The line under an app's name: version, author, what it runs on or what runs on it, where it goes.
+  function facts(el, e) {
+    el.textContent = '';
+    const parts = [];
+    if (e.project.version) parts.push('v' + e.project.version);
+    if (e.project.author) parts.push(finder(e.project.author, e.project.author));
     const t = TYPES[e.app.type] || e.app.type;
     if (e.app.type === 'script' && e.app.interpreter) {
-      const interp = entries.find((x) => x.slug === e.app.interpreter);
-      out.push(`runs on ${interp ? interp.project.name : e.app.interpreter}`);
-    } else if (t !== 'app') out.push(t);
+      const n = nameOf(e.app.interpreter);
+      parts.push(['runs on ', finder(n, n)]);
+    } else if (t !== 'app') parts.push(t);
+    const users = runsOn(e.slug);
+    if (users.length) parts.push(finder(`${users.length} app${users.length === 1 ? ' runs' : 's run'} on it`, e.project.name));
     const p = Konsool.places(e.app);
-    if (!p.int) out.push('SD card only');
-    if (!p.sd) out.push('internal only');
-    return out.filter(Boolean).join(' · ');
+    if (!p.int) parts.push('SD card only');
+    if (!p.sd) parts.push('internal only');
+    parts.forEach((part, i) => {
+      if (i) el.append(' · ');
+      el.append(...[].concat(part));
+    });
+  }
+
+  // The fold-out: what the repository says about it, and its download's size when opened.
+  function details(el, e) {
+    const dl = el.querySelector('dl');
+    const row = (term, ...value) => {
+      const dt = document.createElement('dt');
+      dt.textContent = term;
+      const dd = document.createElement('dd');
+      dd.append(...value);
+      dl.append(dt, dd);
+      return dd;
+    };
+    const link = (href, text) => { const a = document.createElement('a'); a.href = href; a.textContent = text; return a; };
+    const lic = e.project.license_type || 'not given';
+    const licDd = row('License', lic);
+    if (e.project.license_file) {
+      Konsool.dataUrl(e.slug, e.project.license_file).then((u) => licDd.append(' (', link(u, 'its text'), ')'));
+    }
+    const size = row('Download', '…');
+    row('Revision', String(e.app.revision || 0));
+    row('For', (e.app.targets || []).join(', '));
+    row('Kind', e.app.type === 'script' ? `script, for ${nameOf(e.app.interpreter)}` : TYPES[e.app.type] || e.app.type || '');
+    row('Id', e.slug);
+    row('Source', link(`https://github.com/Nicolai-Electronics/app-repository/tree/main/${encodeURIComponent(e.slug)}`, 'in the app repository'));
+    el.addEventListener('toggle', () => {
+      if (!el.open || size.dataset.done) return;
+      size.dataset.done = '1';
+      Konsool.sizes(e).then(({ files, bytes }) => {
+        size.textContent = `${bytes < 1024 * 1024 ? Math.max(1, Math.round(bytes / 1024)) + ' KB' : (bytes / 1024 / 1024).toFixed(1) + ' MB'}, ${files} file${files === 1 ? '' : 's'}`;
+      }).catch(() => { size.textContent = 'unknown'; });
+    });
   }
 
   // One card's buttons, from what the badge has.
@@ -211,7 +266,8 @@
     if (only === 'updates' && !hasUpdate(e)) return false;
     const q = search.value.trim().toLowerCase();
     if (!q) return true;
-    return [e.project.name, e.project.description, e.project.author, e.slug].some((s) => (s || '').toLowerCase().includes(q));
+    const interp = e.app.type === 'script' && e.app.interpreter ? nameOf(e.app.interpreter) : '';
+    return [e.project.name, e.project.description, e.project.author, e.slug, interp].some((s) => (s || '').toLowerCase().includes(q));
   }
 
   function filter() {
@@ -235,9 +291,13 @@
         icon.src = url;
         icon.alt = '';
       } else icon.remove();
-      card.querySelector('.name').textContent = e.project.name || e.slug;
-      card.querySelector('.facts').textContent = facts(e);
+      card.id = e.slug;
+      const name = card.querySelector('.name a');
+      name.textContent = e.project.name || e.slug;
+      name.href = '#' + encodeURIComponent(e.slug);
+      facts(card.querySelector('.facts'), e);
       card.querySelector('.about').textContent = e.project.description || '';
+      details(card.querySelector('details'), e);
       actions(card, e);
       grid.append(card);
     }
@@ -314,10 +374,28 @@
     say('This browser cannot talk to USB devices: Chrome or Edge can. You can still look around.', 'error');
   }
 
+  // /konsool/#slug: that app, found and lit.
+  function seek() {
+    const slug = decodeURIComponent(location.hash.slice(1));
+    const card = slug && document.getElementById(slug);
+    if (!card || !card.classList.contains('card')) return;
+    search.value = '';
+    category = '';
+    for (const x of cats.children) x.setAttribute('aria-pressed', String(x === cats.firstChild));
+    filter();
+    for (const c of grid.querySelectorAll('.card.lit')) c.classList.remove('lit');
+    card.classList.add('lit');
+    card.scrollIntoView({ block: 'center' });
+  }
+  addEventListener('hashchange', seek);
+
   Konsool.list().then((list) => {
     entries = list;
     chips();
     render();
+    const when = Konsool.updated();
+    $('#repo').textContent = `${entries.length} apps` + (when ? `, the repository as of ${when.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}` : '') + '.';
+    seek();
   }).catch((e) => {
     grid.textContent = 'The app repository could not be loaded: ' + Konsool.explain(e);
   });

@@ -51,6 +51,7 @@
         </section>
 
         <section class="filters" aria-label="Find an app">
+          <p id="repo" class="note"></p>
           <input id="search" type="search" placeholder="Search apps" aria-label="Search apps" autocomplete="off" />
           <div id="categories" class="chips" role="group" aria-label="Categories"></div>
           <div id="only" class="chips" role="group" aria-label="Show" hidden>
@@ -73,9 +74,10 @@
       <article class="card">
         <img class="icon" width="64" height="64" alt="" loading="lazy" />
         <div class="body">
-          <h4 class="name"></h4>
+          <h4 class="name"><a></a></h4>
           <p class="facts"></p>
           <p class="about"></p>
+          <details class="more"><summary>More</summary><dl></dl></details>
           <p class="badge" hidden></p>
           <div class="actions"></div>
           <div class="progress" hidden><div class="bar"></div></div>

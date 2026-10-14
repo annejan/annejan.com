@@ -42,9 +42,27 @@
   }
 
   let dataPath = null;
+  let updated = null;   // when the repository was last built (its information's version: a time)
   async function dataUrl(slug, file) {
-    if (!dataPath) dataPath = (await (await get(REPO + '/v1/information', 'the app repository')).json()).data_path;
+    if (!dataPath) {
+      const info = await (await get(REPO + '/v1/information', 'the app repository')).json();
+      dataPath = info.data_path;
+      if (info.version > 1e9) updated = new Date(info.version * 1000);
+    }
     return `${REPO}${dataPath}/${slug}/${file}`;
+  }
+
+  // An app's download: its files and their sizes, asked with HEAD (Content-Length).
+  async function sizes(entry) {
+    const files = new Set(Object.values(entry.project.icon || {}));
+    for (const a of entry.app.assets || []) files.add(a.source_file);
+    if (entry.app.executable) files.add(entry.app.executable);
+    let bytes = 0;
+    await Promise.all([...files].map(async (f) => {
+      const r = await fetch(await dataUrl(entry.slug, f), { method: 'HEAD', cache: 'no-cache' });
+      bytes += Number(r.headers.get('content-length')) || 0;
+    }));
+    return { files: files.size, bytes };
   }
 
   // The Konsool's entry in a project's application list.
@@ -278,5 +296,5 @@
     return (e && e.message) || String(e);
   }
 
-  globalThis.Konsool = { REPO, compare, list, project, appFor, places, baseFor, iconUrl, dataUrl, connect, scan, install, uninstall, canStart, start, hasInterpreter, explain };
+  globalThis.Konsool = { REPO, compare, sizes, updated: () => updated, list, project, appFor, places, baseFor, iconUrl, dataUrl, connect, scan, install, uninstall, canStart, start, hasInterpreter, explain };
 })();

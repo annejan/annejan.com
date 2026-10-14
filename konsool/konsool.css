@@ -123,6 +123,27 @@
 .card .name { margin: 0; color: var(--fg); font-size: 14px; }
 .card .facts { margin: 0; color: var(--muted); font-size: 12px; }
 .card .about { margin: 0; overflow-wrap: anywhere; }
+.card .name a { color: var(--fg); }
+.card.lit { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+.card .find {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.card .find:hover, .card .find:focus-visible { color: var(--fg); text-decoration-color: currentColor; }
+.card .more summary { color: var(--muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+.card .more summary:hover, .card .more summary:focus-visible { color: var(--fg); }
+.card .more dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 8px 0 0; font-size: 12px; }
+.card .more dt { color: var(--muted); }
+.card .more dd { margin: 0; overflow-wrap: anywhere; }
+.card .more a { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 2px; }
+.filters .note { margin: 0; color: var(--muted); font-size: 12px; }
 .card .badge { margin: 0; color: var(--lime); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
 .card .badge.update { color: var(--cyan); }
 .card .badge.newer { color: #ff8a1c; }
