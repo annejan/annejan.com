@@ -127,6 +127,28 @@ addEventListener('keydown', (event) => {
   }
 });
 
+// Hover over the Badge.Team icon for a while and its badger comes up to see who is there
+// (fx/peek.js); it goes when the pointer does. Only where there is a pointer to hover with.
+const badgeTeam = document.querySelector('.social a[href="https://badge.team/"]');
+if (badgeTeam && !reduceMotion && matchMedia('(hover: hover)').matches) {
+  let hovering = false;
+  let wait;
+  let away = null;
+  badgeTeam.addEventListener('pointerenter', () => {
+    hovering = true;
+    clearTimeout(wait);
+    wait = setTimeout(() => {
+      import('/fx/peek.js').then((fx) => { if (hovering) away = fx.peek(badgeTeam); }).catch(() => {});
+    }, 2000);
+  });
+  badgeTeam.addEventListener('pointerleave', () => {
+    hovering = false;
+    clearTimeout(wait);
+    away?.();
+    away = null;
+  });
+}
+
 // Three minutes of nothing on the home page bring on the screensaver (fx/screensaver.js):
 // long enough not to take the page away from someone still reading it.
 if (document.getElementById('card') && !reduceMotion) {
@@ -203,6 +225,7 @@ console.log(
   '  * click the AJB logo, once, four times, then five times fast\n' +
   '  * up up down down left right left right B A\n' +
   '  * type pass, badger or snake\n' +
+  '  * hover over Badge.Team for a while\n' +
   '  * or just leave it alone for a few minutes\n' +
   '  * ajb.help()\n\n' +
   'deFEEST greets Badge.Team, Hacker Hotel, Trepaan, Poobrain, BornHack, Evoke and Outline.',
