@@ -243,7 +243,10 @@ a.cta {
   transition: background-color 0.2s, color 0.2s;
 }
 a.cta.lime { border-color: var(--lime); color: var(--lime); }
+/* The stories: the orange portal. */
+a.cta.orange { border-color: #ff8a1c; color: #ff8a1c; }
 a.cta:hover, a.cta:focus-visible { background: var(--cyan); color: var(--bg); }
 a.cta.lime:hover, a.cta.lime:focus-visible { background: var(--lime); color: var(--bg); }
+a.cta.orange:hover, a.cta.orange:focus-visible { background: #ff8a1c; color: var(--bg); }
 a.cta:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { a.cta { transition: none; } }
