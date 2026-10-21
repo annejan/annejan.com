@@ -6,6 +6,7 @@
   --rule: #222;
   --cyan: #24cafe;
   --lime: #cafe24;
+  --bronze: #e3913f;
 }
 * { box-sizing: border-box; }
 html { color-scheme: dark; }
@@ -341,6 +342,7 @@ aside ul + p { margin-top: 12px; }
 .prods li > a { color: var(--fg); font-weight: bold; }
 .prods .meta { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
 .prods .win { color: var(--lime); font-weight: bold; }
+.prods .bronze { color: var(--bronze); font-weight: bold; }
 .prods small { margin-left: auto; font-size: 12px; }
 
 /* 13:37 on the home page (site.js): the address goes leet green for a minute. */
