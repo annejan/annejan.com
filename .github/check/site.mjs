@@ -29,6 +29,9 @@ const PAGES = ['/', '/portfolio/', '/portfolio/nl/', '/konsool/', '/portals/', '
 // the live site when it can be reached, and only as a warning: it is not this repository's.
 const ELSEWHERE = ['/40/', '/media/360/', '/media/The%20Badge%20Is%20the%20Demo.odp', '/bagger/', '/baggerParty/',
   '/kansloos/', '/kansloosParty/', '/html5/instafail/', '/html5/instafailParty/'];
+// Whole directories of it: the local copies of the talks.
+const ELSEWHERE_DIRS = ['/media/talks/'];
+const isElsewhere = (path) => ELSEWHERE.includes(path) || ELSEWHERE_DIRS.some((d) => path.startsWith(d));
 // Anchors that a script answers, not an id: annejan.com/#demo starts the demo (site.js).
 const SCRIPTED = ['/#demo'];
 
@@ -153,7 +156,7 @@ console.log('Links');
     const to = local(url);
     if (!to || seen.has(`${from} ${to.path}#${to.hash}`)) continue;
     seen.add(`${from} ${to.path}#${to.hash}`);
-    if (ELSEWHERE.includes(to.path)) { elsewhere.add(to.path); continue; }
+    if (isElsewhere(to.path)) { elsewhere.add(to.path); continue; }
     const text = await get(to.path);
     if (text === null) { fail(`${from}: ${to.path} is not there`); continue; }
     if (to.hash && to.path !== from && !SCRIPTED.includes(`${to.path}#${to.hash}`)) {
@@ -173,7 +176,7 @@ console.log('Links');
   for (const url of new Set([...listed, ...alternates])) {
     const to = local(url);
     if (!to) { fail(`sitemap.xml: ${url} is not on ${SITE}`); continue; }
-    if (ELSEWHERE.includes(to.path)) { elsewhere.add(to.path); continue; }
+    if (isElsewhere(to.path)) { elsewhere.add(to.path); continue; }
     if ((await get(to.path)) === null) fail(`sitemap.xml: ${to.path} is not there`);
   }
   check(/^Sitemap: https:\/\/annejan\.com\/sitemap\.xml$/m.test(await get('/robots.txt') || ''), 'robots.txt points to the sitemap');
