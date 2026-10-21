@@ -22,7 +22,8 @@ jobs:
       - uses: fsfe/reuse-action@v6
 
   site:
-    runs-on: ubuntu-latest
+    # ubuntu-latest is 26.04 since October 2026; Playwright 1.56 has no Chromium build for it yet.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
