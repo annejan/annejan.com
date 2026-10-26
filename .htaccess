@@ -44,6 +44,10 @@ RedirectMatch 404 ^/(\.git|\.github|node_modules|konsool/test)(/|$)
 
 # Old side documents that now live elsewhere
 Redirect 301 /media/qtpass.pdf https://qtpass.org/
+Redirect 301 /media/NLUUG_SHA2017Badge.pdf /media/talks/2017-nluug-sha2017-badge-hardware-and-software.pdf
+# Gone with the old server (2026-10); Search Console still knew them
+Redirect gone /media/hh-xmas
+Redirect gone /media/ppa2018
 
 # One canonical host: send www.annejan.com, and any other name that lands here,
 # to annejan.com (but leave certificate challenges alone)
