@@ -24,7 +24,7 @@ const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 const BASE = process.argv[2] || 'http://localhost:8000';
 const SITE = 'https://annejan.com';
-const PAGES = ['/', '/portfolio/', '/portfolio/nl/', '/konsool/', '/portals/', '/tic80/', '/ai-key/', '/error/404.html'];
+const PAGES = ['/', '/portfolio/', '/portfolio/nl/', '/portfolio/uk/', '/portfolio/de/', '/konsool/', '/portals/', '/tic80/', '/ai-key/', '/error/404.html'];
 // On the server, but not in this repository: the old demos, talks and the 40 page. Checked on
 // the live site when it can be reached, and only as a warning: it is not this repository's.
 const ELSEWHERE = ['/40/', '/media/360/', '/media/The%20Badge%20Is%20the%20Demo.odp', '/bagger/', '/baggerParty/',

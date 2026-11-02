@@ -171,7 +171,7 @@ body.home {
   grid-area: tag;
   margin: 12px 0 0;
   font-size: 10px;
-  letter-spacing: 4px;
+  letter-spacing: 3px;  /* 3, not 4: with NL · УКР · DE the line still fits under www.annejan.com */
   text-transform: uppercase;
 }
 
@@ -262,7 +262,7 @@ body.cv {
   font-size: 20px;
   letter-spacing: 0.2em;
 }
-/* Switch between the English and the Dutch CV, in the space above the header so annejan.com keeps its place. */
+/* Switch between the CV's languages (the other three), in the space above the header so annejan.com keeps its place. */
 .page > header .lang {
   position: absolute;
   top: -36px;
@@ -273,6 +273,8 @@ body.cv {
   letter-spacing: 4px;
   text-transform: uppercase;
 }
+.page > header .lang a { color: inherit; }
+.page > header .lang a:hover, .page > header .lang a:focus-visible { color: var(--fg); }
 
 .columns {
   display: grid;
@@ -323,6 +325,10 @@ aside ul + p { margin-top: 12px; }
   .page > header .www { display: none; }
   /* Without annejan.com, line the switch up with the end of the rule (letter-spacing also follows the last letter). */
   .page > header .lang { margin-right: -4px; }
+}
+/* Three languages on a phone: less spacing, so the switch stays on one line above the header. */
+@media (max-width: 480px) {
+  .page > header .lang { margin-right: 0; letter-spacing: 1px; white-space: nowrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {

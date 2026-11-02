@@ -169,7 +169,8 @@ if (document.getElementById('card') && !reduceMotion) {
 // Away from the tab: it calls you back.
 const title = document.title;
 document.addEventListener('visibilitychange', () => {
-  document.title = document.hidden ? (document.documentElement.lang === 'nl' ? 'Kom terug… · AJB' : 'Come back… · AJB') : title;
+  const back = { nl: 'Kom terug…', uk: 'Повертайся…', de: 'Komm zurück…' }[document.documentElement.lang] || 'Come back…';
+  document.title = document.hidden ? `${back} · AJB` : title;
 });
 
 // Dates: on 1 April the CV is set in Comic Sans, like the monogram (style.css, html.april);
