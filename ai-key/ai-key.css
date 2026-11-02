@@ -74,10 +74,10 @@ kbd.ai:hover { box-shadow: 0 0 8px var(--cyan); }
   font: 14px/1.4 "Comic Sans MS", "Comic Neue", "Comic Mono", cursive;
   box-shadow: 4px 4px 0 rgba(36, 202, 254, 0.35);
 }
-.agent .balloon::after {  /* the tail, pointing at the Ai */
+.agent .balloon::after {  /* the tail, pointing at the Ai's head: the dot, on the left since it is mirrored */
   content: "";
   position: absolute;
-  right: 44px;
+  right: 70px;
   bottom: -12px;
   border: 12px solid transparent;
   border-bottom: 0;
