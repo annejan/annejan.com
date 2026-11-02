@@ -299,6 +299,40 @@
     shownTimer = setTimeout(() => {
       $('#shown').textContent = shown === entries.length ? '' : shown ? `${shown} of ${entries.length} apps shown.` : 'No app matches.';
     }, 500);
+    syncUrl();
+  }
+
+  // The search and the category live in the address, so a filtered list can be shared:
+  // /konsool/?Anne%20Jan%20Brouwer (a search alone, bare), /konsool/?cat=games,
+  // /konsool/?cat=games&q=snake. replaceState, so Back does not step through every letter.
+  // "On my Konsool" and "updates" stay out: they only mean something with your own badge.
+  // An app link (#slug) is kept only while nothing is filtered; filtering again drops it.
+  let urlReady = false;  // not before the first load has read the address, #slug included
+  function syncUrl() {
+    if (!urlReady) return;
+    const q = search.value.trim();
+    let query = '';
+    if (category) {
+      const params = new URLSearchParams({ cat: category });
+      if (q) params.set('q', q);
+      query = params.toString();
+    } else if (q) {
+      query = encodeURIComponent(q);  // a search alone: ?Anne%20Jan%20Brouwer
+    }
+    const url = location.pathname + (query ? '?' + query : '') + (query ? '' : location.hash);
+    if (url !== location.pathname + location.search + location.hash) history.replaceState(null, '', url);
+  }
+
+  // Read the search and the category from the address, before the first filter() writes it back.
+  function fromUrl() {
+    const params = new URLSearchParams(location.search);
+    const keys = [...params.keys()];
+    // ?some%20words: one bare term is a search, as if it were ?q=some%20words.
+    const bare = keys.length === 1 && !params.get(keys[0]) && !['q', 'cat'].includes(keys[0]) ? keys[0] : '';
+    search.value = params.get('q') || bare;
+    const c = (params.get('cat') || '').trim().toLowerCase();
+    category = ALIAS[c] || c;
+    if (category && !entries.some((e) => catsOf(e).includes(category))) category = '';  // no such category
   }
 
   function render() {
@@ -415,11 +449,14 @@
 
   Konsool.list().then((list) => {
     entries = list;
+    fromUrl();
     chips();
     render();
     const when = Konsool.updated();
     $('#repo').textContent = `${entries.length} apps` + (when ? `, the repository as of ${when.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}` : '') + '.';
     seek();
+    urlReady = true;
+    syncUrl();
   }).catch((e) => {
     grid.textContent = 'The app repository could not be loaded: ' + Konsool.explain(e);
     say(grid.textContent, 'error');
