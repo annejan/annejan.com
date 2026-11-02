@@ -5,7 +5,7 @@
 //     and no sideways scrolling at 320 CSS px (WCAG 1.4.10);
 //   - links: every link, canonical, hreflang and share image to this site leads somewhere, and
 //     every #anchor to its id; the sitemap lists every page and only what is there;
-//   - every easter egg on the home page runs without an error;
+//   - every easter egg on the home page and the AI key page runs without an error;
 //   - the Konsool pages keep the keyboard focus where it was, and say what a search leaves.
 //
 //   python3 -m http.server 8000 &
@@ -24,7 +24,7 @@ const axeSource = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 const BASE = process.argv[2] || 'http://localhost:8000';
 const SITE = 'https://annejan.com';
-const PAGES = ['/', '/portfolio/', '/portfolio/nl/', '/konsool/', '/portals/', '/tic80/', '/error/404.html'];
+const PAGES = ['/', '/portfolio/', '/portfolio/nl/', '/konsool/', '/portals/', '/tic80/', '/ai-key/', '/error/404.html'];
 // On the server, but not in this repository: the old demos, talks and the 40 page. Checked on
 // the live site when it can be reached, and only as a warning: it is not this repository's.
 const ELSEWHERE = ['/40/', '/media/360/', '/media/The%20Badge%20Is%20the%20Demo.odp', '/bagger/', '/baggerParty/',
@@ -221,6 +221,24 @@ console.log('Easter eggs');
   await page.waitForTimeout(3500);
   check(await page.locator('img[src="/fx/badger-snake.webp"]').count() === 1, 'the badger comes up after a long hover on Badge.Team');
   check(errors.length === 0, `the home page, after all that: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
+  await page.close();
+}
+
+console.log('AI key eggs');
+{
+  const { page, errors } = await open('/ai-key/');
+  // Three clicks on the big Ai wake the agent; typing "poep" makes the Ai drop one.
+  for (let i = 0; i < 3; i++) await page.locator('.intro .mark-button').click();
+  await page.waitForTimeout(600);
+  check(await page.locator('.agent.in').isVisible(), 'three clicks on the Ai wake the agent');
+  await page.keyboard.press('Escape');
+  await page.keyboard.type('poep');
+  await page.waitForTimeout(1500);
+  check(await page.locator('.intro svg.mark.live').count() === 1, 'typing "poep": the Ai is live SVG');
+  await page.waitForTimeout(4500);
+  check(await page.locator('.intro svg.mark.live').count() === 0 && await page.locator('.intro img.mark').isVisible(),
+    'and afterwards the <img> is back');
+  check(errors.length === 0, `the AI key page, after both eggs: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
   await page.close();
 }
 
