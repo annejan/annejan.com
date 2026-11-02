@@ -4,6 +4,9 @@
 //                        switches on in it (konsool/konsool.js, konsool.css)
 //   /portals/            a blue portal opens at the link and swallows the page, then opens until
 //                        its inside is the window; /portals/ comes out of an orange one
+//   /ai-key/             the Ai key cap pops up and is pressed, the page goes black and a big Ai
+//                        draws itself; /ai-key/ starts on that Ai and shrinks it into place
+//                        (ai-key/arrive.js)
 //
 // An icon link (the front page's) flies from its icon; a text link pops the icon up on itself
 // first. Links with a modifier key, to the page you are on, and reduced motion: plain links.
@@ -17,6 +20,7 @@
     '/konsool/': { icon: '/logos/konsool.png', screen: [0.207, 0.148, 0.586, 0.332] },
     '/tic80/': { icon: '/logos/tic80.png', screen: [0.16, 0.26, 0.56, 0.48] },
     '/portals/': { icon: '/logos/portals.png', portal: true },
+    '/ai-key/': { icon: '/ai-key/icon.svg', key: true },
   };
 
   // An animation's end, or its time up: a hidden tab never runs the end.
@@ -100,6 +104,63 @@
     go(href, 'portal');
   }
 
+  // The Ai as ai.svg draws it: three strokes and the dot. ai-key/arrive.js starts from the same one.
+  const NS = 'http://www.w3.org/2000/svg';
+  const AI_PATHS = ['M78 640 Q190 380 392 190', 'M392 190 Q384 470 394 720', 'M112 470 Q250 452 392 454'];
+
+  async function key(link, t, href) {
+    const { box: r, popped } = startBox(link);
+    const cap = document.createElement('div');
+    cap.className = 'key-fly';
+    const s = Math.max(r.width, r.height);
+    Object.assign(cap.style, { left: r.left + r.width / 2 - s / 2 + 'px', top: r.top + r.height / 2 - s / 2 + 'px', width: s + 'px', height: s + 'px' });
+    cap.style.setProperty('--icon', `url(${t.icon})`);
+    document.body.append(cap);
+    if (popped) {
+      await done(cap.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }],
+        { duration: 260, easing: 'cubic-bezier(0.3, 1.6, 0.6, 1)' }));
+    }
+    // Pressed: down and a little smaller, then back up.
+    await done(cap.animate([{ transform: 'none' }, { transform: 'translateY(8%) scale(0.9)', filter: 'brightness(1.6)' }, { transform: 'none' }],
+      { duration: 260, easing: 'ease-in-out' }));
+    // Lights out, and a big Ai draws itself in the middle: the strokes, then the dot.
+    const curtain = document.createElement('div');
+    curtain.className = 'ai-curtain';
+    document.body.append(curtain);
+    document.body.classList.add('zooming');
+    curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-in', fill: 'forwards' });
+    cap.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '36 8 462 754');
+    svg.setAttribute('class', 'ai-draw');
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'stroke');
+    const strokes = AI_PATHS.map((d) => {
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', d);
+      g.append(path);
+      return path;
+    });
+    const dot = document.createElementNS(NS, 'circle');
+    Object.entries({ cx: 440, cy: 64, r: 50, class: 'dot' }).forEach(([k, v]) => dot.setAttribute(k, v));
+    svg.append(g, dot);
+    document.body.append(svg);
+    let at = 250;
+    strokes.forEach((path, i) => {
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = `${len} ${len}`;
+      path.style.strokeDashoffset = `${len}`;
+      path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }],
+        { duration: [380, 340, 260][i], delay: at, easing: 'ease-in-out', fill: 'forwards' });
+      at += [300, 300, 220][i];
+    });
+    dot.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }],
+      { duration: 260, delay: at + 60, easing: 'ease-out', fill: 'backwards' });
+    // Wait for the whole timeline: done() would not count the delays.
+    await new Promise((r) => setTimeout(r, at + 60 + 260 + 150));
+    go(href, 'ai');
+  }
+
   let going = false;
   document.querySelectorAll('a[href]').forEach((link) => {
     const url = new URL(link.href, location.href);
@@ -109,7 +170,7 @@
       if (!plain(event) || going) return;
       event.preventDefault();
       going = true;
-      (t.portal ? portal : zoom)(link, t, link.href);
+      (t.portal ? portal : t.key ? key : zoom)(link, t, link.href);
     });
   });
 
@@ -118,7 +179,7 @@
     if (!event.persisted) return;
     going = false;
     document.body.classList.remove('zooming', 'portaling');
-    document.querySelectorAll('.konsool-fly, .portal-out').forEach((el) => el.remove());
+    document.querySelectorAll('.konsool-fly, .portal-out, .key-fly, .ai-curtain, .ai-draw').forEach((el) => el.remove());
     const page = content();
     if (page) {
       page.getAnimations().forEach((a) => a.cancel());

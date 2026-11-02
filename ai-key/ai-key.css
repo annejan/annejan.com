@@ -39,6 +39,9 @@ kbd.ai .glyph {
 }
 kbd.ai:hover { box-shadow: 0 0 8px var(--cyan); }
 
+/* Arriving through the Ai key (ai-key/arrive.js): black until the Ai has landed on the mark. */
+html.ai-arrive .page { opacity: 0; }
+
 /* The intro: the text, and the large hand-drawn Ai next to it. */
 .intro { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
 .intro .mark { display: block; width: auto; height: 150px; transition: filter 0.4s; }

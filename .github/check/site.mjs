@@ -224,6 +224,21 @@ console.log('Easter eggs');
   await page.close();
 }
 
+console.log('AI key transition');
+{
+  // The front page's Ai icon: the key cap is pressed, the Ai draws itself (fx/transit.js), and on
+  // /ai-key/ it shrinks into the mark (ai-key/arrive.js), which is back in place afterwards.
+  const { page, errors } = await open('/');
+  await page.locator('.social a[href="/ai-key/"]').click();
+  await page.waitForURL('**/ai-key/', { timeout: 6000 });
+  await page.waitForTimeout(1800);
+  check(await page.locator('svg.ai-draw').count() === 0 && await page.locator('.intro img.mark').isVisible()
+    && !(await page.evaluate(() => document.documentElement.classList.contains('ai-arrive'))),
+    'the Ai icon: through the key to /ai-key/, and the mark is back in place');
+  check(errors.length === 0, `the way to the AI key: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
+  await page.close();
+}
+
 console.log('AI key eggs');
 {
   const { page, errors } = await open('/ai-key/');

@@ -201,6 +201,29 @@ body.zooming #card, body.zooming .page { opacity: 0; transition: opacity 0.7s ea
 }
 .konsool-screen { position: absolute; background: var(--bg); }
 .konsool-screen.round { border-radius: 50%; }
+/* The way to the AI key (fx/transit.js): the key cap is pressed, the lights go out and a big Ai
+   draws itself; ai-key/arrive.js picks it up from the same place and size on the other side. */
+.key-fly {
+  position: fixed;
+  z-index: 11;
+  pointer-events: none;
+  background: var(--icon) center / contain no-repeat;
+}
+.ai-curtain { position: fixed; inset: 0; z-index: 10; background: var(--bg); pointer-events: none; }
+.ai-draw {
+  position: fixed;
+  z-index: 12;
+  left: 50%;
+  top: 50%;
+  height: 60vh;
+  width: auto;
+  aspect-ratio: 462 / 754;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  pointer-events: none;
+}
+.ai-draw .stroke { fill: none; stroke: var(--fg); stroke-width: 72; stroke-linecap: round; stroke-linejoin: round; }
+.ai-draw .dot { fill: var(--fg); transform-box: fill-box; transform-origin: center; }
 /* The way to Portals: a blue portal (fx/transit.js), black inside, a glowing blue rim. */
 body.portaling #card, body.portaling .page { opacity: 1; transition: none; }
 .portal-out {
