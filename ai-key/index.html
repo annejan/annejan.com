@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The AI key, on your own NPU – Anne Jan Brouwer</title>
+    <meta name="description" content="Your laptop has an AI key. local-llm-hotkeys gives it four jobs on KDE Plasma: chat, translate, explain text and screenshots. Everything runs on the AMD Ryzen AI NPU in the laptop, offline." />
+    <meta name="author" content="Anne Jan Brouwer" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="canonical" href="https://annejan.com/ai-key/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://annejan.com/ai-key/" />
+    <meta property="og:site_name" content="Anne Jan Brouwer" />
+    <meta property="og:title" content="The AI key, on your own NPU" />
+    <meta property="og:description" content="Make the Copilot key on your Linux laptop do something: chat, translate and explain, on the NPU, offline." />
+    <meta property="og:image" content="https://annejan.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AJB monogram with the name Anne Jan Brouwer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="fediverse:creator" content="@annejan@mastodon.social" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "local-llm-hotkeys",
+        "url": "https://annejan.com/ai-key/",
+        "description": "KDE Plasma hotkeys for the Copilot (AI) key: chat, translate and explain text and screenshots, and dictate, with local models on the AMD Ryzen AI NPU.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Linux (KDE Plasma 6)",
+        "softwareVersion": "0.2.0",
+        "license": "https://opensource.org/licenses/MIT",
+        "author": {
+          "@type": "Person",
+          "@id": "https://annejan.com/#person",
+          "name": "Anne Jan Brouwer",
+          "url": "https://annejan.com/"
+        },
+        "downloadUrl": "https://github.com/annejan/local-llm-hotkeys/releases/latest",
+        "codeRepository": "https://github.com/annejan/local-llm-hotkeys",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/ai-key/ai-key.css" />
+    <script src="/fx/transit.js" defer></script>
+  </head>
+  <body class="cv app">
+    <div class="page">
+      <header>
+        <a href="/" id="home" class="fade" title="Home"><img src="/ajb.svg" width="603" height="781" alt="Anne Jan Brouwer – home" /></a>
+        <div>
+          <h1>The AI key</h1>
+          <h2>On your own NPU</h2>
+        </div>
+        <p class="www">annejan.com</p>
+      </header>
+
+      <div class="columns">
+        <main>
+          <section>
+            <p class="lede">Your laptop has an AI key. Make it do something, on your own NPU.</p>
+            <p>New laptops have a Copilot key. On Linux it does nothing. <a href="https://github.com/annejan/local-llm-hotkeys">local-llm-hotkeys</a> gives it four jobs on KDE Plasma, and runs all of them on the AMD Ryzen AI NPU that is already in the laptop. There is no cloud, no account and no subscription. Nothing leaves your computer, it works offline, and the GPU stays free.</p>
+          </section>
+
+          <section aria-labelledby="jobs-title">
+            <h3 id="jobs-title">Four jobs for one key</h3>
+            <ul class="jobs">
+              <li>
+                <p class="combo"><kbd class="ai" title="Copilot key"><span class="glyph" aria-hidden="true"></span><span class="sr">Copilot</span></kbd></p>
+                <h4>Chat</h4>
+                <p>A chat window. Ask anything, then ask follow-up questions. It knows your distribution and desktop, so the commands fit your system.</p>
+              </li>
+              <li>
+                <p class="combo"><kbd>Alt</kbd> <kbd class="ai" title="Copilot key"><span class="glyph" aria-hidden="true"></span><span class="sr">Copilot</span></kbd></p>
+                <h4>Translate</h4>
+                <p>The copied text, translated to your language. A Ukrainian article, a German invoice, a Japanese error message.</p>
+              </li>
+              <li>
+                <p class="combo"><kbd>Ctrl</kbd> <kbd class="ai" title="Copilot key"><span class="glyph" aria-hidden="true"></span><span class="sr">Copilot</span></kbd></p>
+                <h4>Explain</h4>
+                <p>The copied text in a few plain sentences, in your language, with a to-do list if it asks you to do something.</p>
+              </li>
+              <li>
+                <p class="combo"><kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd class="ai" title="Copilot key"><span class="glyph" aria-hidden="true"></span><span class="sr">Copilot</span></kbd></p>
+                <h4>What is on my screen?</h4>
+                <p>The window in front of you, explained: "what is this error, and what do I do?" Then ask on.</p>
+              </li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="examples-title">
+            <h3 id="examples-title">For example</h3>
+            <ul class="examples">
+              <li>A letter from the tax office that you do not understand: copy it, press <kbd>Ctrl</kbd> <kbd class="ai" title="Copilot key"><span class="glyph" aria-hidden="true"></span><span class="sr">Copilot</span></kbd>, and read what it says and what you must do before which date.</li>
+              <li>An error dialog, a settings page, a chart: press <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd class="ai" title="Copilot key"><span class="glyph" aria-hidden="true"></span><span class="sr">Copilot</span></kbd>, then ask "and how do I fix that?"</li>
+              <li>An email to someone who does not read your language: press <kbd>Meta</kbd> <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>D</kbd>, speak your language, and the English text is typed for you.</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="keys-title">
+            <h3 id="keys-title">No AI key? These work too</h3>
+            <table class="keys">
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>Q</kbd></th><td>chat</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>T</kbd></th><td>translate the clipboard</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>E</kbd></th><td>explain the clipboard</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>W</kbd></th><td>explain the active window</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>X</kbd></th><td>explain a screen region that you select</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>Y</kbd></th><td>translate a screen region (OCR)</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>F</kbd></th><td>fix spelling and grammar of the clipboard</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Shift</kbd> <kbd>D</kbd></th><td>dictate: speak, and the text is typed</td></tr>
+              <tr><th><kbd>Meta</kbd> <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>D</kbd></th><td>dictate and translate</td></tr>
+            </table>
+            <p>In Dolphin, right-click a document to translate it or have it explained.</p>
+          </section>
+
+          <section aria-labelledby="install-title">
+            <h3 id="install-title">Install</h3>
+<pre class="chamber"><code>git clone https://github.com/annejan/local-llm-hotkeys.git
+cd local-llm-hotkeys
+./install.sh</code></pre>
+            <p><code>install.sh</code> needs no root. It checks what is missing and prints the install command for openSUSE, Debian, Ubuntu, Fedora or Arch, then sets up the commands, the hotkeys, the Dolphin menu and the key map for the Copilot key. The models run in <a href="https://github.com/FastFlowLM/FastFlowLM">FastFlowLM</a> on the NPU; on a computer without one, ollama on a GPU works too.</p>
+            <p class="note">The <a href="https://github.com/annejan/local-llm-hotkeys#readme">README</a> has every command and setting. Release files are signed; the README shows how to check them.</p>
+          </section>
+
+          <p class="made">Made with Claude: these tools and this page were written with an AI, and the tools run on a laptop's NPU every day.</p>
+        </main>
+
+        <aside>
+          <section>
+            <h3>Source</h3>
+            <ul>
+              <li><a href="https://github.com/annejan/local-llm-hotkeys">local-llm-hotkeys</a> <small>MIT</small></li>
+              <li><a href="https://github.com/annejan/local-llm-hotkeys/releases/latest">Latest release</a> <small>signed</small></li>
+            </ul>
+          </section>
+          <section>
+            <h3>Needs</h3>
+            <ul>
+              <li>KDE Plasma 6 on Wayland</li>
+              <li>AMD Ryzen AI 300 NPU <small>or ollama on a GPU</small></li>
+              <li>Python 3.9 or newer</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Models</h3>
+            <ul>
+              <li>translategemma <small>translate</small></li>
+              <li>Qwen3.5 9B <small>chat, explain, screenshots</small></li>
+              <li>Whisper <small>dictate</small></li>
+            </ul>
+          </section>
+          <section>
+            <h3>Also by me</h3>
+            <ul>
+              <li><a href="https://qtpass.org/">QtPass</a> <small>a GUI for pass</small></li>
+              <li><a href="/konsool/">Konsool apps</a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
