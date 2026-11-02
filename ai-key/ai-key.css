@@ -111,6 +111,11 @@ kbd.ai:hover { box-shadow: 0 0 8px var(--cyan); }
   .agent.talking .dot, .agent.talking .figure svg { animation: none; }
 }
 
+/* What is an NPU: the photo of the key. */
+.photo { margin: 24px 0 0; }
+.photo img { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--rule); }
+.photo figcaption { margin-top: 8px; color: var(--muted); font-size: 12px; }
+
 /* Four jobs: a grid of cards, two per row, one on a phone. */
 .jobs {
   display: grid;

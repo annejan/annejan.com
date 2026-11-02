@@ -21,7 +21,7 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2010-2026 Anne Jan Brouwer"
 SPDX-License-Identifier = "MIT"
 
-# Pages, texts, the AJB monogram and the Ai, the favicon, the share image and Yuki's photo: CC-BY-4.0.
+# Pages, texts, the AJB monogram and the Ai, the AI key photo, the favicon, the share image and Yuki's photo: CC-BY-4.0.
 # The inline GitHub, LinkedIn and Mastodon icons in index.html are marked as CC0-1.0 snippets.
 [[annotations]]
 path = [
@@ -30,6 +30,7 @@ path = [
     "ajb.png",
     "ajb.svg",
     "ai-key/*.svg",
+    "ai-key/*.webp",
     "bimi.svg",
     "logo.svg",
     "og.png",
