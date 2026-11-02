@@ -1,5 +1,6 @@
-// Easter egg: click the big Ai three times and it comes to life, Clippy style. Our own character
-// and drawing (the Ai from ai.svg), not Microsoft's Clippy. Nothing inline, so the strict CSP holds.
+// Easter eggs: click the big Ai three times and it comes to life, Clippy style (our own character
+// and drawing, the Ai from ai.svg, not Microsoft's Clippy); type "poep" and it drops one; press
+// the real Copilot key and it notices. Nothing inline, so the strict CSP holds.
 (() => {
   "use strict";
   const mark = document.querySelector(".intro .mark-button");
@@ -119,7 +120,22 @@
   const WORDS = ["poep", "poop", "shit"];
   let typed = "", busy = false;
 
+  // Third egg: the real Copilot key. It sends Shift+Meta+F23 (some keyboards a plain F23), and
+  // on Linux nothing claims it, so the page may see it. Where local-llm-hotkeys runs, KDE takes
+  // the key first and this never fires: as it should be.
+  const KEY_LINES = [
+    "You pressed me! On Linux this key does nothing… unless you install local-llm-hotkeys. Then I answer from your NPU, not from a web page.",
+    "Still a web page. Install it, and the key is mine.",
+  ];
+  let keyPresses = 0;
+
   document.addEventListener("keydown", (e) => {
+    if (e.key === "F23" || e.code === "F23") {
+      e.preventDefault();
+      open();
+      text.textContent = KEY_LINES[Math.min(keyPresses++, KEY_LINES.length - 1)];
+      return;
+    }
     if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
     const t = e.target;
     if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;

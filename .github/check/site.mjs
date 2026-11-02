@@ -238,7 +238,14 @@ console.log('AI key eggs');
   await page.waitForTimeout(4500);
   check(await page.locator('.intro svg.mark.live').count() === 0 && await page.locator('.intro img.mark').isVisible(),
     'and afterwards the <img> is back');
-  check(errors.length === 0, `the AI key page, after both eggs: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
+  // The real Copilot key sends Shift+Meta+F23: the agent notices. Playwright has no F23, so the
+  // event the browser would send is dispatched by hand.
+  await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown',
+    { key: 'F23', code: 'F23', shiftKey: true, metaKey: true, bubbles: true })));
+  await page.waitForTimeout(600);
+  check(await page.locator('.agent.in').isVisible() && /pressed me/.test(await page.locator('.agent .balloon p').textContent()),
+    'the Copilot key (Shift+Meta+F23) wakes the agent');
+  check(errors.length === 0, `the AI key page, after its eggs: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
   await page.close();
 }
 
