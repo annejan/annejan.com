@@ -111,6 +111,34 @@ kbd.ai:hover { box-shadow: 0 0 8px var(--cyan); }
   .agent.talking .dot, .agent.talking .figure svg { animation: none; }
 }
 
+/* The second egg (agent.js, type "poep"): the big Ai as live SVG, the same size as the <img>. */
+.intro svg.mark { width: auto; aspect-ratio: 462 / 754; overflow: visible; }
+.mark.live .stroke { fill: none; stroke: #fff; stroke-width: 72; stroke-linecap: round; stroke-linejoin: round; }
+.mark.live .dot { fill: #fff; transform-box: fill-box; transform-origin: center; }
+.mark.live .leg { transition: stroke-dashoffset 0.6s ease-in-out; }
+.mark.live.strain { animation: strain 0.12s linear 6; }
+.mark.live .drop {
+  fill: none; stroke: #fff; stroke-width: 32; stroke-linecap: round;
+  transform-box: fill-box; transform-origin: 50% 0; transform: scale(0.1, 0); opacity: 0;
+  transition: transform 0.7s ease-out, opacity 0.2s;
+}
+.mark.live.out .drop { transform: none; opacity: 1; }
+.mark.live.down .drop { transform: translateY(74px); transition: transform 0.35s cubic-bezier(0.5, 0, 1, 1); animation: land 0.3s ease-out 0.35s; }
+.mark.live .smell { fill: none; stroke: var(--muted); stroke-width: 10; stroke-linecap: round; opacity: 0; }
+.mark.live.stink .smell { animation: smell 1.1s ease-out 2; }
+.mark.live.done .drop { opacity: 0; transition: transform 0.35s, opacity 0.8s 0.2s; }
+.mark.live.done .dot { animation: hop 0.5s ease-out 2; }
+@keyframes strain { 25% { transform: translate(2px, 1px); } 75% { transform: translate(-2px, 1px); } }
+@keyframes land { 40% { transform: translateY(74px) scale(1.18, 0.8); } }
+@keyframes smell { 0% { opacity: 0; transform: translateY(0); } 40% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-40px); } }
+@media (prefers-reduced-motion: reduce) {
+  .mark.live .leg, .mark.live .drop, .mark.live.down .drop, .mark.live.done .drop { transition: none; }
+  .mark.live.strain, .mark.live.down .drop, .mark.live.stink .smell, .mark.live.done .dot { animation: none; }
+  .mark.live.down .drop { transform: translateY(74px); }
+  .mark.live.stink .smell { opacity: 0.9; }
+  .mark.live.done .smell { opacity: 0; }
+}
+
 /* What is an NPU: the photo of the key. */
 .photo { margin: 24px 0 0; }
 .photo img { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--rule); }
