@@ -30,6 +30,7 @@ path = [
     "ajb.png",
     "ajb.svg",
     "ai-key/*.svg",
+    "ai-key/*.png",
     "ai-key/*.webp",
     "ai-key/og.jpg",
     "bimi.svg",
