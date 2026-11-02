@@ -1,6 +1,6 @@
 /* The AI key page (local-llm-hotkeys). Shared layout comes from /style.css. */
 
-.app .lede { color: var(--fg); font-size: 20px; line-height: 1.5; margin: 0 0 16px; }
+.app .lede { color: var(--fg); font-size: 20px; line-height: 1.5; margin: 0 0 16px; text-wrap: balance; }
 .made { margin-top: 40px; color: var(--muted); font-size: 12px; font-style: italic; }
 .note { color: var(--muted); font-size: 12px; }
 
@@ -38,6 +38,77 @@ kbd.ai .glyph {
   white-space: nowrap;
 }
 kbd.ai:hover { box-shadow: 0 0 8px var(--cyan); }
+
+/* The intro: the text, and the large hand-drawn Ai next to it. */
+.intro { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+.intro .mark { display: block; width: auto; height: 150px; transition: filter 0.4s; }
+.intro .mark:hover { filter: drop-shadow(0 0 10px var(--cyan)); }
+
+/* The big Ai is a button: three clicks wake it up (agent.js). No hint, it is an easter egg. */
+.mark-button { padding: 0; border: 0; background: none; cursor: default; }
+.mark-button:focus-visible { outline: 1px dashed var(--muted); outline-offset: 6px; }
+
+/* The Ai as a Clippy-style assistant, bottom right, with a yellow speech balloon. */
+.agent {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: min(320px, 100vw - 48px);
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.4s, transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.agent.in { opacity: 1; transform: none; }
+.agent .balloon {
+  position: relative;
+  margin-bottom: 18px;
+  padding: 12px 14px 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  background: #ffffcc;
+  color: #000;
+  font: 14px/1.4 "Comic Sans MS", "Comic Neue", "Comic Mono", cursive;
+  box-shadow: 4px 4px 0 rgba(36, 202, 254, 0.35);
+}
+.agent .balloon::after {  /* the tail, pointing at the Ai */
+  content: "";
+  position: absolute;
+  right: 44px;
+  bottom: -12px;
+  border: 12px solid transparent;
+  border-bottom: 0;
+  border-top-color: #ffffcc;
+  filter: drop-shadow(0 1px 0 #000);
+}
+.agent .balloon p { margin: 0 0 10px; }
+.agent .buttons { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.agent .buttons button {
+  padding: 3px 10px;
+  border: 1px solid #000;
+  border-radius: 3px;
+  background: #eee;
+  color: #000;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.agent .buttons button:hover, .agent .buttons button:focus-visible { background: #fff; outline: 2px solid var(--cyan); }
+.agent .figure { width: 64px; height: 102px; margin-right: 24px; cursor: pointer; }
+.agent .figure svg { width: 100%; height: 100%; overflow: visible; }
+.agent .stroke { fill: none; stroke: #fff; stroke-width: 96; stroke-linecap: round; stroke-linejoin: round; }
+.agent .dot { fill: var(--cyan); transform-box: fill-box; transform-origin: center; }
+.agent.talking .dot { animation: hop 0.5s ease-out 3; }
+.agent.talking .figure svg { animation: lean 1.5s ease-in-out; }
+@keyframes hop { 50% { transform: translateY(-60%); } }
+@keyframes lean { 30% { transform: rotate(-6deg); } 70% { transform: rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .agent { transition: opacity 0.2s; transform: none; }
+  .agent.talking .dot, .agent.talking .figure svg { animation: none; }
+}
 
 /* Four jobs: a grid of cards, two per row, one on a phone. */
 .jobs {
@@ -87,6 +158,8 @@ pre.chamber code { color: inherit; }
 .columns > * { min-width: 0; }
 
 @media (max-width: 760px) {
+  .intro { gap: 16px; }
+  .intro .mark { height: 96px; }
   .columns { grid-template-columns: 1fr; gap: 24px; }
   .jobs { grid-template-columns: 1fr; }
   .keys th { white-space: normal; }
