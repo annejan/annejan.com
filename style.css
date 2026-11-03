@@ -71,6 +71,7 @@ html.ajb-draw #mark { visibility: hidden; }
 .mark-draw .hot, .mark-draw .halo, .mark-draw .neon { stroke: var(--cyan); }
 .mark-draw .neon { stroke-linecap: round; opacity: 0; }
 .mark-draw .neon .far { opacity: 0.55; }
+.mark-draw .logo { fill: var(--fg); opacity: 0; }
 .mark-draw .tip { fill: #fff; opacity: 0; }
 .mark-draw .tip-glow { fill: var(--cyan); opacity: 0; }
 

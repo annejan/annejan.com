@@ -3,11 +3,11 @@
 // point out to the left, which is the A's bar, back, and the bottom bowl). The lines are fitted
 // to ajb.svg. The pen moves like a hand, fast on the straights and slower in the curves, with a
 // glowing tip and a hot trail that cools to white behind it. When both lines are down, the
-// drawing switches on like the neon of the address and cools off into the real logo, which then
-// takes over. Not on every visit: on the first one and then once a week (localStorage), or
-// whenever the address ends in #draw, also when that is typed while the page is open. Loaded
-// without defer in <head>, so the <img> is hidden before the first paint. Reduced motion: just
-// the <img>.
+// drawing switches on like the neon of the address; in its first blink the lines make way for
+// the real logo, which stutters on and cools off to white. Not on every visit: on the first one
+// and then once a week (localStorage), or whenever the address ends in #draw, also when that is
+// typed while the page is open. Loaded without defer in <head>, so the <img> is hidden before the
+// first paint. Reduced motion: just the <img>.
 'use strict';
 
 (function () {
@@ -66,11 +66,11 @@
   const TIP_OFF = 150;    // ms: the tip fades when the pen leaves the paper, and comes back
   // When both lines are down the drawing switches on like the neon of the address: it goes dark as
   // glass, stutters on, holds, and its glow dies down until it is the white logo again. [ms after
-  // the drawing, glow, colour of the line]; until the hold the steps are sudden.
+  // the drawing, glow, colour]; until the hold the steps are sudden. In the first blink, when it
+  // goes dark, the drawn lines make way for the real logo: the swap is not seen.
   const NEON_AT = 120;
   const NEON = [[0, 0, '#fff'], [90, 0, '#4f8fa3'], [150, 1, '#e8fbff'], [190, 0, '#4f8fa3'],
     [330, 1, '#e8fbff'], [380, 0.2, '#4f8fa3'], [430, 1, '#e8fbff'], [1000, 1, '#e8fbff'], [1700, 0, '#fff']];
-  const HANDOVER = 200;   // ms: the drawing fades into the real logo
   const NS = 'http://www.w3.org/2000/svg';
   let drawing = false;
 
@@ -184,6 +184,10 @@
     const halo = el('g', { class: 'halo', filter: 'url(#ajb-glow)' }, svg);
     const tipGlow = el('circle', { class: 'tip-glow', r: 0, filter: 'url(#ajb-tip)' }, svg);
     const ink = el('g', { class: 'ink' }, svg);
+    // The real logo (ajb.svg, white, so it masks as itself), in a colour that can blink.
+    const mask = el('mask', { id: 'ajb-logo' }, defs);
+    el('image', { href: '/ajb.svg', x: 5, y: 9, width: 603, height: 781 }, mask);
+    const logo = el('rect', { class: 'logo', x: 5, y: 9, width: 603, height: 781, mask: 'url(#ajb-logo)' }, svg);
     const heat = el('g', { class: 'hot', filter: 'url(#ajb-soft)' }, svg);
     const tip = el('circle', { class: 'tip', r: 0 }, svg);
 
@@ -273,25 +277,26 @@
     };
     requestAnimationFrame(frame);
 
-    // The neon: its glow and the colour of the line, in sudden steps until the hold, then the
-    // glow dies down. Then the real logo comes back under the drawing, which fades away over it.
+    // The neon: its glow and the logo's colour, in sudden steps until the hold, then the glow dies
+    // down. In the first blink the drawn line and what is left of its trails go and the logo
+    // comes; at the end that logo is the <img>, white in the same place, and the <img> takes over.
     function switchOn() {
       const total = NEON[NEON.length - 1][0];
-      const key = (glow) => NEON.map(([ms, g, c], i) => ({
+      const key = (prop) => NEON.map(([ms, glow, colour], i) => ({
         offset: ms / total,
         easing: i < NEON.length - 2 ? 'steps(1, end)' : 'ease-in-out',
-        ...(glow ? { opacity: g } : { stroke: c }),
+        [prop]: prop === 'opacity' ? glow : colour,
       }));
-      neon.animate(key(true), { duration: total, fill: 'forwards' });
-      ink.animate(key(false), { duration: total, fill: 'forwards' });
+      neon.animate(key('opacity'), { duration: total, fill: 'forwards' });
+      logo.animate(key('fill'), { duration: total, fill: 'forwards' });
+      const swap = { duration: 1, delay: NEON[1][0], fill: 'forwards' };
+      for (const g of [ink, heat, halo]) g.animate([{ opacity: 1 }, { opacity: 0 }], swap);
+      logo.animate([{ opacity: 0 }, { opacity: 1 }], swap);
       setTimeout(() => {
         root.classList.remove('ajb-draw');
-        svg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: HANDOVER, fill: 'forwards' });
-        setTimeout(() => {
-          removeEventListener('resize', place);
-          svg.remove();
-          drawing = false;
-        }, HANDOVER);
+        removeEventListener('resize', place);
+        svg.remove();
+        drawing = false;
       }, total);
     }
   }
