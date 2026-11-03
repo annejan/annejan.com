@@ -60,6 +60,12 @@ body.home {
   transition: filter 0.4s;
 }
 #mark:hover { filter: drop-shadow(0 0 12px var(--glow, var(--cyan))); }
+/* The monogram drawing itself (fx/ajb-draw.js): the <img> keeps its place, invisible, and the
+   drawing lies over it, outside the fading card, until the real logo takes over. */
+html.ajb-draw #mark { visibility: hidden; }
+.mark-draw { position: absolute; z-index: 5; overflow: visible; pointer-events: none; }
+.mark-draw path { fill: none; stroke: var(--fg); stroke-linecap: round; stroke-linejoin: round; }
+
 #mark.boing { animation: boing 0.4s ease; }
 @keyframes boing {
   30% { transform: scale(1.12, 0.88); }

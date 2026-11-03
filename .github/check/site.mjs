@@ -32,8 +32,9 @@ const ELSEWHERE = ['/40/', '/media/360/', '/media/The%20Badge%20Is%20the%20Demo.
 // Whole directories of it: the local copies of the talks.
 const ELSEWHERE_DIRS = ['/media/talks/'];
 const isElsewhere = (path) => ELSEWHERE.includes(path) || ELSEWHERE_DIRS.some((d) => path.startsWith(d));
-// Anchors that a script answers, not an id: annejan.com/#demo starts the demo (site.js).
-const SCRIPTED = ['/#demo'];
+// Anchors that a script answers, not an id: annejan.com/#demo starts the demo (site.js), #draw
+// draws the monogram (fx/ajb-draw.js).
+const SCRIPTED = ['/#demo', '/#draw'];
 
 // The Content-Security-Policy .htaccess sets for a path: the first <If "%{REQUEST_URI} =~ m#..#">
 // block that matches it. The test server sends none of its own. Over plain http (the test
@@ -221,6 +222,18 @@ console.log('Easter eggs');
   await page.waitForTimeout(3500);
   check(await page.locator('img[src="/fx/badger-snake.webp"]').count() === 1, 'the badger comes up after a long hover on Badge.Team');
   check(errors.length === 0, `the home page, after all that: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
+  await page.close();
+}
+
+console.log('Monogram');
+{
+  // annejan.com/#draw: the monogram draws itself (fx/ajb-draw.js), and the <img> is back afterwards.
+  const { page, errors } = await open('/#draw');
+  await page.waitForTimeout(800);
+  check(await page.locator('svg.mark-draw').count() === 1, '#draw: the monogram draws itself');
+  await page.waitForTimeout(2500);
+  check(await page.locator('svg.mark-draw').count() === 0 && await page.locator('#mark').isVisible(), 'and afterwards the <img> is back');
+  check(errors.length === 0, `the drawing: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
   await page.close();
 }
 

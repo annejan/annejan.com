@@ -2,6 +2,7 @@
 
 .app .lede { color: var(--fg); font-size: 20px; line-height: 1.5; margin: 0 0 16px; text-wrap: balance; }
 .made { margin-top: 40px; color: var(--muted); font-size: 12px; font-style: italic; }
+.made + .made { margin-top: 4px; }  /* the credit sits right under the first line */
 .note { color: var(--muted); font-size: 12px; }
 
 kbd {
