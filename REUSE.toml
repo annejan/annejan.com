@@ -27,6 +27,7 @@ SPDX-License-Identifier = "MIT"
 path = [
     "**.html",
     "humans.txt",
+    "README.md",
     "ajb.png",
     "ajb.svg",
     "ai-key/*.svg",
