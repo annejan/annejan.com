@@ -231,7 +231,7 @@ console.log('Monogram');
   const { page, errors } = await open('/#draw');
   await page.waitForTimeout(800);
   check(await page.locator('svg.mark-draw').count() === 1, '#draw: the monogram draws itself');
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(5500);
   check(await page.locator('svg.mark-draw').count() === 0 && await page.locator('#mark').isVisible(), 'and afterwards the <img> is back');
   check(errors.length === 0, `the drawing: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
   await page.close();

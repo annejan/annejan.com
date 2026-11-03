@@ -1,10 +1,13 @@
 // The monogram draws itself on the front page, as two pen lines like the Ai on /ai-key/: the /J
 // (up the A's diagonal, down the stem into the hook) and the 3 of the B (top bowl, its middle
 // point out to the left, which is the A's bar, back, and the bottom bowl). The lines are fitted
-// to ajb.svg; when they are done the real logo takes over. Not on every visit: on the first one
-// and then once a week (localStorage), or whenever the address ends in #draw, also when that is
-// typed while the page is open. Loaded without defer in <head>, so the <img> is hidden before the
-// first paint. Reduced motion: just the <img>.
+// to ajb.svg. The pen moves like a hand, fast on the straights and slower in the curves, with a
+// glowing tip and a hot trail that cools to white behind it. When both lines are down, the
+// drawing switches on like the neon of the address and cools off into the real logo, which then
+// takes over. Not on every visit: on the first one and then once a week (localStorage), or
+// whenever the address ends in #draw, also when that is typed while the page is open. Loaded
+// without defer in <head>, so the <img> is hidden before the first paint. Reduced motion: just
+// the <img>.
 'use strict';
 
 (function () {
@@ -26,7 +29,7 @@
 
   // The two lines, fitted to ajb.svg as smooth curves (dense points, a penalty on wobble; under
   // 2% of the logo's pixels differ): the /J in two parts and the 3 in three, each part with its
-  // own width as in the hand-drawn logo. The pen pauses only between the /J and the 3.
+  // own width as in the hand-drawn logo.
   const STROKES = [
     // the A's diagonal
     ['M44.8 421.2 C48 416.3 57.7 401.5 64.2 391.7 C70.7 381.9 77.3 372 83.9 362.3 C90.4 352.6 97 343 103.6 333.5 C110.1 323.9 116.5 314.5 123.3 305.1 C130.1 295.8 137.2 286.4 144.3 277.2 C151.3 267.9 158.5 258.7 165.7 249.5 C172.9 240.4 180.2 231.3 187.6 222.3 C195.1 213.3 202.6 204.5 210.2 195.6 C217.7 186.7 225.4 177.9 233 169.1 C240.6 160.3 248.3 151.5 256 142.8 C263.7 134.1 271.2 125.2 279.3 116.7 C287.3 108.3 295.7 100.2 304.1 92.2 C312.5 84.1 325.5 72.4 329.8 68.5', 72],
@@ -39,13 +42,114 @@
     // the B's bottom bowl, back into the stem
     ['M410.5 293 C418.4 294.4 443.1 297.6 458.2 301.3 C473.3 305 488.1 309.9 501.2 315.3 C514.3 320.7 526.9 326.6 536.9 333.8 C546.8 341.1 555.9 349.6 560.9 358.6 C565.8 367.6 567.9 378.2 566.6 387.9 C565.3 397.5 559.7 407.9 553.1 416.7 C546.5 425.6 536.6 434 527.1 441.2 C517.6 448.4 506.8 454.7 496.1 460 C485.4 465.3 474.1 469.3 462.9 472.9 C451.6 476.5 440.2 479.1 428.7 481.6 C417.2 484.2 405.5 486 394 488 C382.6 490.1 365.7 493 360 494', 70.5],
   ];
-  const BREAK_AFTER = 1;  // the /J ends with part 1
-  const START = 400;     // ms: on arrival, a moment for the page to appear
-  const SPEED = 1.3;     // units of the drawing per ms: one speed, so the time follows the length
-  const PAUSE = 120;     // ms between the two lines
-  const HANDOVER = 200;  // ms: the drawing fades into the real logo
+  // The pen's runs, the parts it draws without lifting it: [part, backwards]. The bar is drawn
+  // out to its point and back over itself, into the bottom bowl.
+  const RUNS = [[[0], [1]], [[2], [3], [3, true], [4]]];
+  const START = 400;      // ms: on arrival, a moment for the page to appear
+  const LIFT = 260;       // ms: the pen off the paper between the /J and the 3
+  // The pen moves like a hand: in a curve at PACE x (its radius)^1/3 (the two-thirds power law of
+  // hand movement), on a straight at most VMAX, to a stop at a corner, and it speeds up and slows
+  // down gradually. Speeds in units of the drawing per ms.
+  const VMAX = 2.4;
+  const PACE = 0.23;
+  const REST = 0.08;      // at a start, a stop or a corner
+  const ACCEL = 0.04;     // per ms, getting up to speed...
+  const BRAKE = 0.06;     // ...and coming to rest
+  const STEP = 4;         // units between the points the speed is worked out for
+  const ROUND = 6;        // points on either side over which a curve's radius is measured
+  // Behind the pen the line is hot, and cools to white: layers of cyan on it (units behind the
+  // pen, strength), softly blurred into each other, and a glow around it, which cool off when the
+  // pen has left the part.
+  const HOT = [[30, 0.22], [70, 0.22], [120, 0.22], [180, 0.2], [250, 0.18]];
+  const HALO = [[100, 1], [260, 0.6]];
+  const COOL = 300;       // ms
+  const TIP_OFF = 150;    // ms: the tip fades when the pen leaves the paper, and comes back
+  // When both lines are down the drawing switches on like the neon of the address: it goes dark as
+  // glass, stutters on, holds, and its glow dies down until it is the white logo again. [ms after
+  // the drawing, glow, colour of the line]; until the hold the steps are sudden.
+  const NEON_AT = 120;
+  const NEON = [[0, 0, '#fff'], [90, 0, '#4f8fa3'], [150, 1, '#e8fbff'], [190, 0, '#4f8fa3'],
+    [330, 1, '#e8fbff'], [380, 0.2, '#4f8fa3'], [430, 1, '#e8fbff'], [1000, 1, '#e8fbff'], [1700, 0, '#fff']];
+  const HANDOVER = 200;   // ms: the drawing fades into the real logo
   const NS = 'http://www.w3.org/2000/svg';
   let drawing = false;
+
+  function el(name, attrs, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    parent.append(e);
+    return e;
+  }
+
+  // Plan one run: the points the pen passes, its speed at each (the limit there, then no faster
+  // than it can speed up to or slow down from), and so the time at each. Adds a phase per part:
+  // the times and, at each, how far along its path the pen is. Returns when the run ends.
+  function plan(run, t0, phases) {
+    const p = [];
+    const parts = [];
+    for (const [j, [part, back]] of run.entries()) {
+      const n = Math.ceil(part.len / STEP);
+      const ss = [];
+      for (let k = 0; k <= n; k++) {
+        const s = (part.len * (back ? n - k : k)) / n;
+        ss.push(s);
+        if (j && !k) continue;  // the joint is the previous part's last point
+        const q = part.ink.getPointAtLength(s);
+        p.push([q.x, q.y]);
+      }
+      parts.push({ part, back, ss, from: p.length - 1 - n });
+    }
+    const N = p.length;
+    const dist = (a, b) => Math.hypot(p[b][0] - p[a][0], p[b][1] - p[a][1]);
+    const dir = (a, b) => Math.atan2(p[b][1] - p[a][1], p[b][0] - p[a][0]);
+    const turn = (a, b, c) => {
+      const d = dir(b, c) - dir(a, b);
+      return Math.abs(d - Math.round(d / (2 * Math.PI)) * 2 * Math.PI);
+    };
+    const bend = p.map((_, k) => (k && k < N - 1 ? turn(k - 1, k, k + 1) : 0));
+    const v = p.map((_, k) => {
+      let a = 0;
+      let l = 0;
+      for (let j = Math.max(1, k - ROUND); j <= Math.min(N - 2, k + ROUND); j++) {
+        a += bend[j];
+        l += dist(j, j + 1);
+      }
+      const curve = a > 1e-6 ? PACE * Math.cbrt(l / a) : VMAX;
+      const corner = k >= 2 && k < N - 2 ? VMAX * ((1 + Math.cos(turn(k - 2, k, k + 2))) / 2) ** 3 : VMAX;
+      return Math.max(REST, Math.min(VMAX, curve, corner));
+    });
+    v[0] = v[N - 1] = REST;
+    for (let k = 1; k < N; k++) v[k] = Math.min(v[k], Math.sqrt(v[k - 1] ** 2 + 2 * ACCEL * dist(k - 1, k)));
+    for (let k = N - 2; k >= 0; k--) v[k] = Math.min(v[k], Math.sqrt(v[k + 1] ** 2 + 2 * BRAKE * dist(k, k + 1)));
+    const time = [t0];
+    for (let k = 1; k < N; k++) time.push(time[k - 1] + (2 * dist(k - 1, k)) / (v[k - 1] + v[k]));
+    for (const { part, back, ss, from } of parts) phases.push({ part, back, ss, ts: time.slice(from, from + ss.length) });
+    return time[N - 1];
+  }
+
+  // How far along its path the pen is in a phase at time t.
+  function along(ph, t) {
+    const { ts, ss } = ph;
+    if (t >= ts[ts.length - 1]) return ss[ss.length - 1];
+    let lo = 0;
+    let hi = ts.length - 1;
+    while (hi - lo > 1) {
+      const m = (lo + hi) >> 1;
+      if (ts[m] <= t) lo = m;
+      else hi = m;
+    }
+    return ss[lo] + ((ss[hi] - ss[lo]) * (t - ts[lo])) / (ts[hi] - ts[lo]);
+  }
+
+  // The hot stretch of a part, as [start, length] along its path: the last T units the pen went
+  // over it. Back over the bar that is first both ways around its point, then behind the pen.
+  function hot(part, T) {
+    if (!part.back) return [part.s - T, T];
+    const b = part.len - part.s;
+    if (b >= T) return [part.s, T];
+    const m = Math.max(b, T - b);
+    return [part.len - m, m];
+  }
 
   function draw(lead) {
     const img = document.getElementById('mark');
@@ -53,37 +157,143 @@
     drawing = true;
     root.classList.add('ajb-draw');  // style.css: the <img> waits, invisible, in its place
 
-    // Over the <img>, outside the card: the card fades in, the pen stays bright white.
-    const r = img.getBoundingClientRect();
+    // Over the <img>, outside the card: the card fades in, the pen stays bright white. It follows
+    // the <img> when the window changes size.
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '5 9 603 781');
     svg.setAttribute('class', 'mark-draw');
     svg.setAttribute('aria-hidden', 'true');
-    Object.assign(svg.style, { left: r.left + scrollX + 'px', top: r.top + scrollY + 'px', width: r.width + 'px', height: r.height + 'px' });
+    const place = () => {
+      const r = img.getBoundingClientRect();
+      Object.assign(svg.style, { left: r.left + scrollX + 'px', top: r.top + scrollY + 'px', width: r.width + 'px', height: r.height + 'px' });
+    };
+    place();
+    addEventListener('resize', place);
     document.body.append(svg);
 
-    let at = START - lead;
-    for (const [i, [d, width]] of STROKES.entries()) {
-      const pen = document.createElementNS(NS, 'path');
-      pen.setAttribute('d', d);
-      svg.append(pen);
-      const len = pen.getTotalLength();
-      const ms = len / SPEED;
-      Object.assign(pen.style, { strokeWidth: `${width}px`, strokeDasharray: `${len} ${len}`, strokeDashoffset: `${len}` });
-      pen.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: ms, delay: at, easing: 'cubic-bezier(0.45, 0, 0.55, 1)', fill: 'forwards' });
-      // A round cap shows even on an empty dash: each part stays hidden until its turn.
-      pen.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: at, fill: 'both' });
-      at += ms + (i === BREAK_AFTER ? PAUSE : 0);
+    // Blurs for the glows, over the whole drawing (a glow around the bar is wider than the bar's
+    // own box) and around the tip.
+    const defs = el('defs', {}, svg);
+    for (const [id, sd] of [['ajb-soft', 7], ['ajb-glow', 14], ['ajb-bloom', 32]]) {
+      el('feGaussianBlur', { stdDeviation: sd }, el('filter', { id, filterUnits: 'userSpaceOnUse', x: -150, y: -150, width: 900, height: 1080 }, defs));
     }
-    // The real logo comes back under the drawing, and the drawing fades away over it.
-    setTimeout(() => {
-      root.classList.remove('ajb-draw');
-      svg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: HANDOVER, fill: 'forwards' });
+    el('feGaussianBlur', { stdDeviation: 18 }, el('filter', { id: 'ajb-tip', x: '-200%', y: '-200%', width: '500%', height: '500%' }, defs));
+    const neon = el('g', { class: 'neon' }, svg);
+    const near = el('g', { filter: 'url(#ajb-glow)' }, neon);
+    const far = el('g', { class: 'far', filter: 'url(#ajb-bloom)' }, neon);
+    const halo = el('g', { class: 'halo', filter: 'url(#ajb-glow)' }, svg);
+    const tipGlow = el('circle', { class: 'tip-glow', r: 0, filter: 'url(#ajb-tip)' }, svg);
+    const ink = el('g', { class: 'ink' }, svg);
+    const heat = el('g', { class: 'hot', filter: 'url(#ajb-soft)' }, svg);
+    const tip = el('circle', { class: 'tip', r: 0 }, svg);
+
+    const parts = STROKES.map(([d, w]) => {
+      const part = { w, s: 0, drawn: 0, fade: 0, back: false, started: false, trails: [] };
+      part.ink = el('path', { d, 'stroke-width': w }, ink);
+      part.len = part.ink.getTotalLength();
+      part.ink.style.strokeDasharray = `${part.len} ${part.len}`;
+      for (const [T, k] of HOT) part.trails.push({ T, k, el: el('path', { d, 'stroke-width': w }, heat) });
+      for (const [T, k] of HALO) part.trails.push({ T, k, el: el('path', { d, 'stroke-width': w * 1.6 }, halo) });
+      el('path', { d, 'stroke-width': w * 1.25 }, near);
+      el('path', { d, 'stroke-width': w * 1.8 }, far);
+      return part;
+    });
+
+    const phases = [];
+    let end = START - lead;
+    for (const [i, run] of RUNS.entries()) {
+      end = plan(run.map(([n, back]) => [parts[n], !!back]), end + (i ? LIFT : 0), phases);
+    }
+
+    // Each frame: the lines as far as the pen has come, the hot trails, and the tip. The clock
+    // runs in frames, at most 50 ms each, so a hidden tab pauses the pen rather than skip it.
+    let t = 0;
+    let last = null;
+    let lit = false;
+    const frame = (now) => {
+      t += last === null ? 0 : Math.min(now - last, 50);
+      last = now;
+      let pen = null;
+      let alpha = 0;
+      for (const [i, ph] of phases.entries()) {
+        const t0 = ph.ts[0];
+        const t1 = ph.ts[ph.ts.length - 1];
+        const part = ph.part;
+        if (t < t0) {
+          // The pen comes down on the paper: the tip fades in where it will start.
+          if (!pen && t > t0 - TIP_OFF && (!i || phases[i - 1].ts.at(-1) < t0)) {
+            pen = [ph, ph.ss[0]];
+            alpha = 1 - (t0 - t) / TIP_OFF;
+          }
+          break;
+        }
+        part.s = along(ph, t);
+        part.back = ph.back;
+        if (!ph.back) part.drawn = part.s;
+        part.started = true;
+        part.fade = t < t1 ? 1 : Math.max(0, 1 - (t - t1) / COOL);
+        if (t < t1) {
+          pen = [ph, part.s];
+          alpha = 1;
+        } else if (!phases[i + 1] || phases[i + 1].ts[0] > t1) {
+          // The pen leaves the paper: the tip fades where it stopped.
+          pen = [ph, part.s];
+          alpha = Math.max(0, 1 - (t - t1) / TIP_OFF);
+        }
+      }
+      for (const part of parts) {
+        part.ink.style.visibility = part.started ? 'visible' : 'hidden';
+        part.ink.style.strokeDashoffset = part.len - part.drawn;
+        for (const tr of part.trails) {
+          tr.el.style.visibility = part.fade > 0 ? 'visible' : 'hidden';
+          if (!(part.fade > 0)) continue;
+          const [a, w] = hot(part, tr.T);
+          tr.el.style.strokeDasharray = `${w} ${part.len + tr.T}`;
+          tr.el.style.strokeDashoffset = -a;
+          tr.el.style.opacity = tr.k * part.fade;
+        }
+      }
+      if (pen && alpha > 0) {
+        const [ph, s] = pen;
+        const q = ph.part.ink.getPointAtLength(s);
+        for (const [c, rr] of [[tip, ph.part.w / 2], [tipGlow, ph.part.w * 0.75]]) {
+          c.setAttribute('cx', q.x);
+          c.setAttribute('cy', q.y);
+          c.setAttribute('r', rr);
+          c.style.opacity = alpha;
+        }
+      } else {
+        tip.style.opacity = tipGlow.style.opacity = 0;
+      }
+      if (!lit && t >= end + NEON_AT) {
+        lit = true;
+        switchOn();
+      }
+      if (t < end + COOL) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+
+    // The neon: its glow and the colour of the line, in sudden steps until the hold, then the
+    // glow dies down. Then the real logo comes back under the drawing, which fades away over it.
+    function switchOn() {
+      const total = NEON[NEON.length - 1][0];
+      const key = (glow) => NEON.map(([ms, g, c], i) => ({
+        offset: ms / total,
+        easing: i < NEON.length - 2 ? 'steps(1, end)' : 'ease-in-out',
+        ...(glow ? { opacity: g } : { stroke: c }),
+      }));
+      neon.animate(key(true), { duration: total, fill: 'forwards' });
+      ink.animate(key(false), { duration: total, fill: 'forwards' });
       setTimeout(() => {
-        svg.remove();
-        drawing = false;
-      }, HANDOVER);
-    }, at);
+        root.classList.remove('ajb-draw');
+        svg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: HANDOVER, fill: 'forwards' });
+        setTimeout(() => {
+          removeEventListener('resize', place);
+          svg.remove();
+          drawing = false;
+        }, HANDOVER);
+      }, total);
+    }
   }
 
   // On arrival the pen waits a moment (START); asked for later, it starts almost at once.

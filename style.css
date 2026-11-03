@@ -64,7 +64,15 @@ body.home {
    drawing lies over it, outside the fading card, until the real logo takes over. */
 html.ajb-draw #mark { visibility: hidden; }
 .mark-draw { position: absolute; z-index: 5; overflow: visible; pointer-events: none; }
-.mark-draw path { fill: none; stroke: var(--fg); stroke-linecap: round; stroke-linejoin: round; }
+.mark-draw path { fill: none; stroke-linejoin: round; }
+.mark-draw .ink { stroke: var(--fg); stroke-linecap: round; }
+/* The hot trail behind the pen, its glow, the glowing tip, and at the end the whole line as a
+   neon tube, all in the neon's cyan. */
+.mark-draw .hot, .mark-draw .halo, .mark-draw .neon { stroke: var(--cyan); }
+.mark-draw .neon { stroke-linecap: round; opacity: 0; }
+.mark-draw .neon .far { opacity: 0.55; }
+.mark-draw .tip { fill: #fff; opacity: 0; }
+.mark-draw .tip-glow { fill: var(--cyan); opacity: 0; }
 
 #mark.boing { animation: boing 0.4s ease; }
 @keyframes boing {
