@@ -4,10 +4,10 @@
 // to ajb.svg. The pen moves like a hand, fast on the straights and slower in the curves, with a
 // glowing tip and a hot trail that cools to white behind it. When both lines are down, the
 // drawing switches on like the neon of the address; in its first blink the lines make way for
-// the real logo, which stutters on and cools off to white. Not on every visit: on the first one
-// and then once a week (localStorage), or whenever the address ends in #draw, also when that is
-// typed while the page is open. Loaded without defer in <head>, so the <img> is hidden before the
-// first paint. Reduced motion: just the <img>.
+// the real logo, which stutters on and cools off to white. Not on every visit, and not on the
+// first: that one starts the clock, and then it draws once a week (localStorage); and whenever
+// the address ends in #draw, also when that is typed while the page is open. Loaded without defer
+// in <head>, so the <img> is hidden before the first paint. Reduced motion: just the <img>.
 'use strict';
 
 (function () {
@@ -16,14 +16,15 @@
   const WEEK = 7 * 24 * 3600 * 1000;
   const root = document.documentElement;
 
-  // Due: asked for with #draw, or the last drawing was a week ago (or never). No storage: only #draw.
+  // Due: asked for with #draw, or the last drawing (or the first visit) was a week ago. The first
+  // visit only starts the clock: the logo is just there. No storage: only #draw.
   function due() {
     if (location.hash === '#draw') return true;
     try {
       const last = Number(localStorage.getItem('ajb-drawn-at')) || 0;
-      if (Date.now() - last < WEEK) return false;
+      if (last && Date.now() - last < WEEK) return false;
       localStorage.setItem('ajb-drawn-at', String(Date.now()));
-      return true;
+      return last > 0;
     } catch (e) { return false; }
   }
 
