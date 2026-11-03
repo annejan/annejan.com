@@ -33,8 +33,8 @@ const ELSEWHERE = ['/40/', '/media/360/', '/media/The%20Badge%20Is%20the%20Demo.
 const ELSEWHERE_DIRS = ['/media/talks/'];
 const isElsewhere = (path) => ELSEWHERE.includes(path) || ELSEWHERE_DIRS.some((d) => path.startsWith(d));
 // Anchors that a script answers, not an id: annejan.com/#demo starts the demo (site.js), #draw
-// draws the monogram (fx/ajb-draw.js).
-const SCRIPTED = ['/#demo', '/#draw'];
+// draws the monogram (fx/ajb-draw.js), #trace starts the tracing game (fx/trace.js).
+const SCRIPTED = ['/#demo', '/#draw', '/#trace'];
 
 // The Content-Security-Policy .htaccess sets for a path: the first <If "%{REQUEST_URI} =~ m#..#">
 // block that matches it. The test server sends none of its own. Over plain http (the test
@@ -234,6 +234,47 @@ console.log('Monogram');
   await page.waitForTimeout(5500);
   check(await page.locator('svg.mark-draw').count() === 0 && await page.locator('#mark').isVisible(), 'and afterwards the <img> is back');
   check(errors.length === 0, `the drawing: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
+  await page.close();
+}
+
+console.log('Trace the AJB');
+{
+  // fx/trace.js: holding the monogram starts the game (and is not a click: no neon), a drawing
+  // along the logo is scored, Esc ends it; "trace" typed and annejan.com/#trace start it too.
+  const { page, errors } = await open('/');
+  await page.waitForTimeout(3200);
+  const box = await page.locator('#mark').boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(800);
+  await page.mouse.up();
+  await page.waitForTimeout(400);
+  check(await page.locator('canvas.trace').count() === 1 && await page.locator('#card .www.lit').count() === 0,
+    'holding the monogram starts the game, and is no click');
+  // The A's diagonal and the stem, from the drawing's own coordinates (ajb.svg's viewBox 5 9 603 781).
+  const at = ([u, v]) => [box.x + ((u - 5) * box.width) / 603, box.y + ((v - 9) * box.height) / 781];
+  for (const line of [[[45, 421], [190, 220], [330, 68]], [[330, 68], [340, 300], [348, 520], [330, 715], [270, 751], [151, 642]]]) {
+    await page.mouse.move(...at(line[0]));
+    await page.mouse.down();
+    for (const q of line.slice(1)) await page.mouse.move(...at(q), { steps: 12 });
+    await page.mouse.up();
+  }
+  await page.waitForTimeout(2200);
+  const score = await page.locator('.trace-say b').textContent().catch(() => null);
+  check(/^\d+%$/.test(score || '') && parseInt(score, 10) > 20 && parseInt(score, 10) < 90, `the /J alone is scored, but not lit (${score})`);
+  await page.waitForTimeout(4000);
+  check(await page.locator('canvas.trace').count() === 0 && await page.evaluate(() => !document.documentElement.classList.contains('ajb-trace')),
+    'and afterwards the logo is back');
+  await page.keyboard.type('trace');
+  await page.waitForTimeout(500);
+  const typed = await page.locator('canvas.trace').count() === 1;
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(800);
+  check(typed && await page.locator('canvas.trace').count() === 0, 'typing "trace" starts it, Esc ends it');
+  await page.goto(BASE + '/#trace');
+  await page.waitForTimeout(1500);
+  check(await page.locator('canvas.trace').count() === 1, 'annejan.com/#trace starts it');
+  check(errors.length === 0, `the tracing game: no errors${errors.length ? `: ${errors.join('; ')}` : ''}`);
   await page.close();
 }
 

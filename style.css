@@ -75,6 +75,64 @@ html.ajb-draw #mark { visibility: hidden; }
 .mark-draw .tip { fill: #fff; opacity: 0; }
 .mark-draw .tip-glow { fill: var(--cyan); opacity: 0; }
 
+/* Trace the AJB (fx/trace.js): the logo a faint guide, a canvas over it to draw on with a neon pen
+   as wide as the logo's line, its tip following the pointer, and the score under it. Holding the
+   logo starts it, so no image menu or drag on a long press. */
+#mark { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; }
+html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
+.trace {
+  position: absolute;
+  z-index: 5;
+  touch-action: none;
+  cursor: none;
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 8px var(--cyan));
+  transition: opacity 0.6s;
+}
+.trace.dim { opacity: 0.5; filter: none; }
+.trace.lit { animation: trace-lit 1.2s forwards; }
+@keyframes trace-lit {
+  0%, 12%, 30%, 44% { filter: none; opacity: 0.45; }
+  8%, 22%, 38%, 100% { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 10px var(--cyan)) drop-shadow(0 0 26px var(--cyan)); opacity: 1; }
+}
+.trace.gone, .trace-say.gone { opacity: 0; }
+.trace-tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px 2px var(--cyan);
+  pointer-events: none;
+  opacity: 0;
+}
+.trace-tip.on { opacity: 0.3; }
+.trace-tip.down { opacity: 1; box-shadow: 0 0 14px 5px var(--cyan); }
+.trace-say {
+  position: absolute;
+  z-index: 6;
+  margin: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 1px;
+  color: var(--fg);
+  text-shadow: 0 0 4px var(--bg), 0 0 8px var(--bg);
+  transition: opacity 0.6s;
+}
+.trace-say b {
+  display: block;
+  font-size: 40px;
+  letter-spacing: 2px;
+  color: #e8fbff;
+  text-shadow: 0 0 2px #fff, 0 0 8px var(--cyan), 0 0 18px var(--cyan);
+}
+@media (prefers-reduced-motion: reduce) {
+  .trace.lit { animation: none; filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 10px var(--cyan)); }
+}
+
 #mark.boing { animation: boing 0.4s ease; }
 @keyframes boing {
   30% { transform: scale(1.12, 0.88); }

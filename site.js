@@ -59,10 +59,37 @@ function neonClick(colour) {
   });
 }
 
+// Trace the AJB (fx/trace.js): hold the monogram, type "trace", or annejan.com/#trace.
+const trace = () => import('/fx/trace.js').then((fx) => fx.start());
+
 // The monogram: each click makes it boing and changes its glow colour.
-// Five clicks in quick succession start the demo.
+// Five clicks in quick succession start the demo. Held for a moment: the tracing game, and
+// then the click that ends the hold is not a click.
 const mark = document.getElementById('mark');
 if (mark && !reduceMotion) {
+  let hold = null;
+  let held = false;
+  let from = null;
+  const letGo = () => { clearTimeout(hold); hold = null; };
+  mark.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    held = false;
+    from = [event.clientX, event.clientY];
+    hold = setTimeout(() => { hold = null; held = true; trace(); }, 600);
+  });
+  mark.addEventListener('pointermove', (event) => {
+    if (hold && Math.hypot(event.clientX - from[0], event.clientY - from[1]) > 10) letGo();
+  });
+  for (const type of ['pointerup', 'pointercancel', 'pointerleave']) mark.addEventListener(type, letGo);
+  mark.addEventListener('contextmenu', (event) => { if (hold || held) event.preventDefault(); });
+  mark.addEventListener('dragstart', (event) => event.preventDefault());
+  mark.addEventListener('click', (event) => {
+    if (held) {
+      held = false;
+      event.stopImmediatePropagation();
+    }
+  }, true);
+
   const glows = ['#24cafe', '#cafe24', '#d60b51', '#0080c8'];   // as fx/glows.js
   let clicks = 0;
   let resetTimer;
@@ -88,6 +115,13 @@ if (mark && !reduceMotion) {
   });
 }
 
+// annejan.com/#trace starts the tracing game, once the page has come up.
+function traceFromLink() {
+  if (location.hash === '#trace' && !reduceMotion) setTimeout(trace, 600);
+}
+traceFromLink();
+addEventListener('hashchange', traceFromLink);
+
 // annejan.com/#demo starts the demo straight away, so it can be shared as a link.
 function demoFromLink() {
   if (location.hash !== '#demo' || reduceMotion) return;
@@ -108,8 +142,10 @@ addEventListener('keydown', (event) => {
   }
 });
 
-// Typed words: "pass" unlocks the QtPass heart, "badger" and "snake" bring badge.rs over.
+// Typed words: "pass" unlocks the QtPass heart, "badger" and "snake" bring badge.rs over,
+// "trace" starts the tracing game.
 const words = {
+  trace,
   pass: () => import('/fx/unlock.js').then((fx) => fx.start()),
   badger: () => import('/fx/badge.js').then((fx) => fx.badgers()),
   snake: () => import('/fx/badge.js').then((fx) => fx.snake()),
@@ -199,6 +235,7 @@ window.ajb = {
       'ajb.unlock()        the QtPass heart',
       'ajb.badgers()       badgers',
       'ajb.snake()         a snake',
+      'ajb.trace()         trace the monogram (home page)',
     ].join('\n'));
   },
   demo() { location.hash = 'demo'; },
@@ -208,6 +245,7 @@ window.ajb = {
   unlock: words.pass,
   badgers: words.badger,
   snake: words.snake,
+  trace() { if (mark) trace(); else console.log('The monogram is on the home page.'); },
 };
 
 // Something for whoever opens the developer tools.
