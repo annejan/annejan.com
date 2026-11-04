@@ -151,6 +151,15 @@ html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
   margin: 24px 0 0;
   padding: 0;
 }
+/* Text for screen readers and text-only browsers, not shown. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .social a {
   position: relative;
   display: block;
