@@ -185,6 +185,25 @@ if (badgeTeam && !reduceMotion && matchMedia('(hover: hover)').matches) {
   });
 }
 
+// Hover over the Commodore icon (CSDb) for a while and it blows bubbles (fx/bubbles.js); the
+// one with the logo in it starts the C64. Only where there is a pointer to hover with.
+const commodore = document.querySelector('.social a[href^="https://csdb.dk/"]');
+if (commodore && !reduceMotion && matchMedia('(hover: hover)').matches) {
+  let wait;
+  let stop = null;
+  commodore.addEventListener('pointerenter', () => {
+    clearTimeout(wait);
+    wait = setTimeout(() => {
+      import('/fx/bubbles.js').then((fx) => { if (commodore.matches(':hover')) stop = fx.blow(commodore); }).catch(() => {});
+    }, 1500);
+  });
+  commodore.addEventListener('pointerleave', () => {
+    clearTimeout(wait);
+    stop?.();
+    stop = null;
+  });
+}
+
 // Three minutes of nothing on the home page bring on the screensaver (fx/screensaver.js):
 // long enough not to take the page away from someone still reading it.
 if (document.getElementById('card') && !reduceMotion) {

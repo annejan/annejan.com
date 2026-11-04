@@ -41,6 +41,8 @@ const DISK = [
   { name: 'BADGE DEMO', blocks: 17, url: 'https://files.scene.org/view/parties/2017/outline17/realtime_wild/anus_badge.mp4' },
   { name: 'PENTEST AN AI', blocks: 17, url: 'https://files.scene.org/view/parties/2017/outline17/animation/pentest.mp4' },
   divider('----------------'),
+  // The best game on the C64, as Bubble Bobble C64 Remastered (Dave's Retro Forge, fan-made).
+  { name: 'BUBBLE BOBBLE', blocks: 187, url: 'https://daves-retro-forge.itch.io/bubble-bobble-c64-remastered' },
   { name: 'CREDITS', blocks: 3, credits: [
     'SITE AND AJB: ANNE JAN BROUWER',
     'PAIR PROGRAMMER: CLAUDE',

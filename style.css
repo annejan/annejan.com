@@ -262,6 +262,35 @@ html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
   text-transform: uppercase;
 }
 
+/* The bubbles from the Commodore icon (fx/bubbles.js), green as in Bubble Bobble: a ring with a
+   highlight. The one with the logo in it, cyan, starts the C64. A popped one drops a fruit and
+   its score, in the C64 screen's pixel font. */
+@font-face { font-family: 'Press Start 2P'; src: url('/fonts/PressStart2P-Regular.woff2') format('woff2'); font-display: swap; }
+.bubble {
+  --ring: 120, 230, 110;
+  position: fixed;
+  z-index: 25;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(var(--ring), 0.9);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.95) 0 7%, transparent 8%),
+    radial-gradient(circle, rgba(var(--ring), 0.08) 55%, rgba(var(--ring), 0.4));
+  box-shadow: 0 0 10px rgba(var(--ring), 0.4);
+  cursor: pointer;
+}
+.bubble svg { width: 52%; height: 52%; fill: #fff; }
+.bubble.load { --ring: 36, 202, 254; border-color: #fff; box-shadow: 0 0 16px rgba(var(--ring), 0.8); }
+.bubble-fruit, .bubble-score, .bubble-fish { position: fixed; z-index: 25; pointer-events: none; }
+.bubble-fish { overflow: visible; }
+.bubble-fruit { font-size: 28px; line-height: 1; }
+.bubble-score {
+  color: #fff;
+  font: 12px 'Press Start 2P', monospace;
+  text-shadow: 2px 2px 0 #6c5eb5;
+}
+
 body.leaving { background-color: var(--fg); }
 body.leaving .social li, body.leaving .www, body.leaving .tag {
   opacity: 0;
