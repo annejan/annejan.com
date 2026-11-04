@@ -170,6 +170,11 @@
       if (!plain(event) || going) return;
       event.preventDefault();
       going = true;
+      // The page downloads during the show, so it is there when the show ends.
+      const next = document.createElement('link');
+      next.rel = 'prefetch';
+      next.href = link.href;
+      document.head.append(next);
       (t.portal ? portal : t.key ? key : zoom)(link, t, link.href);
     });
   });
