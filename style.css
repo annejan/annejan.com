@@ -210,6 +210,10 @@ html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
   line-height: 1.1;
   white-space: nowrap;
 }
+/* site.js justifies these lines on a wide screen (.justified); no spacing after the last
+   letter, also once the neon has split the address into one span per letter. */
+#card .justified { white-space: nowrap; }
+#card .end, #card .www.justified span:last-child { letter-spacing: 0; }
 /* Once the monogram is clicked, site.js turns it into a neon tube (.lit): a white-hot core
    in a glow, which now and then stutters, like a tube that's not quite warmed up, and a
    longer timeline on top: a bad letter, a drift through the monogram's colours, a power

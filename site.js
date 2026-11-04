@@ -209,6 +209,43 @@ document.addEventListener('visibilitychange', () => {
   document.title = document.hidden ? `${back} · AJB` : title;
 });
 
+// On a wide screen the name, the title, www.annejan.com and the line under it are justified:
+// their letters spread out until each line fills its box, so all end where the column of
+// icons ends. The last letter gets no spacing after it (.end), so it sits right on the edge.
+const lines = [...document.querySelectorAll('#card h1, #card h2, #card .www, #card .tag')];
+const wide = matchMedia('(min-width: 561px)');
+for (const el of lines) {
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  let last = null;
+  while (walk.nextNode()) if (walk.currentNode.data.trim()) last = walk.currentNode;
+  if (!last) continue;
+  const end = document.createElement('span');
+  end.className = 'end';
+  end.textContent = last.data.slice(-1);
+  last.data = last.data.slice(0, -1);
+  last.after(end);
+}
+function justify() {
+  for (const el of lines) {
+    el.classList.remove('justified');
+    el.style.letterSpacing = '';
+    if (!wide.matches) continue;
+    el.classList.add('justified');
+    el.style.letterSpacing = '0px';
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const gaps = [...el.textContent].length - 1;
+    const space = (el.clientWidth - range.getBoundingClientRect().width) / gaps;
+    if (space >= 1) el.style.letterSpacing = `${space}px`;
+    else { el.classList.remove('justified'); el.style.letterSpacing = ''; }
+  }
+}
+if (lines.length) {
+  justify();
+  addEventListener('resize', justify);
+  document.fonts?.ready.then(justify);
+}
+
 // Dates: on 1 April the CV is set in Comic Sans, like the monogram (style.css, html.april);
 // at 13:37 the address on the home page goes green, and the tab reads 1337, for that minute.
 const today = new Date();
