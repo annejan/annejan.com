@@ -322,6 +322,20 @@ body.portaling #card, body.portaling .page { opacity: 1; transition: none; }
   pointer-events: none;
 }
 
+/* Next to the monogram, the name, title and icons fill the column: as tall as the monogram and
+   as wide as www.annejan.com. --u is 1px when the column is its full 412px (760 - 300 - 48),
+   and shrinks with it on narrower screens. */
+@media (min-width: 561px) {
+  #card {
+    --u: clamp(0.66px, calc((64vw - 80px) / 412), 1px);
+    align-items: center;
+  }
+  #card h1 { font-size: calc(22 * var(--u)); letter-spacing: calc(11 * var(--u)); }
+  #card h2 { font-size: calc(22 * var(--u)); letter-spacing: calc(8 * var(--u)); margin-top: calc(10 * var(--u)); }
+  .social { gap: calc(23 * var(--u)); max-width: calc(5 * 64 * var(--u) + 4 * 23 * var(--u)); margin-top: calc(36 * var(--u)); }
+  .social a { width: calc(64 * var(--u)); height: calc(64 * var(--u)); }
+}
+
 @media (max-width: 560px) {
   #card {
     grid-template-columns: 1fr;
