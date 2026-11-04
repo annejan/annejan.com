@@ -105,6 +105,12 @@ path = "logos/aidtoukraine.png"
 SPDX-FileCopyrightText = "Aid to Ukraine"
 SPDX-License-Identifier = "LicenseRef-Trademark"
 
+# The P of pouët.net's minimal logo (content.pouet.net/logos/pouet_minimal.gif), filled in.
+[[annotations]]
+path = "logos/pouet.svg"
+SPDX-FileCopyrightText = "pouët.net"
+SPDX-License-Identifier = "LicenseRef-Trademark"
+
 # Press Start 2P, used by the C64 screen: the upstream font, losslessly repacked as WOFF2
 # (every glyph as it was; only the obsolete DSIG signature, which repacking voids, is gone).
 [[annotations]]

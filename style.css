@@ -146,7 +146,7 @@ html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  max-width: calc(5 * 40px + 4 * 16px);   /* two rows of five */
+  max-width: calc(5 * 40px + 4 * 16px);   /* rows of five */
   list-style: none;
   margin: 24px 0 0;
   padding: 0;
@@ -179,6 +179,7 @@ html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
 .icon.konsool { --icon: url(/logos/konsool.png); }
 .icon.portals { --icon: url(/logos/portals.png); }
 .icon.tic80 { --icon: url(/logos/tic80.png); }
+.icon.pouet { --icon: url(/logos/pouet.svg); }
 .social a:hover :is(svg, .icon), .social a:focus-visible :is(svg, .icon) {
   color: var(--cyan);
   transform: scale(1.5);
