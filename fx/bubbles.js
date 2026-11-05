@@ -1,62 +1,64 @@
-// Hover over the Commodore icon on the home page for a while (site.js) and a bubble dragon comes
-// up and blows bubbles, a nod to Bubble Bobble, the best game on the C64. Mostly a green or a blue
-// dragon, now and then the ghost whale that comes for you when you take too long on a level.
-// The bubbles rise up the window and pop when clicked; the one with the Commodore logo in it
-// starts the C64 (c64.js), so the C64 is there without the Konami code. When the pointer leaves
-// the icon it stops blowing, and the bubbles already out keep rising for a few seconds, so there
-// is still time to catch one. Popping any other bubble lets a fruit fall out and scores, as in
-// the game (but drawn with plain emoji).
+// Hover over the Commodore icon on the home page for a while (site.js) and a derp bubble dragon
+// comes up and blows bubbles, a nod to Bubble Bobble, the best game on the C64. Mostly a green or
+// a blue dragon, now and then a derp skeleton whale. The bubbles rise up the window and pop when
+// clicked; the one with the Commodore logo in it starts the C64 (c64.js), so the C64 is there
+// without the Konami code. When the pointer leaves the icon it stops blowing, and the bubbles
+// already out keep rising for a few seconds, so there is still time to catch one. Popping any
+// other bubble lets a fruit fall out and scores, as in the game (but drawn with plain emoji).
 
 const EVERY = 380;   // ms between bubbles
 const LOAD_EVERY = 6; // every sixth bubble (and the first) carries the logo
 const PX = 4;        // screen pixels to one sprite pixel
 
-// The blowers: C64-style sprites in the C64 palette, drawn for this page (not ripped from the
-// game). All face left and blow from their mouth; `mouth` is in sprite pixels.
+// The blowers: derp C64-style sprites in the C64 palette, drawn for this page. All face left and
+// blow from their mouth; `mouth` is in sprite pixels.
 const DRAGON = [
-  '.....KKKK..........',
-  '...KKGGGGKK.K......',
-  '..KGGGGGGGGKDK.....',
-  '.KGGWWWGGGGKDDK....',
-  '.KGWWWKKGGGGKDK....',
-  'KGGWWWKKGGGGGKDK...',
-  'KGGGWWWGGGGGGKDDK..',
-  'KGKGGGGGGGGGGGKDK..',
-  'KGGGGGGGGGGGGGGKK..',
-  '.KKKKKGGGYYGGGGDK..',
-  '..KGGGGYYYYYGGGDK..',
-  '..KGGKYYYYYYGGGGKKK',
-  '...KKYYYYYYYGGGGGDK',
-  '....KYYYYYYGGGKKKK.',
-  '.....KGGKKKGGK.....',
-  '....KDDDK.KDDDK....',
-  '....KKKKK.KKKKK....',
+  '.....KKKK..KKKK.........',
+  '....KWWWWKKWWWWK........',
+  '...KWWWWWWKWWWWWK.......',
+  '...KWKKWWWKWWWKKWK..K...',
+  '...KWKKWWWKWWWKKWK.KDK..',
+  '...KWWWWWWKWWWWWWKKDDK..',
+  '..KGKWWWWKGKWWWWKGGKDK..',
+  '.KGGGKKKKGGGKKKKGGGGKDK.',
+  'KGGGGGGGGGGGGGGGGGGGKDK.',
+  'KGKGGGGGGGGGGGGGGGGGGKK.',
+  'KGGGGGGGGGGGGGGGGGGGGDK.',
+  '.KKKKKKKKKKGGGGGGGGGGDK.',
+  '.KWKRRRRK.KGGYYYYGGGDK..',
+  '..KKRRRK..KGYYYYYYGGDKKK',
+  '....KKK..KGGYYYYYYGGDDDK',
+  '........KGGGYYYYYYGGGKK.',
+  '........KGGGGYYYYGGGK...',
+  '.........KDDKKKKKDDK....',
+  '........KDDDK...KDDDK...',
+  '........KKKKK...KKKKK...',
 ];
-const WHALE = [
-  '.......KKKKKKK..........',
-  '.....KKWWWWWWWKK........',
-  '....KWWWWWWWWWWWKK....KK',
-  '...KWWWWWWWKKWWWWWK..KWK',
-  '..KWWKKKKKKWWWWWWWWKKWWK',
-  '.KWWWKWWRRKWWWWWWWWWWWK.',
-  '.KWWWKWRRRKWWWWWWWWWWWK.',
-  'KWWWWWKKKKWWWWWWWWWWWK..',
-  'KWWWWWWWWWWWWWWWWWWWLK..',
-  'KKKKKKKKKKWWWWWWWWWLK...',
-  'KWKWKWKWKKKWWWWWWWLLK...',
-  '.KLLLLLLLLKKWWWWLLLK....',
-  '..KKLLLLLLLLLLLLLKK.....',
-  '....KKKKKKKKKKKKKK......',
+const SKELETON = [
+  '....KKKKKKKKK.................',
+  '..KKWWWWWWWWWKK...............',
+  '.KWWWWWWWWWWWWWKK...........KK',
+  'KWWKKKKWWWWKKKKWWK.........KWK',
+  'KWKWWWWKWWKWWWWKWWK.......KWK.',
+  'KWKWWWWKWWKWKKWKWWWKKKKKKKWK..',
+  'KWKKKWWKWWKWKKWKWWWWKWWKWWK...',
+  'KWKKKWWKWWWKKKKWWWWKKKKKKKWK..',
+  'KWWKKKKWWWWWWWWWWWKKWK.KWK.KWK',
+  'KKKKKKKKKKWWWWWWWK.KWK.KWK..KK',
+  'KWKWWKWKWKKWWWWWK..KWK.KWK....',
+  '.KWKWWKWKKKWWWWK....K...K.....',
+  '..KK..KK..KKKKK...............',
 ];
 const C64 = { black: '#000000', white: '#ffffff', green: '#588d43', lightGreen: '#9ad284',
-  yellow: '#b8c76f', blue: '#352879', lightBlue: '#6c5eb5', grey: '#959595', red: '#9a6759' };
+  yellow: '#b8c76f', blue: '#352879', lightBlue: '#6c5eb5' };
+const TONGUE = '#d25050';
 const BLOWERS = [
-  { weight: 4, map: DRAGON, mouth: [0, 7.5],
-    ink: { K: C64.black, W: C64.white, G: C64.lightGreen, D: C64.green, Y: C64.yellow } },
-  { weight: 4, map: DRAGON, mouth: [0, 7.5],
-    ink: { K: C64.black, W: C64.white, G: C64.lightBlue, D: C64.blue, Y: C64.yellow } },
-  { weight: 2, map: WHALE, mouth: [0, 9.5],
-    ink: { K: C64.black, W: C64.white, L: C64.grey, R: '#d03c3c' } },
+  { weight: 4, map: DRAGON, mouth: [1, 12.5],
+    ink: { K: C64.black, W: C64.white, G: C64.lightGreen, D: C64.green, Y: C64.yellow, R: TONGUE } },
+  { weight: 4, map: DRAGON, mouth: [1, 12.5],
+    ink: { K: C64.black, W: C64.white, G: C64.lightBlue, D: C64.blue, Y: C64.yellow, R: TONGUE } },
+  { weight: 2, map: SKELETON, mouth: [0, 9.5],
+    ink: { K: C64.black, W: C64.white } },
 ];
 const FRUIT = [['🍒', 100], ['🍌', 200], ['🍓', 500], ['🍉', 1000], ['💎', 5000]];
 let blowing = null;
