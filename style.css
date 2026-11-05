@@ -282,8 +282,8 @@ html.ajb-trace #mark { opacity: 0.16; transition: opacity 0.4s; }
 }
 .bubble svg { width: 52%; height: 52%; fill: #fff; }
 .bubble.load { --ring: 36, 202, 254; border-color: #fff; box-shadow: 0 0 16px rgba(var(--ring), 0.8); }
-.bubble-fruit, .bubble-score, .bubble-fish { position: fixed; z-index: 25; pointer-events: none; }
-.bubble-fish { overflow: visible; }
+.bubble-fruit, .bubble-score, .bubble-blower { position: fixed; z-index: 25; pointer-events: none; }
+.bubble-blower { overflow: visible; }
 .bubble-fruit { font-size: 28px; line-height: 1; }
 .bubble-score {
   color: #fff;

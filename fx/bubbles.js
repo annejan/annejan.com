@@ -1,28 +1,63 @@
-// Hover over the Commodore icon on the home page for a while (site.js) and a pixel fish comes up
-// and blows bubbles, a nod to Bubble Bobble, the best game on the C64. They rise up the window and pop when clicked;
-// the one with the Commodore logo in it starts the C64 (c64.js), so the C64 is there without
-// the Konami code. When the pointer leaves the icon it stops blowing, and the bubbles already
-// out keep rising for a few seconds, so there is still time to catch one. Popping any other
-// bubble lets a fruit fall out and scores, as in the game (but drawn with plain emoji).
+// Hover over the Commodore icon on the home page for a while (site.js) and a bubble dragon comes
+// up and blows bubbles, a nod to Bubble Bobble, the best game on the C64. Mostly a green or a blue
+// dragon, now and then the ghost whale that comes for you when you take too long on a level.
+// The bubbles rise up the window and pop when clicked; the one with the Commodore logo in it
+// starts the C64 (c64.js), so the C64 is there without the Konami code. When the pointer leaves
+// the icon it stops blowing, and the bubbles already out keep rising for a few seconds, so there
+// is still time to catch one. Popping any other bubble lets a fruit fall out and scores, as in
+// the game (but drawn with plain emoji).
 
 const EVERY = 380;   // ms between bubbles
 const LOAD_EVERY = 6; // every sixth bubble (and the first) carries the logo
-// The blower: a C64-style sprite, our own pixel fish (not the game's dragons). G outline, L body,
-// W and K the eye; four screen pixels to one sprite pixel.
-const FISH = [
-  '......GGGG......',
-  '....GGLLLLGG..GG',
-  '...GLLLLLLLLGGLG',
-  '..GLWWLLLLLLLLLG',
-  '.GLLWKLLLLLLLGLG',
-  'GLLLLLLLLLLLG.GG',
-  '.GLLLLLLLLLLLGLG',
-  '..GLLLLLLLLLGGLG',
-  '...GGLLLLLGG..GG',
-  '.....GGGGGG.....',
+const PX = 4;        // screen pixels to one sprite pixel
+
+// The blowers: C64-style sprites in the C64 palette, drawn for this page (not ripped from the
+// game). All face left and blow from their mouth; `mouth` is in sprite pixels.
+const DRAGON = [
+  '.....KKKK..........',
+  '...KKGGGGKK.K......',
+  '..KGGGGGGGGKDK.....',
+  '.KGGWWWGGGGKDDK....',
+  '.KGWWWKKGGGGKDK....',
+  'KGGWWWKKGGGGGKDK...',
+  'KGGGWWWGGGGGGKDDK..',
+  'KGKGGGGGGGGGGGKDK..',
+  'KGGGGGGGGGGGGGGKK..',
+  '.KKKKKGGGYYGGGGDK..',
+  '..KGGGGYYYYYGGGDK..',
+  '..KGGKYYYYYYGGGGKKK',
+  '...KKYYYYYYYGGGGGDK',
+  '....KYYYYYYGGGKKKK.',
+  '.....KGGKKKGGK.....',
+  '....KDDDK.KDDDK....',
+  '....KKKKK.KKKKK....',
 ];
-const INK = { G: '#588d43', L: '#9ad284', W: '#ffffff', K: '#000000' };
-const PX = 4;
+const WHALE = [
+  '.......KKKKKKK..........',
+  '.....KKWWWWWWWKK........',
+  '....KWWWWWWWWWWWKK....KK',
+  '...KWWWWWWWKKWWWWWK..KWK',
+  '..KWWKKKKKKWWWWWWWWKKWWK',
+  '.KWWWKWWRRKWWWWWWWWWWWK.',
+  '.KWWWKWRRRKWWWWWWWWWWWK.',
+  'KWWWWWKKKKWWWWWWWWWWWK..',
+  'KWWWWWWWWWWWWWWWWWWWLK..',
+  'KKKKKKKKKKWWWWWWWWWLK...',
+  'KWKWKWKWKKKWWWWWWWLLK...',
+  '.KLLLLLLLLKKWWWWLLLK....',
+  '..KKLLLLLLLLLLLLLKK.....',
+  '....KKKKKKKKKKKKKK......',
+];
+const C64 = { black: '#000000', white: '#ffffff', green: '#588d43', lightGreen: '#9ad284',
+  yellow: '#b8c76f', blue: '#352879', lightBlue: '#6c5eb5', grey: '#959595', red: '#9a6759' };
+const BLOWERS = [
+  { weight: 4, map: DRAGON, mouth: [0, 7.5],
+    ink: { K: C64.black, W: C64.white, G: C64.lightGreen, D: C64.green, Y: C64.yellow } },
+  { weight: 4, map: DRAGON, mouth: [0, 7.5],
+    ink: { K: C64.black, W: C64.white, G: C64.lightBlue, D: C64.blue, Y: C64.yellow } },
+  { weight: 2, map: WHALE, mouth: [0, 9.5],
+    ink: { K: C64.black, W: C64.white, L: C64.grey, R: '#d03c3c' } },
+];
 const FRUIT = [['🍒', 100], ['🍌', 200], ['🍓', 500], ['🍉', 1000], ['💎', 5000]];
 let blowing = null;
 const out = new Set();
@@ -31,44 +66,55 @@ const out = new Set();
 export function blow(link) {
   if (blowing) return blowing;
   document.fonts?.load('16px "Press Start 2P"').catch(() => {});
-  const fish = sprite(link);
+  const who = pick();
+  const blower = sprite(link, who);
   const mouth = () => {
-    const r = fish.getBoundingClientRect();
-    return { x: r.left, y: r.top + 5.5 * PX };
+    const r = blower.getBoundingClientRect();
+    return { x: r.left + who.mouth[0] * PX, y: r.top + who.mouth[1] * PX };
   };
   let n = 0;
-  const one = () => bubble(mouth(), n++ % LOAD_EVERY === 0);
+  const one = () => {
+    bubble(mouth(), n++ % LOAD_EVERY === 0);
+    blower.animate([{ scale: 1 }, { scale: '1.06 0.94' }, { scale: 1 }], { duration: 160 });
+  };
   one();
   const timer = setInterval(one, EVERY);
   blowing = () => {
     clearInterval(timer);
     blowing = null;
-    fish.animate([{ opacity: 1 }, { opacity: 0, scale: 0.4 }], { duration: 250 }).onfinish = () => fish.remove();
+    blower.animate([{ opacity: 1 }, { opacity: 0, scale: 0.4 }], { duration: 250 }).onfinish = () => blower.remove();
   };
   return blowing;
 }
 
-// The fish, just above and right of the icon, bobbing; it blows to the left.
-function sprite(link) {
+function pick() {
+  let roll = Math.random() * BLOWERS.reduce((sum, b) => sum + b.weight, 0);
+  return BLOWERS.find((b) => (roll -= b.weight) < 0) ?? BLOWERS[0];
+}
+
+// The blower, just above and right of the icon, bobbing; it blows to the left.
+function sprite(link, { map, ink }) {
   const ns = 'http://www.w3.org/2000/svg';
+  const cols = Math.max(...map.map((row) => row.length));
   const svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('class', 'bubble-fish');
+  svg.setAttribute('class', 'bubble-blower');
   svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('viewBox', `0 0 ${FISH[0].length} ${FISH.length}`);
+  svg.setAttribute('viewBox', `0 0 ${cols} ${map.length}`);
   svg.setAttribute('shape-rendering', 'crispEdges');
-  FISH.forEach((row, y) => [...row].forEach((c, x) => {
-    if (!INK[c]) return;
+  map.forEach((row, y) => [...row].forEach((c, x) => {
+    if (!ink[c]) return;
     const px = document.createElementNS(ns, 'rect');
-    for (const [k, v] of Object.entries({ x, y, width: 1, height: 1, fill: INK[c] })) px.setAttribute(k, v);
+    for (const [k, v] of Object.entries({ x, y, width: 1, height: 1, fill: ink[c] })) px.setAttribute(k, v);
     svg.append(px);
   }));
   const r = link.getBoundingClientRect();
-  const w = FISH[0].length * PX;
+  const w = cols * PX;
+  const h = map.length * PX;
   Object.assign(svg.style, {
     left: `${Math.min(innerWidth - w - 8, r.right - w * 0.25)}px`,
-    top: `${Math.max(8, r.top - FISH.length * PX - 6)}px`,
+    top: `${Math.max(8, r.top - h - 6)}px`,
     width: `${w}px`,
-    height: `${FISH.length * PX}px`,
+    height: `${h}px`,
   });
   document.body.append(svg);
   svg.animate([{ opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1 }], { duration: 250, easing: 'ease-out' });
